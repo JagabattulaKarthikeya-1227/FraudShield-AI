@@ -1,6 +1,6 @@
 import ReactECharts from 'echarts-for-react';
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '@/lib/apiClient';
+import { apiClient } from '@/core/api/client';
 
 export const FraudHeatmapChart = () => {
   const { data, isLoading, isError } = useQuery({

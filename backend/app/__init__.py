@@ -22,6 +22,13 @@ def create_app(config_name=None):
     register_error_handlers(app)
 
     # 3. Initialize Extensions
+    from app.core.database import db
+    from flask_migrate import Migrate
+    from app.security.jwt_manager import jwt
+    from app.api.v1 import v1_bp
+    
+    migrate = Migrate()
+    
     db.init_app(app)
     jwt.init_app(app)
     CORS(app, resources={r"/api/*": {"origins": "*"}})
