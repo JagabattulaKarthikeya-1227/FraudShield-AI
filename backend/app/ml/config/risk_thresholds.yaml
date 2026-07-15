@@ -1,0 +1,11 @@
+thresholds:
+  low_risk:
+    max_probability: 0.15
+    action: "approve"
+  review_required:
+    min_probability: 0.15
+    max_probability: 0.75
+    action: "flag"
+  high_risk:
+    min_probability: 0.75
+    action: "decline"

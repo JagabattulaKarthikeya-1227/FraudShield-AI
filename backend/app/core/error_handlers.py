@@ -1,0 +1,25 @@
+import traceback
+from flask import current_app
+from marshmallow import ValidationError as MarshmallowValidationError
+from sqlalchemy.exc import SQLAlchemyError
+from app.core.exceptions import AppError
+from app.core.responses import error_response
+
+def register_error_handlers(app):
+    @app.errorhandler(AppError)
+    def handle_app_error(e):
+        return error_response(e.message, e.errors, e.status_code)
+
+    @app.errorhandler(MarshmallowValidationError)
+    def handle_marshmallow_error(e):
+        return error_response("Validation failed", e.messages, 422)
+
+    @app.errorhandler(SQLAlchemyError)
+    def handle_db_error(e):
+        current_app.logger.error(f"Database error: {str(e)}")
+        return error_response("A database error occurred", None, 500)
+
+    @app.errorhandler(Exception)
+    def handle_generic_error(e):
+        current_app.logger.error(f"Unhandled exception: {str(e)}\n{traceback.format_exc()}")
+        return error_response("Internal server error", None, 500)

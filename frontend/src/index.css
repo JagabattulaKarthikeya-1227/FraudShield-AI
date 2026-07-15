@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+@layer base {
+  :root {
+    --background: #F8F5F2; /* Fresh Cream */
+    --foreground: #1E1E1E; /* Noir */
+    
+    --card: #FDFBF8; /* Warm Ivory */
+    --card-foreground: #1E1E1E;
+    
+    --popover: #FDFBF8;
+    --popover-foreground: #1E1E1E;
+    
+    --primary: #1E1E1E; /* Noir */
+    --primary-foreground: #F8F5F2;
+    
+    --secondary: #EBE7E0;
+    --secondary-foreground: #1E1E1E;
+    
+    --muted: #EBE7E0;
+    --muted-foreground: #6F7287; /* Storm Gray */
+    
+    --accent: #C7A66A; /* Champagne Gold */
+    --accent-foreground: #FFFFFF;
+    
+    --destructive: #D96B6B; /* Muted Coral */
+    --destructive-foreground: #FFFFFF;
+    
+    --success: #8FAF9B; /* Soft Sage */
+    --success-foreground: #FFFFFF;
+
+    --warning: #D9A441; /* Warm Amber */
+    --warning-foreground: #FFFFFF;
+
+    --border: #E8E5E1; /* Very light gray */
+    --input: #E8E5E1;
+    --ring: #C7A66A;
+    
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: #121212;
+    --foreground: #F8F5F2;
+    
+    --card: #1E1E1E;
+    --card-foreground: #F8F5F2;
+    
+    --popover: #1E1E1E;
+    --popover-foreground: #F8F5F2;
+    
+    --primary: #F8F5F2;
+    --primary-foreground: #1E1E1E;
+    
+    --secondary: #2C2C2C;
+    --secondary-foreground: #F8F5F2;
+    
+    --muted: #2C2C2C;
+    --muted-foreground: #A0A0A0;
+    
+    --accent: #C7A66A;
+    --accent-foreground: #1E1E1E;
+    
+    --destructive: #D96B6B;
+    --destructive-foreground: #FFFFFF;
+    
+    --success: #8FAF9B;
+    --success-foreground: #FFFFFF;
+
+    --warning: #D9A441;
+    --warning-foreground: #FFFFFF;
+
+    --border: #333333;
+    --input: #333333;
+    --ring: #C7A66A;
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Elegant typography hierarchy overrides for editorial look */
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+}
+
+/* Glassmorphism utilities */
+.glass {
+  background: rgba(253, 251, 248, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(232, 229, 225, 0.5);
+}
+
+.dark .glass {
+  background: rgba(30, 30, 30, 0.6);
+  border: 1px solid rgba(51, 51, 51, 0.5);
+}
