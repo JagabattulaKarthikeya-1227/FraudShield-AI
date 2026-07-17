@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # FraudShield AI
 
 <div align="center">
@@ -130,3 +131,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+=======
+# FraudShield-AI
+Explainable Hybrid Ensemble Framework for Intelligent Credit Card Fraud Detection
+>>>>>>> 72e5ede9a75f4edb2f58e417d702d2749ccb869f
