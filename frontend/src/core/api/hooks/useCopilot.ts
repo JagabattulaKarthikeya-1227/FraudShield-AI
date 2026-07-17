@@ -1,10 +1,12 @@
 import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../client';
+import { useCopilotContext } from '../../context/CopilotContext';
 
 export function useCopilotChat() {
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const copilotContext = useCopilotContext();
 
   const sendMessage = useCallback(async (query: string) => {
     setMessages(prev => [...prev, { role: 'user', content: query }]);
@@ -18,7 +20,14 @@ export function useCopilotChat() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({ 
+          query,
+          context: {
+            role: copilotContext.activeRole,
+            page: copilotContext.currentPage,
+            transactionId: copilotContext.activeTransactionId
+          }
+        }),
       });
 
       if (!response.body) throw new Error("No response body");
@@ -54,7 +63,7 @@ export function useCopilotChat() {
       console.error('Copilot Stream Error:', error);
       setIsTyping(false);
     }
-  }, []);
+  }, [copilotContext.activeRole, copilotContext.currentPage, copilotContext.activeTransactionId]);
 
   return { messages, sendMessage, isTyping };
 }

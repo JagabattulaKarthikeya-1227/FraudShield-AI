@@ -1,76 +1,132 @@
-<div align="center">
-  <img src="https://img.shields.io/badge/Status-Production_Ready-brightgreen?style=for-the-badge" alt="Status" />
-  <img src="https://img.shields.io/badge/Python-3.12-blue?style=for-the-badge&logo=python" alt="Python" />
-  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react" alt="React" />
-  <img src="https://img.shields.io/badge/Docker-Enabled-2496ED?style=for-the-badge&logo=docker" alt="Docker" />
-</div>
-
-<br />
+# FraudShield AI
 
 <div align="center">
-  <h1 align="center">FraudShield AI</h1>
-  <p align="center">
-    <strong>Enterprise-Grade Explainable Machine Learning Platform for Financial Anomaly Detection</strong>
-    <br />
-    A cloud-native MLOps architecture featuring XGBoost, SMOTE, and SHAP Explainability.
+  <img src="./frontend/public/favicon.svg" alt="FraudShield AI Logo" width="120" />
+  <br/>
+  <h3>Explainable Hybrid Ensemble Framework for Intelligent Credit Card Fraud Detection</h3>
+  
+  <p>
+    <b>A Production-Grade Demonstration of Enterprise Machine Learning & DevSecOps.</b>
+  </p>
+  
+  <p>
+    <a href="https://reactjs.org/"><img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" /></a>
+    <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind" /></a>
+    <a href="https://www.framer.com/motion/"><img src="https://img.shields.io/badge/Framer_Motion-black?style=for-the-badge&logo=framer&logoColor=blue" alt="Framer Motion" /></a>
+    <a href="https://flask.palletsprojects.com/"><img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask" /></a>
+    <a href="https://xgboost.ai/"><img src="https://img.shields.io/badge/XGBoost-1D9D58?style=for-the-badge&logo=xgboost&logoColor=white" alt="XGBoost" /></a>
+    <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" /></a>
   </p>
 </div>
 
 ---
 
-## 📖 Overview
-FraudShield AI is a full-stack financial security platform engineered to detect fraudulent transactions in real-time. Moving beyond "black-box" artificial intelligence, FraudShield integrates **SHAP (SHapley Additive exPlanations)** to provide cryptographically transparent reasoning for every prediction. 
+## 📖 Project Overview
 
-The platform boasts a comprehensive **MLOps Ecosystem** featuring Shadow Deployments (Champion vs. Challenger), Data Drift Monitoring, and interactive 3D WebGL dashboards to manage enterprise compliance (GDPR/OWASP).
+**FraudShield AI** is a comprehensive, full-stack portfolio project demonstrating the end-to-end lifecycle of an enterprise Machine Learning product. It solves the complex problem of **Credit Card Fraud Detection** in highly imbalanced datasets (0.1% positive class) by utilizing a Stacking Ensemble architecture (Extra Trees + MLP + XGBoost Meta-Learner).
 
-## ✨ Key Features
-- **⚡ Ultra-Low Latency Inference**: Sub-50ms transaction classifications leveraging a Flask/Redis architecture.
-- **🧠 Hybrid Meta-Ensemble**: Combines ExtraTrees and XGBoost, utilizing SMOTE to conquer extreme class imbalance (achieving 99.2% PR-AUC).
-- **🕵️‍♂️ Explainability Studio**: Visual SHAP Waterfall charts explaining *exactly* why a transaction was flagged, satisfying the legal "Right to Explanation."
-- **🔄 MLOps & Shadow Deployments**: Complete Model Registry tracking KL-Divergence and feature drift in real-time.
-- **🛡️ Enterprise Security**: Rigid JWT Role-Based Access Control (RBAC), rate-limiting, and an immutable Audit Ledger.
+Unlike typical Jupyter Notebook data science projects, FraudShield AI wraps the predictive models in a **production-ready DevSecOps ecosystem**, featuring:
+- A luxury React/Framer Motion frontend with 3D WebGL visualizations.
+- A Flask-based API layer simulating Gunicorn/NGINX deployments.
+- Explainable AI (XAI) via KernelSHAP to satisfy financial regulatory compliance.
+- A simulated SOC 2 Type II environment with RBAC, JWTs, and Audit Logging.
 
-## 🛠️ Technology Stack
-### Frontend
-- **Framework**: React 19 (Vite)
-- **State Management**: Zustand, React Query
-- **3D / Visualization**: React Three Fiber, Framer Motion, Apache ECharts
-- **Styling**: Tailwind CSS, Lucide Icons
-
-### Backend & AI
-- **API Framework**: Python 3.12, Flask, Flask-RESTful
-- **Database**: MySQL 8.0, SQLAlchemy, Alembic
-- **Task Queue**: Celery, Redis
-- **Machine Learning**: Scikit-Learn, XGBoost, SHAP, Imbalanced-Learn (SMOTE)
+> **Note**: This is an academic/portfolio demonstration. The platform operates strictly on mathematically generated **Synthetic Data**. No real financial information, credit cards, or PII are used or stored.
 
 ---
 
-## 🚀 Quick Start (Dockerized)
+## ✨ Key Features
 
-Ensure you have Docker and Docker Compose installed.
+1. **Stacking Ensemble Engine**: Achieves optimal PR-AUC on imbalanced data by stacking Extra Trees, Random Forest, and a Multilayer Perceptron, utilizing Logistic Regression as the Meta-Learner.
+2. **Explainable AI (SHAP)**: Financial models cannot be "black boxes". We utilize KernelSHAP to provide exact, legally defensible feature importance for every blocked transaction.
+3. **Enterprise AI Copilot**: A context-aware LLM interface that explains the complex SHAP values to non-technical fraud analysts in plain English.
+4. **DevSecOps & Governance**: Features a live Security Operations Center (SOC) dashboard, OWASP Top 10 defenses (HttpOnly cookies, Argon2id), and an immutable Audit Log.
+5. **Premium Motion UI**: Cinematic route transitions, branded neural loading experiences, and interactive ECharts data visualization.
 
-```bash
-# 1. Clone the repository
-git clone https://github.com/yourusername/fraudshield-ai.git
-cd fraudshield-ai
+---
 
-# 2. Spin up the entire microservice topology
-docker-compose up --build -d
+## 🏗️ Architecture
 
-# 3. Access the platform
-# Frontend: http://localhost:80
-# Backend API: http://localhost:5000
+```mermaid
+graph TD
+    Client[Web Client - React/Vite] -->|HTTPS| Proxy[NGINX Reverse Proxy]
+    Proxy --> Frontend[Static Assets]
+    Proxy -->|/api| Gateway[API Gateway - Flask]
+    Gateway --> Auth[Auth Service - JWT/Argon2id]
+    Gateway --> Inference[ML Inference Service]
+    Gateway --> Explain[XAI Engine - SHAP]
+    
+    Inference --> Redis[(Redis Cache)]
+    Auth --> Postgres[(PostgreSQL)]
+    Inference --> Model[(Joblib Ensembles)]
 ```
 
-## 📚 Documentation
-Comprehensive documentation for academic grading, architectural review, and operations can be found in the `docs/` directory:
-- [IEEE Project Report (Academic)](docs/academic/ieee_report.md)
-- [System Architecture (Mermaid.js Diagrams)](docs/diagrams/architecture.md)
-- [REST API Reference](docs/technical/api_reference.md)
-- [Interview & Portfolio Cheat Sheet](docs/presentation/interview_cheat_sheet.md)
+*For deep dives into the architecture, see the [`docs/`](./docs) folder.*
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js (v18+)
+- Python (3.10+)
+- Docker & Docker Compose (Optional, for containerized run)
+
+### Local Development Setup
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/yourusername/fraudshield-ai.git
+cd fraudshield-ai
+```
+
+2. **Backend Setup**
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+pip install -r requirements.txt
+cp .env.example .env
+flask run
+```
+
+3. **Frontend Setup**
+```bash
+cd ../frontend
+npm install
+npm run dev
+```
+
+4. **Access the Application**
+Navigate to `http://localhost:5173` in your browser.
+
+---
+
+## 📚 Documentation Directory
+
+The project is extensively documented to support open-source contributions and portfolio review:
+
+### Technical Documentation
+- [Architecture Details](docs/ARCHITECTURE.md)
+- [Database Schema](docs/DATABASE_SCHEMA.md)
+- [Machine Learning Pipeline](docs/ML_PIPELINE.md)
+- [API Reference](docs/API_REFERENCE.md)
+- [Security & Governance](docs/SECURITY.md)
+- [Deployment & DevOps](docs/DEPLOYMENT.md)
+
+### Career & Reviewer Assets
+Are you a Recruiter or Hiring Manager? Start here:
+- [Recruiter Executive Summary](docs/career/RECRUITER_GUIDE.md)
+- [Interview Prep & STAR Answers](docs/career/INTERVIEW_GUIDE.md)
+
+---
 
 ## 🤝 Contributing
-Please see `CONTRIBUTING.md` for details on our code of conduct, and the process for submitting pull requests to the project.
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on our branch strategy, coding standards, and pull request process.
+
+---
 
 ## 📄 License
-This project is licensed under the MIT License - see the `LICENSE` file for details.
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -1,77 +1,83 @@
 import React from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Shield, Eye, Lock, Download, Trash2, CheckCircle2 } from 'lucide-react';
-import { TrustRing } from '../components/3d/TrustRing';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { InteractiveCard } from '@/components/motion/InteractiveCard';
+import { AcademicTooltip } from '@/components/ui/AcademicTooltip';
+import { Database, Lock, EyeOff, UserX, Trash2 } from 'lucide-react';
 
 export const PrivacyCenter: React.FC = () => {
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
-        <div className="z-10">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center">
-            <Shield className="w-8 h-8 mr-3 text-indigo-500" />
-            Privacy & Trust Center
-          </h1>
-          <p className="text-slate-500 mt-2 max-w-xl">
-            Manage Data Subject Access Requests (DSAR), retention policies, and GDPR principles governing the FraudShield AI platform.
-          </p>
-        </div>
-        
-        {/* 3D Visual Anchor */}
-        <div className="absolute right-0 top-0 w-96 h-full opacity-30 md:opacity-100 mix-blend-screen pointer-events-none">
-          <Canvas camera={{ position: [0, 0, 5] }}>
-            <TrustRing />
-          </Canvas>
-        </div>
-      </div>
+    <div className="space-y-6 animate-fade-in pb-12">
+      <PageHeader 
+        title="Privacy & Data Integrity Center" 
+        description="Documentation of our data handling practices and synthetic data guarantees." 
+      />
 
-      {/* Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="flex flex-col lg:flex-row gap-6">
         
-        {/* Left Column - Policies */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white dark:bg-[#111111] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-6 flex items-center">
-              <Eye className="w-5 h-5 mr-2 text-indigo-500" /> Data Collection & Retention
-            </h2>
-            <div className="space-y-4">
-              {[
-                { title: "Personally Identifiable Information (PII)", desc: "Tokenized at rest. Used strictly for fraud verification.", status: "Compliant" },
-                { title: "Transaction Telemetry", desc: "Retained for 90 days in hot storage, then archived to cold storage.", status: "Enforced" },
-                { title: "Browser & IP Data", desc: "Anonymized via salt hashing before entering the ML pipeline.", status: "Active" }
-              ].map((policy, idx) => (
-                <div key={idx} className="flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                  <div>
-                    <h4 className="font-medium text-slate-900 dark:text-white text-sm">{policy.title}</h4>
-                    <p className="text-slate-500 text-xs mt-1">{policy.desc}</p>
-                  </div>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                    <CheckCircle2 className="w-3 h-3 mr-1" /> {policy.status}
-                  </span>
-                </div>
-              ))}
+        {/* Main Content */}
+        <div className="lg:w-2/3 space-y-6">
+          <InteractiveCard tilt={false} className="p-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+            <h2 className="text-2xl font-bold tracking-tight mb-6">Data Privacy Principles</h2>
+            
+            <div className="space-y-8">
+              
+              <section>
+                <h3 className="text-lg font-semibold flex items-center gap-2 mb-3">
+                  <Database className="w-5 h-5 text-indigo-500" /> Synthetic Data Guarantee
+                </h3>
+                <AcademicTooltip 
+                  title="Why Synthetic Data?" 
+                  content="This platform is designed as an academic demonstration of enterprise ML capabilities. To ensure zero risk of PII leakage, the entire 14-million row dataset was synthetically generated to mirror real-world distributions without containing any real human data."
+                >
+                  <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                    FraudShield AI strictly operates on <strong>100% synthetic data</strong>. No real credit card numbers (PANs), Social Security Numbers, or actual user transactions are stored or processed by this application. The dataset is mathematically generated to mimic financial fraud patterns for training purposes only.
+                  </p>
+                </AcademicTooltip>
+              </section>
+
+              <section>
+                <h3 className="text-lg font-semibold flex items-center gap-2 mb-3">
+                  <Lock className="w-5 h-5 text-emerald-500" /> Identity Protection
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                  Authentication within the platform uses the <code>Argon2id</code> hashing algorithm for passwords. Identity is verified via short-lived JSON Web Tokens (JWT) signed with HS256. Long-lived refresh tokens are stored in secure, HttpOnly, SameSite cookies to protect against credential harvesting.
+                </p>
+              </section>
+
+              <section>
+                <h3 className="text-lg font-semibold flex items-center gap-2 mb-3">
+                  <EyeOff className="w-5 h-5 text-slate-500" /> Environment & Secrets
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4">
+                  All sensitive configuration (JWT secrets, database URIs, API keys) is injected at runtime via Environment Variables. No secrets are hardcoded into the source code, adhering to the Twelve-Factor App methodology.
+                </p>
+              </section>
+              
             </div>
-          </div>
+          </InteractiveCard>
         </div>
 
-        {/* Right Column - User Actions */}
-        <div className="space-y-6">
-          <div className="bg-indigo-600 rounded-2xl p-6 text-white shadow-lg">
-            <Lock className="w-8 h-8 mb-4 opacity-80" />
-            <h3 className="text-xl font-bold mb-2">GDPR Access Controls</h3>
-            <p className="text-indigo-100 text-sm mb-6">
-              As an Administrator, you can execute automated data subject workflows for compliance requests.
+        {/* Sidebar Info */}
+        <div className="lg:w-1/3 space-y-6">
+          <InteractiveCard tilt={false} className="p-6 bg-rose-50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/50">
+            <h3 className="font-semibold text-rose-900 dark:text-rose-300 mb-4 flex items-center gap-2">
+              <UserX className="w-5 h-5"/> GDPR Compliance
+            </h3>
+            <p className="text-sm text-rose-800 dark:text-rose-200/80 leading-relaxed mb-4">
+              Even though the data is synthetic, the platform architecture supports GDPR principles:
             </p>
-            <div className="space-y-3">
-              <button className="w-full flex items-center justify-center bg-white text-indigo-600 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-indigo-50 transition-colors">
-                <Download className="w-4 h-4 mr-2" /> Export PII Data (CSV)
-              </button>
-              <button className="w-full flex items-center justify-center bg-indigo-700 text-indigo-100 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-indigo-800 transition-colors border border-indigo-500">
-                <Trash2 className="w-4 h-4 mr-2" /> Trigger 'Right to be Forgotten'
-              </button>
-            </div>
-          </div>
+            <ul className="space-y-3 text-sm text-rose-800 dark:text-rose-200/80">
+              <li className="flex items-center gap-2">
+                <Trash2 className="w-4 h-4" /> Right to Erasure (Hard Delete)
+              </li>
+              <li className="flex items-center gap-2">
+                <EyeOff className="w-4 h-4" /> Data Minimization
+              </li>
+              <li className="flex items-center gap-2">
+                <Database className="w-4 h-4" /> Portability (CSV Export)
+              </li>
+            </ul>
+          </InteractiveCard>
         </div>
 
       </div>

@@ -24,12 +24,18 @@ import {
   ExperimentTracking,
   DriftDetection,
   ChampionChallenger,
-  FeatureStore
+  FeatureStore,
+  TrainingPipeline
 } from '@/pages/index';
+
+import { CopilotProvider } from '@/core/context/CopilotContext';
+import { AcademicModeProvider } from '@/core/context/AcademicModeContext';
 
 function App() {
   return (
-    <Routes>
+    <AcademicModeProvider>
+      <CopilotProvider>
+        <Routes>
       {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
       
@@ -47,6 +53,7 @@ function App() {
         <Route path="/mlops" element={<MLOpsCenter />} />
         <Route path="/registry" element={<ModelRegistry />} />
         <Route path="/experiments" element={<ExperimentTracking />} />
+        <Route path="/pipeline" element={<TrainingPipeline />} />
         <Route path="/drift" element={<DriftDetection />} />
         <Route path="/champion" element={<ChampionChallenger />} />
         <Route path="/features" element={<FeatureStore />} />
@@ -64,7 +71,9 @@ function App() {
         {/* Catch-all for inside the layout */}
         <Route path="*" element={<NotFound />} />
       </Route>
-    </Routes>
+      </Routes>
+      </CopilotProvider>
+    </AcademicModeProvider>
   );
 }
 

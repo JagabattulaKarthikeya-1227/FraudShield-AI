@@ -2,7 +2,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 import uuid
-from flask import request, g
+from flask import request, g, has_app_context
 
 def setup_logging(app):
     log_dir = os.path.join(os.path.dirname(app.root_path), 'logs')
@@ -22,7 +22,10 @@ def setup_logging(app):
     old_factory = logging.getLogRecordFactory()
     def record_factory(*args, **kwargs):
         record = old_factory(*args, **kwargs)
-        record.request_id = getattr(g, 'request_id', 'SYSTEM')
+        if has_app_context():
+            record.request_id = getattr(g, 'request_id', 'SYSTEM')
+        else:
+            record.request_id = 'SYSTEM'
         return record
     logging.setLogRecordFactory(record_factory)
     

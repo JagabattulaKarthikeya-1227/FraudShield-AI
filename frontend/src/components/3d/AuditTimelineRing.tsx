@@ -1,41 +1,55 @@
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Torus, Float } from '@react-three/drei';
+import { Float, Environment, Torus, Sphere } from '@react-three/drei';
+import * as THREE from 'three';
 
-const Rings = () => {
-  const innerRef = useRef<any>(null);
-  const outerRef = useRef<any>(null);
+const timelineEvents = [
+  { color: "#162A2B", offset: 0 },
+  { color: "#4A6741", offset: Math.PI / 2 },
+  { color: "#D9A441", offset: Math.PI },
+  { color: "#C26E60", offset: (3 * Math.PI) / 2 },
+];
 
-  useFrame(({ clock }) => {
-    if (innerRef.current && outerRef.current) {
-      innerRef.current.rotation.z = clock.getElapsedTime() * 0.8;
-      outerRef.current.rotation.z = -clock.getElapsedTime() * 0.4;
-      
-      innerRef.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.5) * 0.2;
-      outerRef.current.rotation.x = Math.cos(clock.getElapsedTime() * 0.3) * 0.3;
+function TimelineCore() {
+  const group = useRef<THREE.Group>(null);
+  
+  useFrame((state) => {
+    if (group.current) {
+      group.current.rotation.x = Math.PI / 3;
+      group.current.rotation.z = state.clock.elapsedTime * -0.1;
     }
   });
 
   return (
-    <Float speed={1} rotationIntensity={0.2} floatIntensity={0.5}>
-      <Torus ref={outerRef} args={[2.5, 0.05, 16, 100]} rotation={[Math.PI / 2, 0, 0]}>
-        <meshStandardMaterial color="#3b82f6" emissive="#3b82f6" emissiveIntensity={0.5} wireframe={true} />
+    <group ref={group}>
+      {/* Track */}
+      <Torus args={[2, 0.05, 16, 64]}>
+        <meshPhysicalMaterial color="#ffffff" transmission={0.8} opacity={1} roughness={0.1} ior={1.5} />
       </Torus>
-      <Torus ref={innerRef} args={[1.5, 0.1, 16, 100]} rotation={[Math.PI / 2, 0, 0]}>
-        <meshStandardMaterial color="#8b5cf6" emissive="#8b5cf6" emissiveIntensity={1} />
-      </Torus>
-    </Float>
-  );
-};
 
-export const AuditTimelineRing = () => {
+      {/* Events */}
+      {timelineEvents.map((evt, i) => (
+        <group key={i} rotation={[0, 0, evt.offset]}>
+          <Sphere args={[0.2, 32, 32]} position={[2, 0, 0]}>
+            <meshStandardMaterial color={evt.color} emissive={evt.color} emissiveIntensity={0.2} />
+          </Sphere>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+export function AuditTimelineRing() {
   return (
-    <div className="w-full h-[300px] rounded-xl overflow-hidden bg-background/20 relative">
-      <Canvas camera={{ position: [0, 5, 5], fov: 50 }}>
+    <div className="w-full h-[500px] rounded-[32px] overflow-hidden relative">
+      <Canvas camera={{ position: [0, 0, 5], fov: 45 }} dpr={[1, 2]}>
         <ambientLight intensity={0.5} />
-        <directionalLight position={[0, 10, 5]} intensity={1} color="#ffffff" />
-        <Rings />
+        <directionalLight position={[10, 10, 5]} intensity={1.5} color="#F3EFE6" />
+        <Environment preset="city" />
+        <Float speed={1.5} floatIntensity={0.5}>
+          <TimelineCore />
+        </Float>
       </Canvas>
     </div>
   );
-};
+}

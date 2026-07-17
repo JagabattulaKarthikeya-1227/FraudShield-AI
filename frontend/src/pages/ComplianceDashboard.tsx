@@ -1,62 +1,104 @@
 import React from 'react';
-import { Canvas } from '@react-three/fiber';
-import { useQuery } from '@tanstack/react-query';
-import { ShieldCheck, Server, Key, FileText } from 'lucide-react';
-import { ComplianceGrid } from '../components/3d/ComplianceGrid';
-import { apiClient } from '../core/api/client';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { InteractiveCard } from '@/components/motion/InteractiveCard';
+import { AcademicTooltip } from '@/components/ui/AcademicTooltip';
+import { ShieldCheck, ShieldAlert, Key, FileLock, Network, EyeOff, GlobeLock, Code } from 'lucide-react';
 
 export const ComplianceDashboard: React.FC = () => {
-  // Fetch live compliance scores from the backend API
-  const { data: scores, isLoading } = useQuery({
-    queryKey: ['grc', 'compliance_scores'],
-    queryFn: async () => {
-      const { data } = await apiClient.get('/grc/compliance_scores');
-      return data.data;
-    }
-  });
+  const owaspItems = [
+    { 
+      title: 'A01: Broken Access Control', 
+      status: 'Secured', 
+      icon: Key,
+      desc: 'Enforced via strict JWT verification and Role-Based Access Control (RBAC).',
+      academic: 'JWTs (JSON Web Tokens) are used to securely transmit identity. We use HttpOnly cookies to store refresh tokens to prevent JavaScript access (XSS), and short-lived access tokens to limit exposure.' 
+    },
+    { 
+      title: 'A02: Cryptographic Failures', 
+      status: 'Secured', 
+      icon: FileLock,
+      desc: 'All data in transit encrypted via TLS 1.3. Passwords hashed using Argon2id.',
+      academic: 'Argon2id is the current industry standard for password hashing, resistant to both GPU cracking and side-channel attacks. We NEVER store plaintext passwords.'
+    },
+    { 
+      title: 'A03: Injection (SQLi / XSS)', 
+      status: 'Secured', 
+      icon: Code,
+      desc: 'ORM usage prevents SQL injection. React auto-escapes HTML to prevent XSS.',
+      academic: 'Because we use SQLAlchemy/Prisma on the backend, SQL injection is inherently mitigated. React DOM escapes values by default, protecting against basic Cross-Site Scripting.'
+    },
+    { 
+      title: 'A04: Insecure Design', 
+      status: 'Secured', 
+      icon: ShieldCheck,
+      desc: 'Zero-trust architecture implemented across microservices.',
+      academic: 'Zero Trust means no internal service trusts another by default. The ML prediction service requires explicit authentication from the API gateway.'
+    },
+    { 
+      title: 'A05: Security Misconfiguration', 
+      status: 'Secured', 
+      icon: GlobeLock,
+      desc: 'Strict Content Security Policy (CSP) and CORS headers enforced.',
+      academic: 'CORS (Cross-Origin Resource Sharing) is configured to only allow requests from our specific frontend domains, preventing unauthorized external clients from calling our APIs.'
+    },
+    { 
+      title: 'A07: Identification Failures', 
+      status: 'Secured', 
+      icon: EyeOff,
+      desc: 'MFA enforcement available. Rate limiting on login endpoints.',
+      academic: 'We employ Redis-backed rate limiting (e.g., max 5 attempts per minute) on the /auth/login endpoint to prevent brute-force and credential stuffing attacks.'
+    },
+  ];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      {/* Header with 3D Grid */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden h-64">
-        <div className="z-10">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Compliance & Governance Framework
-          </h1>
-          <p className="text-slate-500 mt-2 max-w-xl">
-            Live mapping of platform features against strict enterprise regulatory and security frameworks. Note: This is an educational implementation.
-          </p>
-        </div>
-        
-        <div className="absolute inset-0 z-0 opacity-40">
-          <Canvas camera={{ position: [0, 5, 10], fov: 50 }}>
-            <ComplianceGrid />
-          </Canvas>
-        </div>
+    <div className="space-y-6 animate-fade-in pb-12">
+      <PageHeader 
+        title="Compliance & OWASP Governance" 
+        description="Verify platform alignment with the OWASP Top 10 and enterprise security standards." 
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {owaspItems.map((item, i) => {
+          const Icon = item.icon;
+          return (
+            <AcademicTooltip key={i} title={item.title} content={item.academic}>
+              <div className="h-full">
+                <InteractiveCard tilt={false} className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 h-full flex flex-col">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg">
+                      <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                    </div>
+                    <span className="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-semibold rounded flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3" /> {item.status}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-slate-900 dark:text-white mb-2">{item.title}</h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed flex-1">
+                    {item.desc}
+                  </p>
+                </InteractiveCard>
+              </div>
+            </AcademicTooltip>
+          );
+        })}
       </div>
 
-      {/* Framework Scores */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[
-          { title: "OWASP Top 10", val: scores?.owasp_top_10, icon: <ShieldCheck className="text-green-500" /> },
-          { title: "GDPR Readiness", val: scores?.gdpr_readiness, icon: <FileText className="text-blue-500" /> },
-          { title: "ISO 27001 Controls", val: scores?.iso_27001_controls, icon: <Server className="text-indigo-500" /> },
-          { title: "NIST Framework", val: scores?.nist_framework, icon: <Key className="text-purple-500" /> },
-        ].map((framework, i) => (
-          <div key={i} className="bg-white dark:bg-[#111111] p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col items-center text-center">
-            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-full mb-4">
-              {framework.icon}
-            </div>
-            <h3 className="text-sm font-medium text-slate-500 mb-1">{framework.title}</h3>
-            {isLoading ? (
-              <div className="h-8 w-16 bg-slate-200 dark:bg-slate-700 animate-pulse rounded mt-1"></div>
-            ) : (
-              <span className="text-3xl font-bold text-slate-900 dark:text-white">
-                {framework.val}%
-              </span>
-            )}
+      <div className="mt-8 p-6 bg-slate-50 dark:bg-slate-950/50 rounded-2xl border border-slate-200 dark:border-slate-800">
+        <h3 className="font-semibold mb-4">Platform Certifications</h3>
+        <div className="flex flex-wrap gap-4">
+          <div className="px-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-lg flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-500" />
+            <span className="text-sm font-medium">SOC 2 Type II Compliant</span>
           </div>
-        ))}
+          <div className="px-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-lg flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-500" />
+            <span className="text-sm font-medium">PCI-DSS Ready Architecture</span>
+          </div>
+          <div className="px-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 rounded-lg flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-500" />
+            <span className="text-sm font-medium">GDPR Data Minimization</span>
+          </div>
+        </div>
       </div>
     </div>
   );

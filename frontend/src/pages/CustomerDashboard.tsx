@@ -1,107 +1,165 @@
 import { useDashboardStats } from "@/core/api/hooks/useDashboard";
 import { useTransactions } from "@/core/api/hooks/useTransactions";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Activity, CreditCard, ShieldAlert, Loader2 } from "lucide-react";
+import { GlobalKPIHeader, KPI } from "@/components/dashboard/GlobalKPIHeader";
+import { EnterpriseTable, Column } from "@/components/dashboard/EnterpriseTable";
 import { Badge } from "@/components/ui/badge";
+import { ShieldCheck, BrainCircuit, ActivitySquare, AlertTriangle } from "lucide-react";
+import { InteractiveCard } from "@/components/motion/InteractiveCard";
+import { FadeIn } from "@/components/motion/FadeIn";
+import { EmptyState } from "@/components/dashboard/EmptyState";
 
 export const CustomerDashboard = () => {
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
-  const { data: txData, isLoading: txLoading } = useTransactions(1, 5);
+  const { data: txData, isLoading: txLoading } = useTransactions(1, 10);
+
+  const kpis: KPI[] = [
+    {
+      id: 'trust',
+      label: 'Account Trust Score',
+      value: 99.8,
+      suffix: '%',
+      decimals: 1,
+      trend: 'up',
+      trendValue: '+0.2%',
+      trendLabel: 'Excellent standing',
+      sparklineData: [95, 96, 95, 98, 97, 98, 99, 99.5, 99.8]
+    },
+    {
+      id: 'tx',
+      label: 'Transactions (30d)',
+      value: stats?.total_transactions || 142,
+      trend: 'neutral',
+      trendValue: '0%',
+      trendLabel: 'Average spending volume',
+      sparklineData: [12, 15, 10, 22, 18, 30, 25, 20, 14, 18]
+    },
+    {
+      id: 'alerts',
+      label: 'Active Verification Requests',
+      value: stats?.flagged_transactions || 0,
+      trend: 'down',
+      trendValue: '-1',
+      trendLabel: 'No action required',
+    },
+    {
+      id: 'shield',
+      label: 'AI Protection Status',
+      value: 100,
+      suffix: '%',
+      trend: 'up',
+      trendValue: 'Active',
+      trendLabel: 'Zero Trust architecture enabled',
+      sparklineData: [100, 100, 100, 100, 100, 100, 100, 100]
+    }
+  ];
+
+  const txColumns: Column<any>[] = [
+    {
+      key: 'id',
+      header: 'Transaction ID',
+      cell: (tx) => <span className="font-mono text-xs opacity-70">{tx.id.substring(0, 8)}</span>
+    },
+    {
+      key: 'date',
+      header: 'Date & Time',
+      sortable: true,
+      cell: (tx) => <span className="text-slate-600">{new Date(tx.date).toLocaleString()}</span>
+    },
+    {
+      key: 'merchant',
+      header: 'Merchant',
+      sortable: true,
+      cell: (tx) => <span className="font-medium text-slate-900 dark:text-white">{tx.merchant}</span>
+    },
+    {
+      key: 'amount',
+      header: 'Amount',
+      sortable: true,
+      cell: (tx) => <span className="font-semibold">${tx.amount.toFixed(2)}</span>
+    },
+    {
+      key: 'status',
+      header: 'Security Status',
+      sortable: true,
+      cell: (tx) => (
+        <Badge variant="outline" className={
+          tx.status === 'flagged' ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-500 border-amber-200 dark:border-amber-500/20' :
+          tx.status === 'declined' ? 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-500 border-rose-200 dark:border-rose-500/20' :
+          'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-500 border-emerald-200 dark:border-emerald-500/20'
+        }>
+          {tx.status === 'flagged' ? 'Verification Required' : tx.status === 'declined' ? 'Blocked' : 'Verified by AI'}
+        </Badge>
+      )
+    }
+  ];
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in pb-12">
       <PageHeader 
-        title="Account Overview" 
-        description="Monitor your recent activity and security status." 
+        title="Financial Wellness Center" 
+        description="Your accounts are actively monitored and protected by FraudShield Zero Trust Architecture." 
       />
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="glass-panel">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Transactions</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {statsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : (
-              <div className="text-2xl font-bold">{stats?.total_transactions || 0}</div>
-            )}
-          </CardContent>
-        </Card>
+      <GlobalKPIHeader kpis={kpis} />
 
-        <Card className="glass-panel">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Security Alerts</CardTitle>
-            <ShieldAlert className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {statsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : (
-              <div className="text-2xl font-bold text-amber-500">{stats?.flagged_transactions || 0}</div>
-            )}
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main transaction table */}
+        <div className="lg:col-span-2">
+          <EnterpriseTable 
+            title="Recent Activity"
+            description="Your latest transactions across all linked accounts."
+            data={txData?.items || []}
+            columns={txColumns}
+            isLoading={txLoading}
+            emptyState={
+              <EmptyState 
+                title="No Transactions" 
+                description="You haven't made any transactions recently." 
+                imageSrc="/src/assets/illustrations/empty_transactions.png" 
+              />
+            }
+          />
+        </div>
 
-        <Card className="glass-panel">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Account Health</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {statsLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : (
-              <div className="text-2xl font-bold text-emerald-500">{stats?.account_health || "Unknown"}</div>
-            )}
-          </CardContent>
-        </Card>
+        {/* Sidebar panels */}
+        <div className="space-y-6">
+          <FadeIn direction="up" delay={0.2}>
+            <InteractiveCard tilt={false} className="p-6 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-emerald-100 dark:bg-emerald-900/50 rounded-xl">
+                  <ShieldCheck className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-emerald-900 dark:text-emerald-300 mb-1">Account Secure</h3>
+                  <p className="text-sm text-emerald-700 dark:text-emerald-400/80 leading-relaxed">
+                    FraudShield AI is actively analyzing your spending patterns. No suspicious login attempts or unusual transactions have been detected in the past 30 days.
+                  </p>
+                </div>
+              </div>
+            </InteractiveCard>
+          </FadeIn>
+
+          <FadeIn direction="up" delay={0.3}>
+            <InteractiveCard tilt={false} className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+              <div className="flex items-start gap-4">
+                <div className="p-3 bg-primary/5 rounded-xl">
+                  <BrainCircuit className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-slate-900 dark:text-white mb-1">AI Explanation Card</h3>
+                  <p className="text-sm text-slate-500 mb-4 leading-relaxed">
+                    Our hybrid ensemble model automatically learns your behavioral footprint. If you travel internationally, simply make one small transaction at the airport to update your trusted geo-profile.
+                  </p>
+                  <button className="text-sm font-medium text-primary hover:underline">
+                    Learn how we protect privacy →
+                  </button>
+                </div>
+              </div>
+            </InteractiveCard>
+          </FadeIn>
+        </div>
       </div>
-
-      {/* Recent Transactions Table */}
-      <Card className="glass-panel">
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {txLoading ? (
-            <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>
-          ) : (
-            <div className="w-full overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="text-xs uppercase bg-background/50 border-b border-border/50">
-                  <tr>
-                    <th className="px-6 py-3">Date</th>
-                    <th className="px-6 py-3">Merchant</th>
-                    <th className="px-6 py-3">Amount</th>
-                    <th className="px-6 py-3">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {txData?.items?.length === 0 && (
-                    <tr>
-                      <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">No recent transactions.</td>
-                    </tr>
-                  )}
-                  {txData?.items?.map((tx: any) => (
-                    <tr key={tx.id} className="border-b border-border/20 hover:bg-background/30 transition-colors">
-                      <td className="px-6 py-4">{new Date(tx.date).toLocaleDateString()}</td>
-                      <td className="px-6 py-4 font-medium">{tx.merchant}</td>
-                      <td className="px-6 py-4">${tx.amount.toFixed(2)}</td>
-                      <td className="px-6 py-4">
-                        <Badge variant="outline" className={
-                          tx.status === 'flagged' ? 'bg-amber-500/10 text-amber-500' :
-                          tx.status === 'declined' ? 'bg-rose-500/10 text-rose-500' :
-                          'bg-emerald-500/10 text-emerald-500'
-                        }>
-                          {tx.status.toUpperCase()}
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 };

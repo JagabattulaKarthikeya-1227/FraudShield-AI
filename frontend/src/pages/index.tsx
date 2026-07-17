@@ -33,6 +33,7 @@ export { ExperimentTracking } from './ExperimentTracking';
 export { DriftDetection } from './DriftDetection';
 export { ChampionChallenger } from './ChampionChallenger';
 export { FeatureStore } from './FeatureStore';
+export { TrainingPipeline } from './TrainingPipeline';
 
 export { AdminConsole } from './AdminConsole';
 

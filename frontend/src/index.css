@@ -44,77 +44,78 @@
 
 @layer base {
   :root {
-    --background: #F8F5F2; /* Fresh Cream */
-    --foreground: #1E1E1E; /* Noir */
+    --background: #F3EFE6; /* Warm Neutral Background */
+    --foreground: #242021; /* Primary Text */
     
-    --card: #FDFBF8; /* Warm Ivory */
-    --card-foreground: #1E1E1E;
+    --card: #FBF8F4; /* Clean Surface */
+    --card-foreground: #242021;
     
-    --popover: #FDFBF8;
-    --popover-foreground: #1E1E1E;
+    --popover: #FBF8F4;
+    --popover-foreground: #242021;
     
-    --primary: #1E1E1E; /* Noir */
-    --primary-foreground: #F8F5F2;
+    --primary: #162A2B; /* Deep Trustworthy Green-Black */
+    --primary-foreground: #F3EFE6;
     
-    --secondary: #EBE7E0;
-    --secondary-foreground: #1E1E1E;
+    --secondary: #EAE6DF;
+    --secondary-foreground: #162A2B;
     
-    --muted: #EBE7E0;
-    --muted-foreground: #6F7287; /* Storm Gray */
+    --muted: #EAE6DF;
+    --muted-foreground: #686866; /* Secondary Text */
     
-    --accent: #C7A66A; /* Champagne Gold */
+    --accent: #D4AF37; /* Soft Champagne Gold */
     --accent-foreground: #FFFFFF;
     
-    --destructive: #D96B6B; /* Muted Coral */
+    --destructive: #C26E60; /* Muted Terracotta */
     --destructive-foreground: #FFFFFF;
     
-    --success: #8FAF9B; /* Soft Sage */
+    --success: #4A6741; /* Deep Moss Green */
     --success-foreground: #FFFFFF;
 
     --warning: #D9A441; /* Warm Amber */
     --warning-foreground: #FFFFFF;
 
-    --border: #E8E5E1; /* Very light gray */
-    --input: #E8E5E1;
-    --ring: #C7A66A;
+    --border: #E6E1D8; /* Very light warm gray */
+    --input: #E6E1D8;
+    --ring: #D4AF37;
     
-    --radius: 0.75rem;
+    --radius: 1rem; /* 16px base radius */
   }
 
   .dark {
-    --background: #121212;
-    --foreground: #F8F5F2;
+    /* No dark theme per instructions. Defaulting to light theme colors for safety */
+    --background: #F3EFE6; 
+    --foreground: #242021;
     
-    --card: #1E1E1E;
-    --card-foreground: #F8F5F2;
+    --card: #FBF8F4;
+    --card-foreground: #242021;
     
-    --popover: #1E1E1E;
-    --popover-foreground: #F8F5F2;
+    --popover: #FBF8F4;
+    --popover-foreground: #242021;
     
-    --primary: #F8F5F2;
-    --primary-foreground: #1E1E1E;
+    --primary: #162A2B;
+    --primary-foreground: #F3EFE6;
     
-    --secondary: #2C2C2C;
-    --secondary-foreground: #F8F5F2;
+    --secondary: #EAE6DF;
+    --secondary-foreground: #162A2B;
     
-    --muted: #2C2C2C;
-    --muted-foreground: #A0A0A0;
+    --muted: #EAE6DF;
+    --muted-foreground: #686866;
     
-    --accent: #C7A66A;
-    --accent-foreground: #1E1E1E;
+    --accent: #D4AF37;
+    --accent-foreground: #FFFFFF;
     
-    --destructive: #D96B6B;
+    --destructive: #C26E60;
     --destructive-foreground: #FFFFFF;
     
-    --success: #8FAF9B;
+    --success: #4A6741;
     --success-foreground: #FFFFFF;
 
     --warning: #D9A441;
     --warning-foreground: #FFFFFF;
 
-    --border: #333333;
-    --input: #333333;
-    --ring: #C7A66A;
+    --border: #E6E1D8;
+    --input: #E6E1D8;
+    --ring: #D4AF37;
   }
 }
 
@@ -128,6 +129,11 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Standardize all Lucide icons to an elegant stroke weight */
+  svg.lucide {
+    stroke-width: 1.5 !important;
   }
 
   /* Elegant typography hierarchy overrides for editorial look */

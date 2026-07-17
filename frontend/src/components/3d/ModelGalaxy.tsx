@@ -1,58 +1,84 @@
-import React, { useRef, useMemo } from 'react';
-import { useFrame } from '@react-three/fiber';
+import React, { useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Sphere, Float, Environment, Ring, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
-export const ModelGalaxy: React.FC = () => {
-  const pointsRef = useRef<THREE.Points>(null);
+const satellites = [
+  { label: "Extra Trees", radius: 2, speed: 0.5, color: "#4A6741" },
+  { label: "MLP Network", radius: 3, speed: 0.3, color: "#D9A441" }
+];
 
-  // Generate random clustered points to represent embedded transactions in latent space
-  const [positions, colors] = useMemo(() => {
-    const count = 2000;
-    const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
-    const color = new THREE.Color();
-
-    for (let i = 0; i < count; i++) {
-      // Create two distinct clusters (Normal vs Fraud)
-      const isFraud = i < count * 0.1; 
-      
-      const r = isFraud ? 2 * Math.random() : 5 * Math.random();
-      const theta = 2 * Math.PI * Math.random();
-      const phi = Math.acos(2 * Math.random() - 1);
-      
-      // Shift fraud cluster slightly off-center
-      const offsetX = isFraud ? 3 : 0;
-      
-      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta) + offsetX;
-      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      positions[i * 3 + 2] = r * Math.cos(phi);
-
-      // Color coding: Blue/Purple for Normal, Red/Orange for Fraud
-      if (isFraud) {
-        color.setHSL(0.05 + Math.random() * 0.1, 0.8, 0.5); // Warm
-      } else {
-        color.setHSL(0.6 + Math.random() * 0.1, 0.8, 0.5); // Cool
-      }
-      
-      color.toArray(colors, i * 3);
-    }
-    return [positions, colors];
-  }, []);
-
+function OrbitSystem() {
+  const coreRef = useRef<THREE.Group>(null);
+  
   useFrame((state) => {
-    if (pointsRef.current) {
-      pointsRef.current.rotation.y = state.clock.getElapsedTime() * 0.05;
-      pointsRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 0.1) * 0.1;
+    if (coreRef.current) {
+      coreRef.current.rotation.x = Math.PI / 6; // Tilt
     }
   });
 
   return (
-    <points ref={pointsRef}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-        <bufferAttribute attach="attributes-color" args={[colors, 3]} />
-      </bufferGeometry>
-      <pointsMaterial size={0.05} vertexColors transparent opacity={0.8} sizeAttenuation={true} />
-    </points>
+    <group ref={coreRef}>
+      {/* Central XGBoost Meta Learner */}
+      <Sphere args={[0.5, 32, 32]}>
+        <meshPhysicalMaterial 
+          color="#162A2B" 
+          transmission={0.5} 
+          roughness={0.1} 
+          ior={1.5} 
+          thickness={0.5} 
+        />
+      </Sphere>
+      <Html distanceFactor={10} zIndexRange={[100, 0]}>
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-semibold text-primary bg-white/80 backdrop-blur-md px-3 py-1 rounded-lg border border-border/40 pointer-events-none opacity-0 hover:opacity-100 transition-opacity">
+          XGBoost Meta-Learner
+        </div>
+      </Html>
+
+      {/* Orbit Paths & Satellites */}
+      {satellites.map((sat, i) => (
+        <group key={i}>
+          <Ring args={[sat.radius - 0.01, sat.radius + 0.01, 64]}>
+            <meshBasicMaterial color={sat.color} transparent opacity={0.2} side={THREE.DoubleSide} />
+          </Ring>
+          <Satellite data={sat} />
+        </group>
+      ))}
+    </group>
   );
-};
+}
+
+function Satellite({ data }: { data: any }) {
+  const group = useRef<THREE.Group>(null);
+  
+  useFrame((state) => {
+    if (group.current) {
+      const angle = state.clock.elapsedTime * data.speed;
+      group.current.position.x = Math.cos(angle) * data.radius;
+      group.current.position.z = Math.sin(angle) * data.radius;
+    }
+  });
+
+  return (
+    <group ref={group}>
+      <Sphere args={[0.2, 16, 16]}>
+        <meshStandardMaterial color={data.color} emissive={data.color} emissiveIntensity={0.5} />
+      </Sphere>
+    </group>
+  );
+}
+
+export function ModelGalaxy() {
+  return (
+    <div className="w-full h-[500px] rounded-[32px] overflow-hidden relative">
+      <Canvas camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 2]}>
+        <ambientLight intensity={0.5} />
+        <directionalLight position={[10, 10, 5]} intensity={1.5} color="#F3EFE6" />
+        <Environment preset="city" />
+        <Float speed={1} floatIntensity={0.5}>
+          <OrbitSystem />
+        </Float>
+      </Canvas>
+    </div>
+  );
+}

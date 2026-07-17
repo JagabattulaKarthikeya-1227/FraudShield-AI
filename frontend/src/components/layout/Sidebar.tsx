@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import { cn } from "@/utils/cn";
 import {
   LayoutDashboard,
@@ -64,7 +65,7 @@ export function Sidebar() {
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mt-0.5">Intelligence</p>
           </div>
         </Link>
-        <nav className="space-y-1">
+        <nav className="space-y-1 relative">
           {navItems.map((item) => {
             const isActive = location.pathname.startsWith(item.path);
             const Icon = item.icon;
@@ -73,14 +74,22 @@ export function Sidebar() {
                 key={item.name}
                 to={item.path}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
-                  isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  "relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors z-10",
+                  isActive ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <Icon className="h-4 w-4" />
-                {item.name}
+                {isActive && (
+                  <motion.div
+                    layoutId="sidebar-active"
+                    className="absolute inset-0 bg-primary rounded-lg -z-10 shadow-sm"
+                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                  />
+                )}
+                {!isActive && (
+                  <div className="absolute inset-0 bg-secondary rounded-lg -z-10 opacity-0 hover:opacity-100 transition-opacity" />
+                )}
+                <Icon className="h-4 w-4 relative z-10" />
+                <span className="relative z-10">{item.name}</span>
               </Link>
             );
           })}

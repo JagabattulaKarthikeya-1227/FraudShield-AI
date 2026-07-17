@@ -64,18 +64,18 @@ export const FraudIntelligenceCenter = () => {
 
   const getRiskColor = (level: string) => {
     switch(level) {
-      case "Low Risk": return "bg-emerald-500/10 text-emerald-500 border-emerald-500/20";
-      case "Review Required": return "bg-amber-500/10 text-amber-500 border-amber-500/20";
-      case "High Risk": return "bg-rose-500/10 text-rose-500 border-rose-500/20";
+      case "Low Risk": return "bg-success/10 text-success border-success/20";
+      case "Review Required": return "bg-warning/10 text-warning border-warning/20";
+      case "High Risk": return "bg-destructive/10 text-destructive border-destructive/20";
       default: return "";
     }
   };
 
   const getRiskIcon = (level: string) => {
     switch(level) {
-      case "Low Risk": return <CheckCircle className="w-12 h-12 text-emerald-500 mb-4" />;
-      case "Review Required": return <AlertTriangle className="w-12 h-12 text-amber-500 mb-4" />;
-      case "High Risk": return <XCircle className="w-12 h-12 text-rose-500 mb-4" />;
+      case "Low Risk": return <CheckCircle className="w-12 h-12 text-success mb-4" />;
+      case "Review Required": return <AlertTriangle className="w-12 h-12 text-warning mb-4" />;
+      case "High Risk": return <XCircle className="w-12 h-12 text-destructive mb-4" />;
       default: return null;
     }
   };

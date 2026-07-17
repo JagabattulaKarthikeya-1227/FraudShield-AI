@@ -1,108 +1,258 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useDashboardStats } from "@/core/api/hooks/useDashboard";
 import { useTransactions, useReviewTransaction } from "@/core/api/hooks/useTransactions";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { GlobalKPIHeader, KPI } from "@/components/dashboard/GlobalKPIHeader";
+import { EnterpriseTable, Column } from "@/components/dashboard/EnterpriseTable";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Check, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/dashboard/EmptyState";
+import { InteractiveCard } from "@/components/motion/InteractiveCard";
+import { FadeIn } from "@/components/motion/FadeIn";
+import { motion, AnimatePresence } from "framer-motion";
+import { Check, X, ShieldAlert, History, Key, Activity, Network } from "lucide-react";
 
 export const FraudAnalystWorkspace = () => {
   const [page, setPage] = useState(1);
+  const [selectedTx, setSelectedTx] = useState<any | null>(null);
+  
   const { data: stats } = useDashboardStats();
-  const { data: txData, isLoading: txLoading } = useTransactions(page, 10);
+  const { data: txData, isLoading: txLoading } = useTransactions(page, 15);
   const { mutate: reviewTx, isPending: reviewPending } = useReviewTransaction();
 
   const handleReview = (id: string, action: 'approve' | 'reject') => {
-    reviewTx({ txId: id, action, notes: "Reviewed via priority queue." });
+    reviewTx({ txId: id, action, notes: "Reviewed via Analyst Workspace." });
+    if (selectedTx?.id === id) {
+      setSelectedTx(null); // Close panel after decision
+    }
   };
 
-  return (
-    <div className="space-y-8 animate-fade-in">
-      <PageHeader 
-        title="Analyst Workspace" 
-        description="Priority queue and manual review center." 
-      />
+  const kpis: KPI[] = [
+    {
+      id: 'queue',
+      label: 'Priority Review Queue',
+      value: stats?.priority_queue_size || 0,
+      trend: 'down',
+      trendValue: '-12%',
+      trendLabel: 'vs last hour',
+    },
+    {
+      id: 'reviews',
+      label: 'My Reviews (Month)',
+      value: stats?.my_reviews_this_month || 432,
+      trend: 'up',
+      trendValue: '+24',
+      trendLabel: 'Above average throughput',
+    },
+    {
+      id: 'precision',
+      label: 'Ensemble Precision',
+      value: 99.1,
+      suffix: '%',
+      decimals: 1,
+      trend: 'up',
+      trendValue: '+0.1%',
+      trendLabel: 'Model v4.2.1-prod',
+      sparklineData: [98, 98.2, 98.5, 99.0, 99.1]
+    },
+    {
+      id: 'latency',
+      label: 'Average Inference Time',
+      value: 42,
+      suffix: 'ms',
+      trend: 'neutral',
+      trendValue: '0',
+      trendLabel: 'P99: 85ms',
+    }
+  ];
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="glass-panel border-amber-500/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-amber-500">Pending Reviews (Queue)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats?.priority_queue_size || 0}</div>
-          </CardContent>
-        </Card>
-        <Card className="glass-panel">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">My Reviews (This Month)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{stats?.my_reviews_this_month || 0}</div>
-          </CardContent>
-        </Card>
+  const txColumns: Column<any>[] = [
+    {
+      key: 'id',
+      header: 'ID',
+      cell: (tx) => <span className="font-mono text-xs text-indigo-600 dark:text-indigo-400">{tx.id.substring(0,8)}</span>
+    },
+    {
+      key: 'score',
+      header: 'Risk Score',
+      sortable: true,
+      cell: (tx) => (
+        <div className="flex items-center gap-2">
+          <div className="w-12 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div 
+              className={`h-full rounded-full ${
+                (tx.risk_score * 100) > 80 ? 'bg-rose-500' : 
+                (tx.risk_score * 100) > 40 ? 'bg-amber-500' : 'bg-emerald-500'
+              }`}
+              style={{ width: `${Math.max(10, tx.risk_score * 100)}%` }}
+            />
+          </div>
+          <span className="text-xs font-medium">{(tx.risk_score * 100).toFixed(1)}</span>
+        </div>
+      )
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      cell: (tx) => (
+        <Badge variant="outline" className={
+          tx.status === 'flagged' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
+          tx.status === 'declined' ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' :
+          'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+        }>
+          {tx.status.toUpperCase()}
+        </Badge>
+      )
+    },
+    {
+      key: 'action',
+      header: '',
+      cell: (tx) => (
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={(e) => { e.stopPropagation(); setSelectedTx(tx); }}
+          className="h-7 text-xs px-2"
+        >
+          Investigate
+        </Button>
+      )
+    }
+  ];
+
+  return (
+    <div className="space-y-6 animate-fade-in pb-12 h-[calc(100vh-100px)] flex flex-col">
+      <div className="shrink-0">
+        <PageHeader 
+          title="Security Operations Center" 
+          description="Advanced Investigation & Manual Review Console." 
+        />
+        <GlobalKPIHeader kpis={kpis} />
       </div>
 
-      <Card className="glass-panel">
-        <CardHeader>
-          <CardTitle>Global Transaction Stream</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {txLoading ? (
-            <div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>
-          ) : (
-            <div className="w-full overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="text-xs uppercase bg-background/50 border-b border-border/50">
-                  <tr>
-                    <th className="px-6 py-3">ID</th>
-                    <th className="px-6 py-3">Risk Score</th>
-                    <th className="px-6 py-3">Status</th>
-                    <th className="px-6 py-3 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {txData?.items?.map((tx: any) => (
-                    <tr key={tx.id} className="border-b border-border/20 hover:bg-background/30 transition-colors">
-                      <td className="px-6 py-4 font-mono text-xs opacity-70">{tx.id.substring(0,8)}...</td>
-                      <td className="px-6 py-4">
-                        {tx.risk_score ? (tx.risk_score * 100).toFixed(1) + '%' : 'N/A'}
-                      </td>
-                      <td className="px-6 py-4">
-                        <Badge variant="outline" className={
-                          tx.status === 'flagged' ? 'bg-amber-500/10 text-amber-500' :
-                          tx.status === 'declined' ? 'bg-rose-500/10 text-rose-500' :
-                          'bg-emerald-500/10 text-emerald-500'
-                        }>
-                          {tx.status.toUpperCase()}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-4 text-right space-x-2">
-                        {tx.status === 'flagged' && (
-                          <>
-                            <Button size="sm" variant="outline" onClick={() => handleReview(tx.id, 'approve')} disabled={reviewPending} className="border-emerald-500/50 text-emerald-500 hover:bg-emerald-500/10">
-                              <Check className="h-4 w-4 mr-1" /> Approve
-                            </Button>
-                            <Button size="sm" variant="outline" onClick={() => handleReview(tx.id, 'reject')} disabled={reviewPending} className="border-rose-500/50 text-rose-500 hover:bg-rose-500/10">
-                              <X className="h-4 w-4 mr-1" /> Reject
-                            </Button>
-                          </>
-                        )}
-                        {tx.status !== 'flagged' && <span className="opacity-50 text-xs">Reviewed</span>}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="flex justify-between items-center mt-4 px-4">
-                <Button variant="outline" size="sm" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>Previous</Button>
-                <span className="text-xs text-muted-foreground">Page {page} of {txData?.pages || 1}</span>
-                <Button variant="outline" size="sm" onClick={() => setPage(p => p + 1)} disabled={page >= (txData?.pages || 1)}>Next</Button>
+      <div className="flex-1 flex flex-col lg:flex-row gap-6 min-h-0">
+        
+        {/* Left: Transaction Stream */}
+        <div className={`transition-all duration-500 flex flex-col min-h-0 ${selectedTx ? 'lg:w-1/2' : 'w-full'}`}>
+          <EnterpriseTable 
+            title="Global Transaction Stream"
+            description="Live feed of network activity."
+            data={txData?.items || []}
+            columns={txColumns}
+            isLoading={txLoading}
+            emptyState={
+              <EmptyState 
+                title="Queue Empty" 
+                description="No transactions pending review." 
+                imageSrc="/src/assets/illustrations/empty_transactions.png" 
+              />
+            }
+          />
+        </div>
+
+        {/* Right: Investigation Panel (Split Screen) */}
+        <AnimatePresence>
+          {selectedTx && (
+            <motion.div 
+              initial={{ opacity: 0, x: 20, width: 0 }}
+              animate={{ opacity: 1, x: 0, width: '100%' }}
+              exit={{ opacity: 0, x: 20, width: 0 }}
+              className="lg:w-1/2 flex flex-col h-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden"
+            >
+              {/* Panel Header */}
+              <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/50">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg">
+                    <ShieldAlert className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm">Investigation: <span className="font-mono text-indigo-600 dark:text-indigo-400">{selectedTx.id}</span></h3>
+                    <p className="text-xs text-slate-500">{new Date(selectedTx.date).toLocaleString()}</p>
+                  </div>
+                </div>
+                <button onClick={() => setSelectedTx(null)} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg">
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-            </div>
+
+              {/* Panel Body (Scrollable) */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                
+                {/* Decision Block */}
+                <div className="grid grid-cols-2 gap-4">
+                  <InteractiveCard tilt={false} className="p-4 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30">
+                    <h4 className="text-xs font-semibold text-rose-800 dark:text-rose-400 mb-1 uppercase tracking-wider">XGBoost Score</h4>
+                    <p className="text-3xl font-bold text-rose-600">{(selectedTx.risk_score * 100).toFixed(1)}%</p>
+                  </InteractiveCard>
+                  <InteractiveCard tilt={false} className="p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/30">
+                    <h4 className="text-xs font-semibold text-emerald-800 dark:text-emerald-400 mb-1 uppercase tracking-wider">Customer Trust</h4>
+                    <p className="text-3xl font-bold text-emerald-600">High</p>
+                  </InteractiveCard>
+                </div>
+
+                {/* SHAP Visualizer Mock */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-3 flex items-center gap-2"><Network className="w-4 h-4"/> SHAP Feature Importance</h4>
+                  <div className="space-y-3">
+                    {[
+                      { name: 'amount', val: 0.45, color: 'bg-rose-500' },
+                      { name: 'distance_from_home', val: 0.32, color: 'bg-rose-500' },
+                      { name: 'historical_avg', val: -0.15, color: 'bg-emerald-500' },
+                    ].map((f, i) => (
+                      <div key={i} className="flex items-center gap-3 text-xs">
+                        <span className="w-32 font-mono text-right truncate">{f.name}</span>
+                        <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center">
+                          <div 
+                            className={`h-full rounded-full ${f.color}`} 
+                            style={{ width: `${Math.abs(f.val) * 100}%`, marginLeft: f.val < 0 ? 'auto' : '0' }}
+                          />
+                        </div>
+                        <span className="w-12 font-mono">{f.val > 0 ? '+' : ''}{f.val}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Merchant Context */}
+                <div className="border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+                  <h4 className="text-sm font-semibold mb-2">Transaction Details</h4>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-slate-500 block text-xs">Merchant</span>
+                      <span className="font-medium">{selectedTx.merchant}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block text-xs">Amount</span>
+                      <span className="font-medium">${selectedTx.amount.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Action Footer */}
+              <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 flex justify-between gap-4">
+                <Button 
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white" 
+                  onClick={() => handleReview(selectedTx.id, 'approve')}
+                  disabled={reviewPending}
+                >
+                  <Check className="w-4 h-4 mr-2" /> Mark Safe
+                </Button>
+                <Button 
+                  className="flex-1 bg-rose-600 hover:bg-rose-700 text-white" 
+                  onClick={() => handleReview(selectedTx.id, 'reject')}
+                  disabled={reviewPending}
+                >
+                  <X className="w-4 h-4 mr-2" /> Confirm Fraud
+                </Button>
+              </div>
+
+            </motion.div>
           )}
-        </CardContent>
-      </Card>
+        </AnimatePresence>
+
+      </div>
     </div>
   );
 };

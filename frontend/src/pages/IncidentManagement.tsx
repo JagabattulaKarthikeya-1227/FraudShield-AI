@@ -4,6 +4,8 @@ import { AlertOctagon, Activity, Clock, UserCheck } from 'lucide-react';
 import { apiClient } from '../core/api/client';
 import { Canvas } from '@react-three/fiber';
 import { RiskSphere } from '../components/3d/RiskSphere';
+import { EmptyState } from '../components/dashboard/EmptyState';
+import { Skeleton } from '../components/motion/Skeleton';
 
 export const IncidentManagement: React.FC = () => {
   const { data: incidents, isLoading } = useQuery({
@@ -38,10 +40,34 @@ export const IncidentManagement: React.FC = () => {
       {/* Incident List */}
       <div className="bg-white dark:bg-[#111111] border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
         {isLoading ? (
-          <div className="p-8 text-center text-slate-500">Loading incidents...</div>
+          <div className="divide-y divide-slate-200 dark:divide-slate-800">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="p-6 flex flex-col lg:flex-row justify-between gap-4">
+                <div className="space-y-3 flex-1">
+                  <div className="flex gap-3">
+                    <Skeleton className="w-16 h-5" />
+                    <Skeleton className="w-20 h-5 rounded-full" />
+                    <Skeleton className="w-24 h-5" />
+                  </div>
+                  <Skeleton className="w-3/4 h-4" />
+                </div>
+                <div className="flex items-center gap-6">
+                  <Skeleton className="w-20 h-4" />
+                  <Skeleton className="w-24 h-4" />
+                  <Skeleton className="w-20 h-4" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : !incidents || incidents.length === 0 ? (
+          <EmptyState 
+            title="No Active Alerts" 
+            description="Your systems are fully operational and no security incidents have been detected. The Zero Trust architecture is maintaining boundaries."
+            imageSrc="/src/assets/illustrations/empty_alerts.png"
+          />
         ) : (
           <div className="divide-y divide-slate-200 dark:divide-slate-800">
-            {incidents?.map((incident, idx) => (
+            {incidents.map((incident, idx) => (
               <div key={idx} className="p-6 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   

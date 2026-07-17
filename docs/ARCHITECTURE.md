@@ -1,82 +1,66 @@
-# System Architecture
+# Architecture
 
-FraudShield AI leverages a modern, decoupled Cloud-Native architecture designed for horizontal scalability, high availability, and real-time inference.
+FraudShield AI utilizes a modern, decoupled microservices architecture designed to simulate an enterprise DevSecOps environment.
 
-## Macro Component Layout
+## High-Level System Architecture
 
 ```mermaid
 graph TD
-    Client([Client Browser / SPA]) --> Nginx[Nginx Reverse Proxy]
+    Client[Web Client - React] -->|HTTPS / WAF| Proxy[NGINX Reverse Proxy]
     
-    subgraph "DMZ / Gateway"
-        Nginx
+    subgraph Frontend Layer
+        Proxy --> Assets[Static Asset Delivery]
     end
     
-    subgraph "Application Tier"
-        Nginx --> Frontend[React 19 Frontend Container]
-        Nginx -.-> Backend[Flask Gunicorn Backend Container]
-        
-        Backend --> Auth[JWT Security Middleware]
-        Backend --> Predict[Hybrid ML Inference Engine]
-        Backend --> SSE[Server-Sent Events Stream]
+    subgraph Gateway Layer
+        Proxy -->|/api| Gateway[API Gateway - Flask]
     end
     
-    subgraph "Asynchronous Tier"
-        Backend -- Dispatch --> Redis[(Redis Queue)]
-        Redis -- Consume --> Celery[Celery Background Worker]
-        Celery --> SMTP[Email Delivery Service]
+    subgraph Core Services
+        Gateway --> Auth[Auth Service]
+        Gateway --> Inference[ML Inference Service]
+        Gateway --> Explain[XAI Engine - KernelSHAP]
+        Gateway --> Copilot[LLM Integration Service]
     end
     
-    subgraph "Data Tier"
-        Backend <--> DB[(MySQL 8 Persistent Store)]
-        Celery <--> DB
+    subgraph Data Layer
+        Auth --> Postgres[(PostgreSQL 15)]
+        Inference --> Redis[(Redis Cache)]
+        Explain --> Redis
     end
 ```
 
-## Authentication & RBAC Flow
+## Frontend Architecture
+- **Framework**: React 18 + Vite for lightning-fast HMR and optimized builds.
+- **Styling**: Tailwind CSS for utility-first styling, ensuring a consistent design system.
+- **Motion & 3D**: `framer-motion` for cinematic page transitions and micro-interactions. `@react-three/fiber` for rendering the complex WebGL globes and particles.
+- **State Management**: Context API for global states (Academic Mode, Theme) and React Query for server state caching and optimistic UI updates.
+
+## Backend Architecture
+- **Framework**: Flask (Python) served via Gunicorn.
+- **Concurrency**: Gunicorn runs with asynchronous workers to handle long-running ML inference requests without blocking the event loop for auth requests.
+- **Security**: 
+  - JWTs are generated via `PyJWT` and signed with HS256.
+  - Refresh tokens are stored strictly in `HttpOnly, SameSite=Strict` cookies to prevent XSS exfiltration.
+
+## Machine Learning Pipeline (Training Architecture)
 
 ```mermaid
 sequenceDiagram
-    participant User
-    participant Frontend
-    participant Nginx
-    participant Backend
-    participant DB
-
-    User->>Frontend: Enters Credentials
-    Frontend->>Nginx: POST /api/v1/auth/login
-    Nginx->>Backend: Reverse Proxy
-    Backend->>DB: Verify bcrypt Hash
-    DB-->>Backend: OK, Role=Administrator
-    Backend-->>Frontend: 200 OK (JWT Access Token)
-    Frontend->>Frontend: Store in memory / Zustand
+    participant Data as Raw Data
+    participant Pre as Preprocessor
+    participant Smote as SMOTE
+    participant Base as Base Models (Extra Trees, MLP)
+    participant Meta as Meta-Learner (Logistic Reg)
     
-    User->>Frontend: Clicks "System Config"
-    Frontend->>Backend: GET /api/v1/ops/config (Bearer Token)
-    Backend->>Backend: JWT Middleware validates Token & Role
-    Backend-->>Frontend: 200 OK (Config Data)
+    Data->>Pre: Scaling (RobustScaler)
+    Pre->>Data: Train/Test Split
+    Note over Pre,Smote: Crucial: SMOTE applied ONLY to Train Set
+    Pre->>Smote: Imbalanced Train Data
+    Smote->>Base: Balanced Train Data
+    Base->>Meta: Out-of-fold Predictions
+    Meta->>Meta: Optimize for PR-AUC
 ```
 
-## ML Inference Pipeline Flow
-
-```mermaid
-graph LR
-    Raw[Raw Transaction] --> Scale[StandardScaler]
-    Scale --> SMOTE[SMOTE Balancing (Training Only)]
-    Scale --> ExtraTrees[Extra Trees Classifier]
-    Scale --> XGB[XGBoost Classifier]
-    Scale --> MLP[Keras MLP Neural Net]
-    ExtraTrees --> Meta[Meta-Ensemble Router]
-    XGB --> Meta
-    MLP --> Meta
-    Meta --> Isotonic[Isotonic Calibration]
-    Isotonic --> Prob[Final Probability %]
-    Prob --> SHAP[SHAP TreeExplainer]
-    SHAP --> Visual[Explainability Visualizer]
-```
-
-## Technology Justifications
-
-1. **Vite + React 19**: Chosen for near-instant HMR (Hot Module Replacement) and massive reductions in production bundle sizes compared to CRA.
-2. **Flask + Gunicorn**: A lightweight microframework that doesn't force ORM bloat, allowing precise integration with heavy numerical libraries (Pandas, scikit-learn).
-3. **Redis + Celery**: By offloading SMTP handshakes and Batch ML processing to Celery, the primary Flask threads remain unblocked, ensuring API latency remains under 100ms.
+## Deployment Architecture
+See [DEPLOYMENT.md](DEPLOYMENT.md) for specifics on Docker containerization and CI/CD pipelines.

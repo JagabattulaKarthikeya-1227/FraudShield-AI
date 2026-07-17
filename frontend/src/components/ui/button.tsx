@@ -15,16 +15,16 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : "button";
     
     const baseStyles =
-      "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 cursor-pointer relative overflow-hidden";
+      "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 cursor-pointer relative overflow-hidden";
     
     const variants = {
-      default: "bg-primary text-primary-foreground shadow-[0_2px_10px_rgba(30,30,30,0.1)] hover:bg-primary/90 hover:shadow-[0_4px_14px_rgba(30,30,30,0.15)]",
-      destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
-      outline: "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
-      secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-      ghost: "hover:bg-accent/10 hover:text-accent",
+      default: "bg-primary text-primary-foreground shadow-[0_2px_12px_rgba(22,42,43,0.15)] hover:bg-primary/95 hover:shadow-[0_6px_20px_rgba(22,42,43,0.2)] hover:-translate-y-[1px]",
+      destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 hover:shadow-md hover:-translate-y-[1px]",
+      outline: "border border-input bg-background shadow-sm hover:bg-muted hover:text-foreground hover:-translate-y-[1px]",
+      secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:-translate-y-[1px]",
+      ghost: "hover:bg-muted hover:text-foreground",
       link: "text-primary underline-offset-4 hover:underline",
-      glass: "glass text-foreground hover:bg-background/40 hover:shadow-sm",
+      glass: "glass text-foreground hover:bg-white/40 hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:-translate-y-[1px]",
     };
     
     const sizes = {

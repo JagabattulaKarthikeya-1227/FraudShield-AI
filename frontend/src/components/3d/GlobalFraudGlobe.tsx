@@ -1,59 +1,101 @@
-import { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Sphere, MeshDistortMaterial, Stars, Float } from '@react-three/drei';
+import { Sphere, Float, Environment, QuadraticBezierLine, Points, PointMaterial } from '@react-three/drei';
+import * as THREE from 'three';
 
-const EarthGlobe = () => {
-  const meshRef = useRef<any>(null);
+const arcs = [
+  { start: new THREE.Vector3(1, 1, 1.5), end: new THREE.Vector3(-1, 1.5, 1) },
+  { start: new THREE.Vector3(-1.2, 0.5, 1.5), end: new THREE.Vector3(1.5, 0, 1.2) },
+  { start: new THREE.Vector3(0.5, -1.5, 1.2), end: new THREE.Vector3(-0.5, -1, 1.5) },
+];
 
+function EarthCore() {
+  const meshRef = useRef<THREE.Mesh>(null);
+  
   useFrame(({ clock }) => {
     if (meshRef.current) {
-      meshRef.current.rotation.y = clock.getElapsedTime() * 0.1; // Slow constant rotation
+      meshRef.current.rotation.y = clock.getElapsedTime() * 0.05;
     }
   });
 
   return (
-    <Float speed={1.5} rotationIntensity={0.5} floatIntensity={1}>
-      {/* Outer Atmosphere */}
-      <Sphere ref={meshRef} args={[2, 64, 64]} scale={1.1}>
-        <MeshDistortMaterial 
-          color="#1e293b" 
-          attach="material" 
-          distort={0.1} 
-          speed={1} 
-          roughness={0.8}
-          metalness={0.2}
-          wireframe={true}
-          opacity={0.3}
-          transparent={true}
+    <group ref={meshRef}>
+      {/* Glass Sphere */}
+      <Sphere args={[2, 64, 64]}>
+        <meshPhysicalMaterial 
+          color="#F3EFE6"
+          transmission={0.9}
+          opacity={1}
+          metalness={0.1}
+          roughness={0.1}
+          ior={1.5}
+          thickness={1}
         />
       </Sphere>
-      {/* Core Planet */}
-      <Sphere args={[1.9, 64, 64]}>
-        <meshStandardMaterial 
-          color="#0f172a" 
-          emissive="#3b82f6" 
-          emissiveIntensity={0.2} 
-          roughness={1}
-        />
-      </Sphere>
-    </Float>
-  );
-};
 
-export const GlobalFraudGlobe = () => {
+      {/* Internal Glow */}
+      <Sphere args={[1.9, 32, 32]}>
+        <meshBasicMaterial color="#D9A441" transparent opacity={0.05} />
+      </Sphere>
+
+      {/* Transaction Arcs */}
+      {arcs.map((arc, i) => (
+        <QuadraticBezierLine 
+          key={i}
+          start={arc.start}
+          end={arc.end}
+          mid={new THREE.Vector3().addVectors(arc.start, arc.end).multiplyScalar(0.5).add(new THREE.Vector3(0, 0, 0.5))}
+          color={i === 1 ? "#C26E60" : "#D9A441"}
+          lineWidth={1.5}
+          dashed={true}
+          dashScale={2}
+          dashSize={0.5}
+        />
+      ))}
+    </group>
+  );
+}
+
+function GlobalParticles() {
+  const count = 1000;
+  const positions = useMemo(() => {
+    const p = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      p[i * 3] = (Math.random() - 0.5) * 15;
+      p[i * 3 + 1] = (Math.random() - 0.5) * 15;
+      p[i * 3 + 2] = (Math.random() - 0.5) * 15;
+    }
+    return p;
+  }, [count]);
+
+  const ref = useRef<THREE.Points>(null);
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.rotation.y = state.clock.elapsedTime * 0.02;
+    }
+  });
+
   return (
-    <div className="w-full h-full min-h-[400px] rounded-xl overflow-hidden bg-background/40 border border-border/50 relative">
-      <div className="absolute inset-0 z-10 pointer-events-none flex flex-col justify-end p-8">
-        <h3 className="text-2xl font-bold tracking-tight text-white mix-blend-overlay">Global Threat Matrix</h3>
-        <p className="text-sm opacity-50">Real-time planetary monitoring</p>
-      </div>
-      <Canvas camera={{ position: [0, 0, 5] }}>
-        <ambientLight intensity={0.2} />
-        <directionalLight position={[10, 10, 5]} intensity={1} color="#3b82f6" />
-        <directionalLight position={[-10, -10, -5]} intensity={0.5} color="#ef4444" />
-        <Stars radius={100} depth={50} count={5000} factor={2} saturation={0.5} fade speed={1} />
-        <EarthGlobe />
+    <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
+      <PointMaterial transparent color="#D9A441" size={0.03} sizeAttenuation={true} depthWrite={false} opacity={0.3} />
+    </Points>
+  );
+}
+
+export function GlobalFraudGlobe() {
+  return (
+    <div className="w-full h-full min-h-[500px] rounded-[32px] overflow-hidden relative">
+      <Canvas camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 2]}>
+        <ambientLight intensity={0.5} />
+        <directionalLight position={[10, 10, 5]} intensity={1.5} color="#F3EFE6" />
+        <directionalLight position={[-10, -10, -5]} intensity={0.5} color="#D9A441" />
+        <Environment preset="city" />
+        
+        <Float speed={1} rotationIntensity={0.2} floatIntensity={0.5}>
+          <EarthCore />
+        </Float>
+        <GlobalParticles />
       </Canvas>
     </div>
   );
-};
+}

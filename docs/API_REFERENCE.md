@@ -1,66 +1,65 @@
-# API Reference Guide
+# API Reference
 
-All API endpoints are prefixed with `/api/v1`. The API consumes and produces `application/json`.
+The FraudShield API is a RESTful Flask service. All requests and responses are JSON encoded. 
 
-## Authentication
+## Base URL
+`http://localhost:5000/api/v1`
 
-FraudShield AI uses short-lived JWTs (JSON Web Tokens) for authentication. You must pass the token in the `Authorization` header:
-`Authorization: Bearer <your_jwt_here>`
+## Authentication Flow
 
 ### `POST /auth/login`
-Authenticates a user and returns a JWT.
-- **Body**: `{"email": "admin@fraudshield.ai", "password": "password"}`
-- **Response**: `200 OK`
+Authenticates a user and establishes a secure session.
+
+**Request Body:**
 ```json
 {
-  "status": "success",
-  "data": {
-    "access_token": "eyJhbG...",
-    "user": { "role": "Administrator", "name": "Admin" }
+  "email": "admin@fraudshield.ai",
+  "password": "SecurePassword123!"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "usr_123",
+    "role": "admin"
   }
 }
 ```
+*Note: The API also sets an `HttpOnly, SameSite=Strict` cookie containing a long-lived refresh token. The returned `token` is a short-lived access token.*
 
-## Telemetry & Operations (RBAC: Administrator)
+## Core ML Endpoints
 
-### `GET /telemetry/health`
-Returns live system hardware metrics.
-- **Response**: `200 OK`
+### `POST /predict/fraud`
+Accepts a transaction payload and returns a fraud probability score and explanation.
+
+**Headers:**
+- `Authorization: Bearer <token>`
+
+**Request Body:**
 ```json
 {
-  "cpu_usage": 45.2,
-  "memory_usage": 60.1,
-  "api_latency_ms": 42
+  "transaction_id": "tx_8921",
+  "features": [1.4, -0.2, 3.1, 85.50, 2]
 }
 ```
 
-### `GET /notifications/stream`
-Server-Sent Events (SSE) endpoint. Keeps a persistent HTTP connection open.
-- **Response**: `text/event-stream`
-```text
-data: {"type": "heartbeat", "timestamp": "2026-07-15..."}
-
-data: {"type": "alert", "message": "High Risk TX-9182"}
-```
-
-## Machine Learning
-
-### `POST /predict/realtime`
-Scores a raw transaction via the Meta-Ensemble.
-- **Body**: 
+**Response (200 OK):**
 ```json
 {
-  "V1": -1.3,
-  "V2": 2.4,
-  "Amount": 150.00,
-  "Time": 45912
+  "prediction": "FRAUD",
+  "probability": 0.982,
+  "shap_values": {
+    "V14": 0.42,
+    "Amount": 0.15,
+    "V4": 0.31
+  },
+  "explanation": "Transaction blocked due to unusually high value of feature V14 combined with the transaction amount."
 }
 ```
-- **Response**: `200 OK`
-```json
-{
-  "risk_score": 0.89,
-  "classification": "Fraudulent",
-  "shap_values": {"V2": 0.4, "Amount": 0.1}
-}
-```
+
+## Security Controls
+- **Rate Limiting**: All endpoints are rate-limited via Redis (e.g., 5 requests per minute for `/auth/login`).
+- **Authorization**: The `@require_role('admin')` decorator enforces RBAC on specific routes (e.g., MLOps configuration endpoints).
