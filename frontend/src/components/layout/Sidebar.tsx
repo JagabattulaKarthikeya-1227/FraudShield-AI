@@ -1,99 +1,80 @@
 import { Link, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
 import { cn } from "@/utils/cn";
 import {
   LayoutDashboard,
-  ShieldAlert,
-  Activity,
-  Settings,
   List,
+  Bell,
   BarChart3,
-  Microscope,
-  Shield,
-  AlertOctagon,
-  Lock,
-  Eye,
-  Server,
-  Scale,
-  Book,
-  Database,
-  Beaker,
-  ActivitySquare,
-  DatabaseZap,
-  GitCompare
+  Cpu,
+  Activity,
+  User,
+  Settings,
+  LogOut,
 } from "lucide-react";
 
 export function Sidebar() {
   const location = useLocation();
 
-  const navItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', roles: ['Administrator', 'Fraud Analyst', 'Customer'] },
-    { name: 'Transactions', icon: List, path: '/transactions', roles: ['Administrator', 'Fraud Analyst'] },
-    { name: 'Analytics', icon: BarChart3, path: '/analytics', roles: ['Administrator', 'Fraud Analyst'] },
-    
-    // MLOps & Operations
-    { name: 'Decision Lab', icon: Microscope, path: '/explainability', roles: ['Administrator', 'Fraud Analyst'] },
-    { name: 'Model Registry', icon: Database, path: '/registry', roles: ['Administrator'] },
-    { name: 'Experiments', icon: Beaker, path: '/experiments', roles: ['Administrator'] },
-    { name: 'Drift Det.', icon: ActivitySquare, path: '/drift', roles: ['Administrator'] },
-    { name: 'Feature Store', icon: DatabaseZap, path: '/features', roles: ['Administrator'] },
-    { name: 'Champion/Challenger', icon: GitCompare, path: '/champion', roles: ['Administrator'] },
-    { name: 'System Health', icon: Activity, path: '/health', roles: ['Administrator'] },
-    
-    // GRC (Governance, Risk, Compliance)
-    { name: 'Security Center', icon: Shield, path: '/security', roles: ['Administrator'] },
-    { name: 'Incident Mgmt', icon: AlertOctagon, path: '/incidents', roles: ['Administrator', 'Fraud Analyst'] },
-    { name: 'Audit Ledger', icon: Lock, path: '/audit', roles: ['Administrator'] },
-    { name: 'Privacy Center', icon: Eye, path: '/privacy', roles: ['Administrator'] },
-    { name: 'Compliance', icon: Server, path: '/compliance', roles: ['Administrator'] },
-    { name: 'Responsible AI', icon: Scale, path: '/responsible-ai', roles: ['Administrator', 'Fraud Analyst'] },
-    
-    // User & Settings
-    { name: 'Knowledge Center', icon: Book, path: '/knowledge', roles: ['Administrator', 'Fraud Analyst', 'Customer'] },
-    { name: 'Settings', icon: Settings, path: '/settings', roles: ['Administrator', 'Fraud Analyst', 'Customer'] },
+  const mainNavItems = [
+    { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+    { name: 'Transactions', icon: List, path: '/transactions' },
+    { name: 'Alerts', icon: Bell, path: '/alerts' },
+    { name: 'Analytics', icon: BarChart3, path: '/analytics' },
+    { name: 'AI Engine', icon: Cpu, path: '/explainability' },
+    { name: 'Model Performance', icon: Activity, path: '/models' },
   ];
 
+  const accountNavItems = [
+    { name: 'Profile', icon: User, path: '/profile' },
+    { name: 'Settings', icon: Settings, path: '/settings' },
+  ];
+
+  const NavItem = ({ item }: { item: any }) => {
+    const isActive = location.pathname.startsWith(item.path);
+    const Icon = item.icon;
+    return (
+      <Link
+        to={item.path}
+        className={cn(
+          "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-1",
+          isActive 
+            ? "bg-emerald-50 text-emerald-900 dark:bg-emerald-900/30 dark:text-emerald-100" 
+            : "text-slate-500 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800/50"
+        )}
+      >
+        <Icon className={cn("h-4 w-4", isActive ? "text-emerald-600 dark:text-emerald-400" : "")} />
+        {item.name}
+      </Link>
+    );
+  };
+
   return (
-    <aside className="w-64 border-r bg-card/40 backdrop-blur-md flex flex-col justify-between hidden md:flex">
-      <div className="p-6">
+    <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 flex flex-col justify-between hidden md:flex">
+      <div className="p-6 overflow-y-auto">
         <Link to="/" className="flex items-center gap-2 mb-10">
-          <div className="h-8 w-8 rounded bg-primary flex items-center justify-center">
-            <ShieldAlert className="h-5 w-5 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-lg font-bold leading-none tracking-tight">FraudShield</h1>
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mt-0.5">Intelligence</p>
-          </div>
+          <img src="/logo.svg" alt="FraudShield AI Logo" className="w-6 h-6 dark:invert" />
+          <h1 className="text-lg font-bold leading-none tracking-tight text-slate-900 dark:text-white">FraudShield AI</h1>
         </Link>
-        <nav className="space-y-1 relative">
-          {navItems.map((item) => {
-            const isActive = location.pathname.startsWith(item.path);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={cn(
-                  "relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors z-10",
-                  isActive ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="sidebar-active"
-                    className="absolute inset-0 bg-primary rounded-lg -z-10 shadow-sm"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                  />
-                )}
-                {!isActive && (
-                  <div className="absolute inset-0 bg-secondary rounded-lg -z-10 opacity-0 hover:opacity-100 transition-opacity" />
-                )}
-                <Icon className="h-4 w-4 relative z-10" />
-                <span className="relative z-10">{item.name}</span>
-              </Link>
-            );
-          })}
+        
+        <nav className="mb-10">
+          {mainNavItems.map((item) => <NavItem key={item.name} item={item} />)}
         </nav>
+
+        <div>
+          <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-3 px-3">Account</p>
+          <nav>
+            {accountNavItems.map((item) => <NavItem key={item.name} item={item} />)}
+          </nav>
+        </div>
+      </div>
+
+      <div className="p-6 border-t border-slate-200 dark:border-slate-800">
+        <button className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-400 dark:hover:text-slate-100 dark:hover:bg-slate-800/50 w-full transition-colors justify-between">
+          <div className="flex items-center gap-3">
+            <LogOut className="h-4 w-4" />
+            Logout
+          </div>
+        </button>
       </div>
     </aside>
   );

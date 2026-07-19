@@ -1,54 +1,142 @@
-import { useKPIs, useTrends } from "@/core/api/hooks/useTelemetry";
+import React from 'react';
+import ReactECharts from 'echarts-for-react';
 import { PageHeader } from "@/components/layout/PageHeader";
-import { GlobalKPIHeader, KPI } from "@/components/dashboard/GlobalKPIHeader";
-import { InteractiveCard } from "@/components/motion/InteractiveCard";
-import { PredictionTimelineChart } from "@/components/charts/PredictionTimelineChart";
-import { FraudHeatmapChart } from "@/components/charts/FraudHeatmapChart";
-import { GlobalFraudGlobe } from "@/components/3d/GlobalFraudGlobe";
-import { Loader2 } from "lucide-react";
 
 export const AnalyticsCenter = () => {
-  const { data: kpi, isLoading: loadingKpi } = useKPIs();
-  const { data: trends, isLoading: loadingTrends } = useTrends();
 
-  const kpis: KPI[] = [
-    { id: 'rate', label: 'Global Fraud Rate', value: kpi?.fraud_rate || 0.12, suffix: '%', decimals: 2, trend: 'down', trendValue: '-0.02%' },
-    { id: 'acc', label: 'Detection Accuracy', value: kpi?.detection_accuracy || 99.8, suffix: '%', decimals: 1, trend: 'up', trendValue: '+0.1%' },
-    { id: 'queue', label: 'Priority Review Queue', value: kpi?.review_queue || 45, trend: 'down', trendValue: '-12' },
-    { id: 'latency', label: 'Avg Decision Latency', value: kpi?.avg_decision_time_ms || 32, suffix: 'ms', trend: 'neutral', trendValue: '0ms' }
-  ];
+  const areaOptions = {
+    tooltip: { trigger: 'axis' },
+    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    xAxis: [
+      {
+        type: 'category',
+        boundaryGap: false,
+        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: { color: '#64748b' }
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        splitLine: { lineStyle: { color: '#f1f5f9', type: 'dashed' } },
+        axisLabel: { color: '#64748b' }
+      }
+    ],
+    series: [
+      {
+        name: 'Transaction Volume',
+        type: 'line',
+        smooth: true,
+        lineStyle: { width: 3, color: '#0f766e' },
+        showSymbol: false,
+        areaStyle: {
+          opacity: 0.8,
+          color: {
+            type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [{ offset: 0, color: 'rgba(15,118,110,0.3)' }, { offset: 1, color: 'rgba(15,118,110,0)' }]
+          }
+        },
+        data: [120, 132, 101, 134, 90, 230, 210]
+      },
+      {
+        name: 'Fraud Attempts',
+        type: 'line',
+        smooth: true,
+        lineStyle: { width: 3, color: '#e11d48' },
+        showSymbol: false,
+        data: [20, 12, 11, 34, 20, 30, 10]
+      }
+    ]
+  };
+
+  const barOptions = {
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    xAxis: [
+      {
+        type: 'category',
+        data: ['Electronics', 'Travel', 'Retail', 'Digital', 'Food'],
+        axisTick: { alignWithLabel: true, show: false },
+        axisLine: { show: false },
+        axisLabel: { color: '#64748b' }
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        splitLine: { lineStyle: { color: '#f1f5f9', type: 'dashed' } },
+        axisLabel: { color: '#64748b' }
+      }
+    ],
+    series: [
+      {
+        name: 'Risk Exposure',
+        type: 'bar',
+        barWidth: '40%',
+        itemStyle: { borderRadius: [4, 4, 0, 0], color: '#f59e0b' },
+        data: [390, 330, 220, 110, 80]
+      }
+    ]
+  };
+
+  const pieOptions = {
+    tooltip: { trigger: 'item' },
+    legend: { top: '5%', left: 'center', textStyle: { color: '#64748b' } },
+    series: [
+      {
+        name: 'Alert Types',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        avoidLabelOverlap: false,
+        itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+        label: { show: false, position: 'center' },
+        emphasis: {
+          label: { show: true, fontSize: '18', fontWeight: 'bold' }
+        },
+        labelLine: { show: false },
+        data: [
+          { value: 1048, name: 'Velocity', itemStyle: { color: '#0f766e' } },
+          { value: 735, name: 'Location', itemStyle: { color: '#14b8a6' } },
+          { value: 580, name: 'Amount', itemStyle: { color: '#f59e0b' } },
+          { value: 484, name: 'Device', itemStyle: { color: '#e11d48' } }
+        ]
+      }
+    ]
+  };
 
   return (
-    <div className="space-y-6 animate-fade-in pb-12">
-      <PageHeader 
-        title="Analytics & Command Center" 
-        description="Enterprise macroscopic monitoring and real-time fraud velocity telemetry." 
-      />
-
-      <GlobalKPIHeader kpis={kpis} />
+    <div className="space-y-6 pb-12 w-full animate-in fade-in duration-500">
+      <PageHeader title="Analytics" description="Deep insights into geographical and temporal risk patterns." />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Timeline */}
-        <InteractiveCard tilt={false} className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 lg:col-span-2">
-          <h3 className="text-lg font-semibold mb-6 text-slate-900 dark:text-white">30-Day Prediction Velocity</h3>
-          {loadingTrends ? (
-            <div className="h-[350px] flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin opacity-50" /></div>
-          ) : (
-            trends && <PredictionTimelineChart labels={trends.labels} legitimate={trends.legitimate} fraudulent={trends.fraudulent} />
-          )}
-        </InteractiveCard>
-
-        {/* 3D Global Globe */}
-        <div className="h-full min-h-[400px] w-full rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-slate-50 dark:bg-slate-950">
-          <GlobalFraudGlobe />
+        
+        {/* Main Area Chart */}
+        <div className="bg-white p-6 rounded-[1.25rem] border border-slate-200 shadow-sm lg:col-span-2">
+          <h3 className="text-base font-semibold text-slate-900 mb-6">Volume vs Fraud</h3>
+          <div className="h-[300px]">
+            <ReactECharts option={areaOptions} style={{ height: '100%', width: '100%' }} />
+          </div>
         </div>
-      </div>
 
-      {/* Heatmap Row */}
-      <InteractiveCard tilt={false} className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-        <h3 className="text-lg font-semibold mb-6 text-slate-900 dark:text-white">Global Fraud Density Matrix</h3>
-        <FraudHeatmapChart />
-      </InteractiveCard>
+        {/* Pie Chart */}
+        <div className="bg-white p-6 rounded-[1.25rem] border border-slate-200 shadow-sm">
+          <h3 className="text-base font-semibold text-slate-900 mb-6">Alert Composition</h3>
+          <div className="h-[300px]">
+            <ReactECharts option={pieOptions} style={{ height: '100%', width: '100%' }} />
+          </div>
+        </div>
+
+        {/* Bar Chart */}
+        <div className="bg-white p-6 rounded-[1.25rem] border border-slate-200 shadow-sm lg:col-span-3">
+          <h3 className="text-base font-semibold text-slate-900 mb-6">Risk Exposure by Category</h3>
+          <div className="h-[300px]">
+            <ReactECharts option={barOptions} style={{ height: '100%', width: '100%' }} />
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 };

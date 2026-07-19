@@ -1,0 +1,136 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Fingerprint, CheckCircle2, BarChart3 } from 'lucide-react';
+
+export function ExplainableAI() {
+  return (
+    <section id="how-it-works" className="py-24 relative overflow-hidden bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-900">
+      <div className="max-w-[1200px] mx-auto px-6 md:px-12 relative z-10">
+        
+        <div className="flex flex-col lg:flex-row gap-16 items-center">
+          
+          {/* Left Content */}
+          <div className="lg:w-1/2">
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              className="text-sm font-semibold tracking-wide text-zinc-500 uppercase mb-4"
+            >
+              Explainable AI (XAI)
+            </motion.div>
+            
+            <motion.h2
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ delay: 0.1 }}
+              className="text-3xl md:text-5xl font-semibold tracking-tight text-primary mb-6 leading-tight"
+            >
+              Don't just detect fraud. <br />
+              <span className="text-zinc-400">Understand it.</span>
+            </motion.h2>
+
+            <motion.p
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ delay: 0.2 }}
+              className="text-lg text-zinc-500 mb-10 leading-relaxed"
+            >
+              Black-box models are a liability in regulated industries. FraudShield AI integrates SHAP and LIME to provide human-readable explanations for every single decision, satisfying compliance requirements instantly.
+            </motion.p>
+
+            <div className="space-y-6">
+              {[
+                { title: "SHAP Values", desc: "Understand exactly how much each feature contributed to the final risk score globally and locally." },
+                { title: "LIME Explanations", desc: "Generate intuitive, localized approximations for complex neural network decisions." },
+                { title: "Regulatory Compliance", desc: "Automated rationale reports ready for auditors and internal review boards." }
+              ].map((item, idx) => (
+                <motion.div 
+                  key={idx}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ delay: 0.3 + (idx * 0.1) }}
+                  className="flex gap-4 group"
+                >
+                  <div className="mt-0.5">
+                    <CheckCircle2 className="w-5 h-5 text-zinc-900 dark:text-zinc-100" />
+                  </div>
+                  <div>
+                    <h4 className="text-primary font-semibold text-sm mb-1">{item.title}</h4>
+                    <p className="text-sm text-zinc-500">{item.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Content - Visuals */}
+          <div className="lg:w-1/2 w-full">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.98 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.4 }}
+              className="relative rounded-2xl bg-zinc-50 dark:bg-zinc-900/30 border border-zinc-200 dark:border-zinc-800 p-8 shadow-sm"
+            >
+              {/* Feature Importance Mockup */}
+              <div className="mb-8 flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-4">
+                <h3 className="text-sm font-semibold text-primary flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-zinc-500" />
+                  Local Feature Importance
+                </h3>
+                <span className="text-[10px] font-bold bg-white dark:bg-zinc-950 px-2 py-1 rounded border border-zinc-200 dark:border-zinc-800 text-zinc-500 uppercase tracking-widest">
+                  TXN-9124
+                </span>
+              </div>
+
+              <div className="space-y-5">
+                {[
+                  { label: "IP Location Distance", value: 85, color: "bg-zinc-900 dark:bg-zinc-100", impact: "+0.45" },
+                  { label: "Transaction Amount", value: 65, color: "bg-zinc-700 dark:bg-zinc-300", impact: "+0.22" },
+                  { label: "Time of Day", value: 40, color: "bg-zinc-500", impact: "+0.12" },
+                  { label: "Device Fingerprint", value: 20, color: "bg-zinc-300 dark:bg-zinc-700", impact: "-0.08" },
+                  { label: "Account Age", value: 15, color: "bg-zinc-200 dark:bg-zinc-800", impact: "-0.05" },
+                ].map((feature, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <div className="w-32 text-xs font-medium text-zinc-500 truncate text-right">
+                      {feature.label}
+                    </div>
+                    <div className="flex-1 h-2 bg-zinc-200/50 dark:bg-zinc-800/50 rounded-full relative">
+                      {/* Midpoint line */}
+                      <div className="absolute top-[-4px] bottom-[-4px] left-1/2 w-px bg-zinc-300 dark:bg-zinc-700 z-10" />
+                      
+                      {/* Bar */}
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${feature.value}%` }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8, delay: 0.3 + (i * 0.1), ease: "easeOut" }}
+                        className={`h-full rounded-full ${feature.color} ${feature.impact.startsWith('+') ? 'ml-[50%]' : 'ml-[50%] -scale-x-100 origin-left'}`}
+                        style={{ width: `${feature.value / 2}%` }}
+                      />
+                    </div>
+                    <div className={`w-12 text-xs font-semibold ${feature.impact.startsWith('+') ? 'text-primary' : 'text-zinc-400'}`}>
+                      {feature.impact}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800 flex gap-3">
+                <Fingerprint className="w-4 h-4 text-zinc-500 shrink-0 mt-0.5" />
+                <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                  <span className="font-semibold text-primary">AI Conclusion:</span> The extreme distance between the billing address and the IP location (+0.45), combined with an unusually high transaction amount (+0.22), strongly indicates a compromised card, resulting in a <strong>98% Fraud Risk Score</strong>.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}

@@ -1,142 +1,153 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ReactECharts from 'echarts-for-react';
-import { useQuery } from '@tanstack/react-query';
-import { Database, GitCommit, Clock, CheckCircle, XCircle, Search, Play } from 'lucide-react';
-import { apiClient } from '../core/api/client';
-import { PageHeader } from '@/components/layout/PageHeader';
-import { EnterpriseTable, Column } from '@/components/dashboard/EnterpriseTable';
-import { InteractiveCard } from '@/components/motion/InteractiveCard';
-import { Badge } from '@/components/ui/badge';
-import { AcademicTooltip } from '@/components/ui/AcademicTooltip';
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Database, GitCompare, Activity } from "lucide-react";
+import { Button } from '@/components/ui/button';
 
-export const ModelRegistry: React.FC = () => {
-  const [selectedModel, setSelectedModel] = useState<string>('model-ensemble-v4');
+export const ModelRegistry = () => {
 
-  const { data: models, isLoading } = useQuery({
-    queryKey: ['ml', 'registry'],
-    queryFn: async () => {
-      // Return mock data for robust UI display if backend fails
-      return [
-        { id: 'model-ensemble-v4', name: 'Stacking Classifier', status: 'Champion', f1_score: 0.985, latency_ms: 45, commit: 'a8f9c2e' },
-        { id: 'model-xgb-v3', name: 'XGBoost Baseline', status: 'Retired', f1_score: 0.962, latency_ms: 12, commit: 'd4b7a1f' },
-        { id: 'model-rf-v2', name: 'Random Forest', status: 'Archived', f1_score: 0.941, latency_ms: 85, commit: 'b9e3f2a' },
-        { id: 'model-nn-v1', name: 'MLP Embeddings', status: 'Shadow', f1_score: 0.978, latency_ms: 115, commit: 'c7d2e1b' },
-      ];
-    }
-  });
-
-  const columns: Column<any>[] = [
-    { key: 'id', header: 'Model ID', cell: (r) => <span className="font-mono text-xs text-indigo-600 dark:text-indigo-400">{r.id}</span> },
-    { key: 'name', header: 'Architecture', sortable: true, cell: (r) => <span className="font-medium">{r.name}</span> },
-    { 
-      key: 'status', 
-      header: 'Status', 
-      sortable: true,
-      cell: (r) => (
-        <Badge variant="outline" className={
-          r.status === 'Champion' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-          r.status === 'Shadow' ? 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20' :
-          'bg-slate-500/10 text-slate-500 border-slate-500/20'
-        }>
-          {r.status.toUpperCase()}
-        </Badge>
-      )
-    },
-    { key: 'f1_score', header: 'F1 Score', sortable: true, cell: (r) => <span className="font-medium">{(r.f1_score * 100).toFixed(1)}%</span> },
-    { key: 'latency_ms', header: 'Latency (P99)', sortable: true, cell: (r) => <span className="text-slate-500">{r.latency_ms}ms</span> },
-    { key: 'commit', header: 'Git Hash', cell: (r) => <span className="font-mono text-xs text-slate-400 flex items-center gap-1"><GitCommit className="w-3 h-3"/> {r.commit}</span> },
-    { key: 'actions', header: '', cell: (r) => <button className="text-xs text-indigo-500 hover:underline" onClick={() => setSelectedModel(r.id)}>Compare</button>}
-  ];
-
-  const radarOptions = {
-    backgroundColor: 'transparent',
-    tooltip: { trigger: 'item' },
-    legend: {
-      data: ['Stacking Ensemble (Champion)', 'XGBoost (Baseline)', 'MLP (Shadow)'],
-      bottom: 0,
-      textStyle: { color: '#64748b' }
-    },
-    radar: {
-      indicator: [
-        { name: 'Precision', max: 100 },
-        { name: 'Recall', max: 100 },
-        { name: 'F1 Score', max: 100 },
-        { name: 'PR-AUC', max: 100 },
-        { name: 'Speed (Inv)', max: 100 },
-        { name: 'Robustness', max: 100 }
-      ],
-      splitArea: { show: false },
-      axisLine: { lineStyle: { color: 'rgba(99, 102, 241, 0.2)' } },
-      splitLine: { lineStyle: { color: 'rgba(99, 102, 241, 0.2)' } }
-    },
+  const rocOptions = {
+    tooltip: { trigger: 'axis' },
+    legend: { data: ['Ensemble v4', 'Random Guess'], textStyle: { color: '#64748b' } },
+    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    xAxis: { type: 'value', name: 'False Positive Rate', nameLocation: 'middle', nameGap: 25, axisLabel: { color: '#64748b' }, splitLine: { show: false } },
+    yAxis: { type: 'value', name: 'True Positive Rate', nameLocation: 'middle', nameGap: 35, axisLabel: { color: '#64748b' }, splitLine: { lineStyle: { type: 'dashed', color: '#f1f5f9' } } },
     series: [
       {
-        name: 'Model Comparison',
-        type: 'radar',
-        data: [
-          {
-            value: [99, 98, 98.5, 99.1, 75, 95],
-            name: 'Stacking Ensemble (Champion)',
-            areaStyle: { color: 'rgba(16, 185, 129, 0.2)' },
-            lineStyle: { color: '#10b981' },
-            itemStyle: { color: '#10b981' }
-          },
-          {
-            value: [95, 92, 93.5, 94.2, 98, 85],
-            name: 'XGBoost (Baseline)',
-            areaStyle: { color: 'rgba(244, 63, 94, 0.2)' },
-            lineStyle: { color: '#f43f5e' },
-            itemStyle: { color: '#f43f5e' }
-          },
-          {
-            value: [96, 99, 97.5, 98.1, 40, 92],
-            name: 'MLP (Shadow)',
-            areaStyle: { color: 'rgba(99, 102, 241, 0.2)' },
-            lineStyle: { color: '#6366f1' },
-            itemStyle: { color: '#6366f1' }
-          }
-        ]
+        name: 'Ensemble v4',
+        type: 'line',
+        smooth: true,
+        lineStyle: { width: 3, color: '#0f766e' },
+        showSymbol: false,
+        data: [[0, 0], [0.05, 0.8], [0.1, 0.9], [0.2, 0.95], [0.5, 0.98], [1, 1]]
+      },
+      {
+        name: 'Random Guess',
+        type: 'line',
+        lineStyle: { type: 'dashed', color: '#cbd5e1' },
+        showSymbol: false,
+        data: [[0, 0], [1, 1]]
       }
     ]
   };
 
-  return (
-    <div className="space-y-6 animate-fade-in pb-12">
-      <PageHeader 
-        title="Enterprise Model Registry" 
-        description="Track, govern, and compare trained models across the ML lifecycle." 
-      />
+  const matrixData = [
+    [9982, 18],
+    [45, 955]
+  ];
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  return (
+    <div className="space-y-6 pb-12 w-full animate-in fade-in duration-500">
+      
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
+        <PageHeader 
+          title="Model Performance" 
+          description="Registry and evaluation metrics for active fraud detection models." 
+        />
+        <Button className="bg-slate-900 hover:bg-slate-800 text-white shadow-sm font-medium h-9">
+          Deploy New Version
+        </Button>
+      </div>
+
+      {/* Top Metrics Row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { label: "Accuracy", val: "99.82%", color: "emerald" },
+          { label: "Precision", val: "98.15%", color: "emerald" },
+          { label: "Recall", val: "95.50%", color: "amber" },
+          { label: "F1 Score", val: "96.80%", color: "emerald" },
+        ].map((m, i) => (
+          <div key={i} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{m.label}</div>
+            <div className={`text-3xl font-bold text-${m.color}-600`}>{m.val}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        {/* Radar Comparison */}
-        <div className="lg:col-span-1 space-y-6">
-          <InteractiveCard tilt={false} className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 h-full flex flex-col">
-            <h3 className="font-semibold mb-2">Model Radar Comparison</h3>
-            <AcademicTooltip 
-              title="Radar Visualization" 
-              content="Radar charts reveal the trade-off between speed (latency) and recall. Our Stacking Ensemble achieves near-perfect PR-AUC at the cost of slight inference speed (45ms vs 12ms XGBoost)."
-            >
-              <p className="text-xs text-slate-500 mb-6">Evaluating trade-offs between precision, recall, and inference latency.</p>
-            </AcademicTooltip>
-            <div className="flex-1 w-full min-h-[350px]">
-              <ReactECharts option={radarOptions} style={{ height: '100%', width: '100%' }} />
-            </div>
-          </InteractiveCard>
+        {/* ROC Curve */}
+        <div className="bg-white p-6 rounded-[1.25rem] border border-slate-200 shadow-sm">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-base font-semibold text-slate-900">ROC Curve</h3>
+            <span className="text-xs font-bold bg-emerald-50 text-emerald-600 px-2 py-1 rounded-md">AUC: 0.994</span>
+          </div>
+          <div className="h-[300px]">
+            <ReactECharts option={rocOptions} style={{ height: '100%', width: '100%' }} />
+          </div>
         </div>
 
-        {/* Registry Table */}
-        <div className="lg:col-span-2">
-          <EnterpriseTable 
-            title="Artifact Repository"
-            description="Immutable log of all trained algorithms."
-            data={models || []}
-            columns={columns}
-            isLoading={isLoading}
-          />
+        {/* Confusion Matrix */}
+        <div className="bg-white p-6 rounded-[1.25rem] border border-slate-200 shadow-sm">
+          <h3 className="text-base font-semibold text-slate-900 mb-6">Confusion Matrix</h3>
+          
+          <div className="flex items-center justify-center h-[300px]">
+            <div className="grid grid-cols-3 gap-2 text-center w-full max-w-sm">
+              <div className="col-span-1"></div>
+              <div className="col-span-1 text-xs font-semibold text-slate-500 mb-2">Predicted Safe</div>
+              <div className="col-span-1 text-xs font-semibold text-slate-500 mb-2">Predicted Fraud</div>
+              
+              <div className="col-span-1 flex items-center justify-end pr-4 text-xs font-semibold text-slate-500">Actual Safe</div>
+              <div className="col-span-1 bg-emerald-50 border border-emerald-100 rounded-lg p-4 flex flex-col items-center justify-center">
+                <span className="text-2xl font-bold text-emerald-700">{matrixData[0][0]}</span>
+                <span className="text-[10px] text-emerald-600 uppercase mt-1">True Negative</span>
+              </div>
+              <div className="col-span-1 bg-rose-50 border border-rose-100 rounded-lg p-4 flex flex-col items-center justify-center">
+                <span className="text-2xl font-bold text-rose-700">{matrixData[0][1]}</span>
+                <span className="text-[10px] text-rose-600 uppercase mt-1">False Positive</span>
+              </div>
+
+              <div className="col-span-1 flex items-center justify-end pr-4 text-xs font-semibold text-slate-500">Actual Fraud</div>
+              <div className="col-span-1 bg-amber-50 border border-amber-100 rounded-lg p-4 flex flex-col items-center justify-center">
+                <span className="text-2xl font-bold text-amber-700">{matrixData[1][0]}</span>
+                <span className="text-[10px] text-amber-600 uppercase mt-1">False Negative</span>
+              </div>
+              <div className="col-span-1 bg-emerald-50 border border-emerald-100 rounded-lg p-4 flex flex-col items-center justify-center">
+                <span className="text-2xl font-bold text-emerald-700">{matrixData[1][1]}</span>
+                <span className="text-[10px] text-emerald-600 uppercase mt-1">True Positive</span>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
+
+      {/* Model History Table */}
+      <div className="bg-white rounded-[1.25rem] border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+        <div className="p-6 border-b border-slate-200 bg-slate-50/50">
+          <h3 className="text-base font-semibold text-slate-900">Active Models</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-white border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <th className="p-4">Version</th>
+                <th className="p-4">Type</th>
+                <th className="p-4">Deployed</th>
+                <th className="p-4">Latency</th>
+                <th className="p-4">Status</th>
+              </tr>
+            </thead>
+            <tbody className="text-sm divide-y divide-slate-100">
+              <tr className="hover:bg-slate-50 transition-colors">
+                <td className="p-4 font-mono text-slate-900">v4.2.1-prod</td>
+                <td className="p-4 text-slate-600">Hybrid Ensemble (XGB+LGBM)</td>
+                <td className="p-4 text-slate-600">2 days ago</td>
+                <td className="p-4 text-slate-600">42ms</td>
+                <td className="p-4"><span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-md">Primary</span></td>
+              </tr>
+              <tr className="hover:bg-slate-50 transition-colors">
+                <td className="p-4 font-mono text-slate-900">v4.3.0-rc1</td>
+                <td className="p-4 text-slate-600">Neural Network (Transformer)</td>
+                <td className="p-4 text-slate-600">5 hours ago</td>
+                <td className="p-4 text-slate-600">115ms</td>
+                <td className="p-4"><span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-md">Challenger</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   );
 };

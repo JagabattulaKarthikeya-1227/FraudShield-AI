@@ -1,36 +1,31 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const techLogos = [
-  "Research Paper", "Kaggle Dataset", "IEEE", "React", 
-  "Flask", "TensorFlow", "XGBoost", "SHAP", "LIME", 
-  "Extra Trees", "MLP"
+const enterpriseLogos = [
+  "FinTrust BANKING", "SecurePay PAYMENTS", "TrustNext FINTECH", "NovaBank DIGITAL", "PayGuard SECURITY"
 ];
 
 export function TrustBar() {
-  // Duplicate array for seamless infinite scroll
-  const duplicatedLogos = [...techLogos, ...techLogos];
-
   return (
-    <div className="w-full border-y border-border/40 bg-white/10 backdrop-blur-sm overflow-hidden py-8 flex relative z-20">
-      {/* Gradient Fades for edges */}
-      <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background to-transparent z-10" />
-      <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background to-transparent z-10" />
+    <section className="w-full bg-white rounded-3xl mx-6 md:mx-12 my-12 py-12 flex flex-col items-center relative z-20 shadow-sm border border-slate-200">
+      <div className="mb-10 text-xs font-semibold tracking-widest text-slate-500 uppercase">
+        Trusted by innovative teams
+      </div>
       
-      <motion.div 
-        className="flex gap-12 sm:gap-24 items-center px-4"
-        animate={{ x: ["0%", "-50%"] }}
-        transition={{ ease: "linear", duration: 30, repeat: Infinity }}
-      >
-        {duplicatedLogos.map((logo, index) => (
-          <div 
-            key={index} 
-            className="flex-shrink-0 text-xl md:text-2xl font-bold text-muted-foreground/40 hover:text-primary transition-colors duration-500 cursor-default"
-          >
-            {logo}
-          </div>
-        ))}
-      </motion.div>
-    </div>
+      <div className="w-full flex justify-center">
+        <div className="flex flex-wrap justify-center gap-10 sm:gap-20 items-center px-4">
+          {enterpriseLogos.map((logo, index) => (
+            <div 
+              key={index} 
+              className="flex-shrink-0 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity duration-300 cursor-default"
+            >
+              <span className="text-lg font-bold tracking-tight text-slate-800">
+                {logo}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
