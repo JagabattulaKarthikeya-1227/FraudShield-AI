@@ -123,7 +123,7 @@ export function EnterpriseHero() {
               <Button size="lg" className="h-14 px-8 text-base rounded-2xl shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 font-semibold group overflow-hidden relative" asChild>
                 <Link to="/register">
                   <span className="relative z-10 flex items-center">
-                    Deploy FraudShield <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    Get Started <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </span>
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 </Link>
