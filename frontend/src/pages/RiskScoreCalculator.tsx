@@ -139,7 +139,7 @@ export const RiskScoreCalculator = () => {
   const summary      = explanationData?.summary;
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row w-full gap-6 lg:items-start pt-2">
+    <div className="flex-1 flex flex-col lg:flex-row w-full gap-6 lg:items-stretch pt-2">
       {/* ── Left: Form ────────────────────────────────────────────────────── */}
       <FadeIn className="lg:w-[400px] shrink-0">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
@@ -250,7 +250,7 @@ export const RiskScoreCalculator = () => {
         </FadeIn>
 
         {/* ── Right: Results ────────────────────────────────────────────────── */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 flex flex-col">
           <AnimatePresence mode="wait">
             {!isSuccess && !isPending ? (
               /* Idle placeholder */
@@ -259,7 +259,7 @@ export const RiskScoreCalculator = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="h-full flex flex-col items-center justify-center gap-6 p-12 text-center"
+                className="flex-1 min-h-[550px] flex flex-col items-center justify-center gap-6 p-12 text-center"
               >
                 <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center">
                   <Play className="w-8 h-8 text-slate-300" />
@@ -278,7 +278,7 @@ export const RiskScoreCalculator = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="h-full flex flex-col items-center justify-center gap-6"
+                className="flex-1 min-h-[550px] flex flex-col items-center justify-center gap-6"
               >
                 <div className="w-24 h-24 rounded-full bg-emerald-50 flex items-center justify-center">
                   <Loader2 className="w-10 h-10 animate-spin text-[#0F766E]" />
