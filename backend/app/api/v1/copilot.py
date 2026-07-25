@@ -14,13 +14,14 @@ def chat_stream():
     Streams a response back to the client using Server-Sent Events (SSE).
     """
     user = get_current_user()
-    data = request.get_json()
+    data = request.get_json() or {}
     query = data.get("query", "")
     
     if not query:
         raise AppError("Query cannot be empty", 400)
         
-    full_response = MockLLMService.generate_chat_response(query, user.role.value)
+    context_role = data.get("context", {}).get("role") or (user.role.value if user and hasattr(user, 'role') else "Customer")
+    full_response = MockLLMService.generate_chat_response(query, context_role)
     
     def generate():
         for token in MockLLMService.stream_tokens(full_response):
