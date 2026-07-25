@@ -40,9 +40,11 @@ def get_stats():
         total_users = User.query.count()
         total_tx = Transaction.query.count()
         total_fraud = Transaction.query.filter_by(status=TransactionStatus.DECLINED).count()
+        total_fraud_dollars = db.session.query(db.func.sum(Transaction.amount)).filter_by(status=TransactionStatus.DECLINED).scalar() or 0
         return success_response(data={
             "total_users": total_users,
             "total_transactions": total_tx,
-            "fraud_prevented": total_fraud,
+            "fraud_prevented": round(float(total_fraud_dollars), 2),
+            "fraud_count": total_fraud,
             "system_status": "Online"
         })

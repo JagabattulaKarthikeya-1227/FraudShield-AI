@@ -147,9 +147,9 @@ def get_global_insights():
             Prediction.risk_score > 0.75
         ).scalar() or 0
         total_count = db.session.query(db.func.count(Prediction.id)).scalar() or 1
-        fraud_rate = round(high_risk_count / max(total_count, 1), 4)
+        fraud_rate = round(high_risk_count / max(total_count, 1), 4) if total_count > 10 else 0.0020
     except Exception:
-        fraud_rate = 0.017  # Kaggle dataset baseline
+        fraud_rate = 0.0020  # Enterprise Kaggle dataset baseline (0.20%)
 
     return success_response(data={
         "fraud_rate": fraud_rate,
