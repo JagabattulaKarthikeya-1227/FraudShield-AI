@@ -1,5 +1,7 @@
+import { useReducedMotion } from '@/utils/useReducedMotion';
+import { VisibleCanvas } from '@/components/3d/VisibleCanvas';
 import React, { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { Sphere, Float, Environment, QuadraticBezierLine, Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -12,7 +14,11 @@ const arcs = [
 function EarthCore() {
   const meshRef = useRef<THREE.Mesh>(null);
   
+  const reducedMotion = useReducedMotion();
+  
   useFrame(({ clock }) => {
+  
+    if (reducedMotion) return;
     if (meshRef.current) {
       meshRef.current.rotation.y = clock.getElapsedTime() * 0.05;
     }
@@ -69,7 +75,9 @@ function GlobalParticles() {
   }, [count]);
 
   const ref = useRef<THREE.Points>(null);
+  const reducedMotion = useReducedMotion();
   useFrame((state) => {
+    if (reducedMotion) return;
     if (ref.current) {
       ref.current.rotation.y = state.clock.elapsedTime * 0.02;
     }
@@ -83,19 +91,21 @@ function GlobalParticles() {
 }
 
 export function GlobalFraudGlobe() {
+  const reducedMotion = useReducedMotion();
+
   return (
     <div className="w-full h-full min-h-[500px] rounded-[32px] overflow-hidden relative">
-      <Canvas camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 2]}>
+      <VisibleCanvas camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 2]}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} color="#F3EFE6" />
         <directionalLight position={[-10, -10, -5]} intensity={0.5} color="#D9A441" />
         <Environment preset="city" />
         
-        <Float speed={1} rotationIntensity={0.2} floatIntensity={0.5}>
+        <Float speed={reducedMotion ? 0 : 1.5} rotationIntensity={0.2} floatIntensity={0.5}>
           <EarthCore />
         </Float>
         <GlobalParticles />
-      </Canvas>
+      </VisibleCanvas>
     </div>
   );
 }

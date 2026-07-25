@@ -41,7 +41,7 @@ export const NotFound: React.FC = () => {
         <Button variant="outline" onClick={() => navigate(-1)} className="gap-2">
           <ArrowLeft className="w-4 h-4" /> Go Back
         </Button>
-        <Button onClick={() => navigate('/dashboard')} className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
+        <Button onClick={() => navigate('/dashboard')} className="gap-2 bg-primary hover:bg-primary text-white">
           <Home className="w-4 h-4" /> Return to Dashboard
         </Button>
       </motion.div>

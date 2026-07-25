@@ -1,12 +1,18 @@
+import { useReducedMotion } from '@/utils/useReducedMotion';
+import { VisibleCanvas } from '@/components/3d/VisibleCanvas';
 import React, { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { RoundedBox, Float, Environment, ContactShadows, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 function Card() {
   const group = useRef<THREE.Group>(null);
 
+  const reducedMotion = useReducedMotion();
+
   useFrame((state) => {
+
+    if (reducedMotion) return;
     if (group.current) {
       group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, (state.pointer.x * Math.PI) / 8, 0.05);
       group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, -(state.pointer.y * Math.PI) / 8, 0.05);
@@ -14,7 +20,7 @@ function Card() {
   });
 
   return (
-    <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
+    <Float speed={reducedMotion ? 0 : 1.5} rotationIntensity={0.2} floatIntensity={0.5}>
       <group ref={group}>
         {/* Glass Body */}
         <RoundedBox args={[3.37, 2.12, 0.05]} radius={0.1} smoothness={4} castShadow>
@@ -53,15 +59,17 @@ function Card() {
 }
 
 export function CreditCardScene() {
+  const reducedMotion = useReducedMotion();
+
   return (
     <div className="w-full h-[500px] rounded-[32px] overflow-hidden relative">
-      <Canvas camera={{ position: [0, 0, 5], fov: 45 }} dpr={[1, 2]}>
+      <VisibleCanvas camera={{ position: [0, 0, 5], fov: 45 }} dpr={[1, 2]}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} color="#F3EFE6" />
         <Environment preset="city" />
         <Card />
         <ContactShadows position={[0, -2, 0]} opacity={0.3} scale={10} blur={2.5} far={4} color="#162A2B" />
-      </Canvas>
+      </VisibleCanvas>
     </div>
   );
 }

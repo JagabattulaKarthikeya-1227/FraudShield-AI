@@ -9,6 +9,7 @@ export const useDashboardStats = () => {
       return data.data;
     },
     // Keep data fresh every minute
+    staleTime: 60000,
     refetchInterval: 60000,
   });
 };

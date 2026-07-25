@@ -1,3 +1,4 @@
+import { useReducedMotion } from '@/utils/useReducedMotion';
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -6,7 +7,9 @@ export const ComplianceGrid: React.FC = () => {
   const gridRef = useRef<THREE.GridHelper>(null);
 
   // Subtle panning motion to represent scanning/auditing
+  const reducedMotion = useReducedMotion();
   useFrame((state) => {
+    if (reducedMotion) return;
     if (gridRef.current) {
       gridRef.current.position.z = (state.clock.getElapsedTime() * 0.5) % 1;
     }

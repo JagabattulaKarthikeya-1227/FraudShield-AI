@@ -1,5 +1,5 @@
 import random
-from app.core.database import db
+from app.database.core import db
 from .models import Transaction
 from app.core.errors import ResourceNotFoundException
 

@@ -1,5 +1,7 @@
+import { useReducedMotion } from '@/utils/useReducedMotion';
+import { VisibleCanvas } from '@/components/3d/VisibleCanvas';
 import React, { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { Sphere, Float, Environment, Line } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -14,7 +16,11 @@ function SHAPCore() {
   const group = useRef<THREE.Group>(null);
   const linesRef = useRef<THREE.Group>(null);
   
+  const reducedMotion = useReducedMotion();
+  
   useFrame((state) => {
+  
+    if (reducedMotion) return;
     if (group.current) {
       group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, (state.pointer.x * Math.PI) / 8, 0.05);
       group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, -(state.pointer.y * Math.PI) / 8, 0.05);
@@ -64,16 +70,18 @@ function SHAPCore() {
 }
 
 export function SHAPScene() {
+  const reducedMotion = useReducedMotion();
+
   return (
     <div className="w-full h-[500px] rounded-[32px] overflow-hidden relative">
-      <Canvas camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 2]}>
+      <VisibleCanvas camera={{ position: [0, 0, 6], fov: 45 }} dpr={[1, 2]}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} color="#F3EFE6" />
         <Environment preset="city" />
-        <Float speed={2} rotationIntensity={0.2}>
+        <Float speed={reducedMotion ? 0 : 1.5} rotationIntensity={0.2}>
           <SHAPCore />
         </Float>
-      </Canvas>
+      </VisibleCanvas>
     </div>
   );
 }

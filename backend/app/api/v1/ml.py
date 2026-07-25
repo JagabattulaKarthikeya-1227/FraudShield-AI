@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_current_user
 from app.core.responses import success_response
 from app.core.exceptions import AppError
 from app.models.mlops import MLModel, MLExperiment, DriftMetric
-from app.core.database import db
+from app.database.core import db
 
 ml_bp = Blueprint('ml', __name__)
 

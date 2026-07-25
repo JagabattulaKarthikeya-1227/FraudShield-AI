@@ -9,7 +9,7 @@ export const NeuralLoader: React.FC = () => {
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-0 m-auto w-6 h-6 rounded-full bg-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.6)]"
+          className="absolute inset-0 m-auto w-6 h-6 rounded-full bg-primary shadow-[0_0_20px_rgba(15,118,110,0.6)]"
         />
         
         {/* Orbiting Particles */}
@@ -34,7 +34,7 @@ export const NeuralLoader: React.FC = () => {
         <motion.div
           animate={{ scale: [1, 3], opacity: [0.5, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-          className="absolute inset-0 m-auto w-6 h-6 rounded-full border border-indigo-500/50"
+          className="absolute inset-0 m-auto w-6 h-6 rounded-full border border-primary/50"
         />
       </div>
       
@@ -42,7 +42,7 @@ export const NeuralLoader: React.FC = () => {
         <motion.p
           animate={{ opacity: [0.4, 1, 0.4] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="text-sm font-medium tracking-widest uppercase text-indigo-500/80 mb-1"
+          className="text-sm font-medium tracking-widest uppercase text-primary/80 mb-1"
         >
           Analyzing
         </motion.p>

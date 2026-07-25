@@ -6,15 +6,16 @@ import os
 class XGBoostMetaTrainer:
     def __init__(self, random_seed=42):
         self.model = xgb.XGBClassifier(
-            n_estimators=150,
-            learning_rate=0.05,
-            max_depth=4,
+            n_estimators=2000,
+            learning_rate=0.005,
+            max_depth=6,
             subsample=0.8,
             colsample_bytree=0.8,
+            gamma=0.1,
             scale_pos_weight=10, # Slight boost to positive class in meta stage
             random_state=random_seed,
             eval_metric="aucpr",
-            early_stopping_rounds=15
+            early_stopping_rounds=50
         )
 
     def prepare_meta_features(self, prob_et, prob_mlp):

@@ -47,7 +47,7 @@ export const FraudHeatmapChart = () => {
       left: 'center',
       bottom: '0%',
       inRange: {
-        color: ['#0f172a', '#3b82f6', '#8b5cf6', '#ef4444'] // Dark to Rose
+        color: ['#0f172a', '#14B8A6', '#0F766E', '#ef4444'] // Dark to Rose
       },
       textStyle: { color: 'rgba(255,255,255,0.6)' }
     },

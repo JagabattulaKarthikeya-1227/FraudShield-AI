@@ -1,3 +1,4 @@
+import { useReducedMotion } from '@/utils/useReducedMotion';
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -6,7 +7,9 @@ export const TrustRing: React.FC = () => {
   const groupRef = useRef<THREE.Group>(null);
   
   // Subtle rotation to represent ongoing privacy protection
+  const reducedMotion = useReducedMotion();
   useFrame((state) => {
+    if (reducedMotion) return;
     if (groupRef.current) {
       groupRef.current.rotation.y = state.clock.getElapsedTime() * 0.15;
       groupRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 0.2) * 0.1;
@@ -24,7 +27,7 @@ export const TrustRing: React.FC = () => {
       {/* Inner Solid Ring */}
       <mesh>
         <torusGeometry args={[1.8, 0.02, 16, 100]} />
-        <meshStandardMaterial color="#c7d2fe" wireframe />
+        <meshStandardMaterial color="#14b8a6" wireframe />
       </mesh>
 
       {/* Floating Particles to represent protected data */}

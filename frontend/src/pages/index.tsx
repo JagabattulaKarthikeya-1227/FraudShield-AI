@@ -1,21 +1,24 @@
-import { PageHeader } from "@/components/layout/PageHeader";
-import { EmptyState } from "@/components/ui/empty-state";
-import { Settings as SettingsIcon } from "lucide-react";
+import React, { lazy } from 'react';
 
-export { ExplainabilityStudio } from './ExplainabilityStudio';
-export { ModelRegistry } from './ModelRegistry';
-export { AnalyticsCenter } from './AnalyticsCenter';
-export { SystemConfiguration } from './SystemConfiguration';
-export { AuditCenter } from './AuditCenter';
-export { ChampionChallenger } from './ChampionChallenger';
-export { AlertsCenter } from './AlertsCenter';
+// Wrap imports in React.lazy to enforce strict code-splitting per route
+export const CustomerDashboard = lazy(() => import('./CustomerDashboard').then(m => ({ default: m.CustomerDashboard })));
+export const FraudAnalystWorkspace = lazy(() => import('./FraudAnalystWorkspace').then(m => ({ default: m.FraudAnalystWorkspace })));
+export const ExplainabilityStudio = lazy(() => import('./ExplainabilityStudio').then(m => ({ default: m.ExplainabilityStudio })));
+export const ModelRegistry = lazy(() => import('./ModelRegistry').then(m => ({ default: m.ModelRegistry })));
+export const AnalyticsCenter = lazy(() => import('./AnalyticsCenter').then(m => ({ default: m.AnalyticsCenter })));
+export const AlertsCenter = lazy(() => import('./AlertsCenter').then(m => ({ default: m.AlertsCenter })));
 
-export const Settings = () => (
-  <div className="space-y-8">
-    <PageHeader title="Settings" description="Platform configurations and user preferences." />
-    <EmptyState title="Settings Loading" description="System configurations are currently locked in this phase." icon={<SettingsIcon className="h-8 w-8" />} />
-  </div>
-);
+export const RiskScoreCalculator = lazy(() => import('./RiskScoreCalculator').then(m => ({ default: m.RiskScoreCalculator })));
+
+// Public Pages
+export const PlatformPage = lazy(() => import('./PlatformPage').then(m => ({ default: m.PlatformPage })));
+export const PricingPage = lazy(() => import('./PricingPage').then(m => ({ default: m.PricingPage })));
+export const AboutPage = lazy(() => import('./AboutPage').then(m => ({ default: m.AboutPage })));
+export const ContactPage = lazy(() => import('./ContactPage').then(m => ({ default: m.ContactPage })));
+export const LoginPage = lazy(() => import('./LoginPage').then(m => ({ default: m.LoginPage })));
+
+
+export const Settings = lazy(() => import('./SettingsPage').then(m => ({ default: m.SettingsPage })));
 
 export const NotFound = () => (
   <div className="min-h-[60vh] flex flex-col items-center justify-center text-center">
@@ -24,3 +27,4 @@ export const NotFound = () => (
     <p className="text-muted-foreground">The module you are looking for does not exist.</p>
   </div>
 );
+

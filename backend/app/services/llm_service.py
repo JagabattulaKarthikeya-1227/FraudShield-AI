@@ -3,7 +3,7 @@ import re
 from app.models.transaction import Transaction
 from app.models.grc import SecurityIncident
 from app.models.mlops import MLModel
-from app.core.database import db
+from app.database.core import db
 
 class MockLLMService:
     @staticmethod

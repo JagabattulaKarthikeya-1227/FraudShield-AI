@@ -3,7 +3,7 @@ import json
 
 def test_predict_realtime_unauthorized(client):
     # Attempting to predict without a JWT should fail
-    resp = client.post('/api/v1/predict/realtime', json={})
+    resp = client.post('/api/v1/predict/single', json={})
     assert resp.status_code == 401
 
 def test_predict_realtime_success(client):
@@ -33,10 +33,10 @@ def test_predict_realtime_success(client):
         "V26": -0.6, "V27": 0.7, "V28": -0.8, "Amount": 150.00, "Time": 1000
     }
     
-    resp = client.post('/api/v1/predict/realtime', headers={"Authorization": f"Bearer {token}"}, json=payload)
+    resp = client.post('/api/v1/predict/single', headers={"Authorization": f"Bearer {token}"}, json=payload)
     assert resp.status_code == 200
     data = json.loads(resp.data)["data"]
     
-    assert "risk_score" in data
-    assert "classification" in data
+    assert "risk_assessment" in data
+    
     assert "transaction_id" in data

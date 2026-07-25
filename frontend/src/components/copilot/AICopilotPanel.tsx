@@ -41,6 +41,7 @@ export const AICopilotPanel: React.FC = () => {
       {/* Floating Action Button */}
       <motion.button
         onClick={() => setIsOpen(true)}
+        aria-label="Open AI Copilot"
         className="fixed bottom-6 right-6 p-4 bg-primary text-primary-foreground rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all z-50 flex items-center justify-center group border border-primary/20"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
@@ -70,11 +71,11 @@ export const AICopilotPanel: React.FC = () => {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <button onClick={() => setIsExpanded(!isExpanded)} className="p-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors">
-                  {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Expand className="w-4 h-4" />}
+                <button aria-label="Toggle full screen" onClick={() => setIsExpanded(!isExpanded)} className="p-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors">
+                  {isExpanded ? <Minimize2 className="w-4 h-4" aria-hidden="true" /> : <Expand className="w-4 h-4" aria-hidden="true" />}
                 </button>
-                <button onClick={() => setIsOpen(false)} className="p-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors">
-                  <X className="w-4 h-4" />
+                <button aria-label="Close Copilot" onClick={() => setIsOpen(false)} className="p-2 text-muted-foreground hover:bg-secondary rounded-lg transition-colors">
+                  <X className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
             </div>
@@ -92,7 +93,7 @@ export const AICopilotPanel: React.FC = () => {
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-6">
+            <div className="flex-1 p-4 overflow-y-auto space-y-6" aria-live="polite">
               {messages.length === 0 ? (
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.95 }} 
@@ -200,10 +201,11 @@ export const AICopilotPanel: React.FC = () => {
                   </button>
                   <button
                     type="submit"
+                    aria-label="Send message"
                     disabled={!input.trim() || isTyping}
                     className="p-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg transition-colors disabled:opacity-50"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </div>
               </form>

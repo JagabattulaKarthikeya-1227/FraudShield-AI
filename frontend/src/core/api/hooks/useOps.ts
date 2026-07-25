@@ -34,7 +34,7 @@ export const useMLOpsRegistry = () => {
 
 // Custom Hook for Server-Sent Events (SSE)
 export const useEventSource = (url: string) => {
-  const [lastEvent, setLastEvent] = useState<any>(null);
+  const [lastEvent, setLastEvent] = useState<unknown>(null);
 
   useEffect(() => {
     // In production, we'd pass auth tokens via cookies or URL params for the EventSource

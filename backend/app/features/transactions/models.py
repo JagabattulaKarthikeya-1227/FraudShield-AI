@@ -1,5 +1,5 @@
 from datetime import datetime
-from app.core.database import db
+from app.database.core import db
 
 class Transaction(db.Model):
     """SQLAlchemy model representing credit card transactions."""

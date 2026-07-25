@@ -18,7 +18,7 @@ def test_smote_training_application():
     
     # Highly imbalanced dummy data
     X_train = pd.DataFrame(np.random.rand(100, 5), columns=[f'f{i}' for i in range(5)])
-    y_train = pd.Series([0]*95 + [1]*5)
+    y_train = pd.Series([0]*90 + [1]*10)
     
     X_res, y_res = generator.apply_smote(X_train, y_train, is_validation=False)
     

@@ -12,7 +12,8 @@
     "lint:frontend": "cd frontend && npm run lint",
     "lint:backend": "cd backend && flake8 app tests",
     "test:backend": "cd backend && pytest",
-    "test:frontend": "cd frontend && npm run test"
+    "test:frontend": "cd frontend && npm run test",
+    "test": "npm run test:frontend"
   },
   "keywords": [
     "fraud-detection",

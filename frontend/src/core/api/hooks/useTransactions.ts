@@ -1,6 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../client';
 
+export interface Transaction {
+  id?: string | number;
+  transaction_id?: string;
+  amount?: number;
+  merchant?: string;
+  category?: string;
+  timestamp?: string;
+  risk_score?: number;
+  status?: string;
+  [key: string]: unknown;
+}
+
 export const useTransactions = (page: number = 1, perPage: number = 20) => {
   return useQuery({
     queryKey: ['transactions', page, perPage],
@@ -8,6 +20,7 @@ export const useTransactions = (page: number = 1, perPage: number = 20) => {
       const { data } = await apiClient.get(`/transactions/?page=${page}&per_page=${perPage}`);
       return data.data; // our backend wraps in { success, data, message }
     },
+    staleTime: 60000,
   });
 };
 

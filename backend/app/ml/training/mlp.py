@@ -1,7 +1,8 @@
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, BatchNormalization, Dropout
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
+import tensorflow.keras.regularizers as regularizers
 import os
 
 class MLPTrainer:
@@ -11,14 +12,17 @@ class MLPTrainer:
         self.model = self._build_model()
 
     def _build_model(self):
+        reg = regularizers.l2(1e-4)
         model = Sequential([
-            Dense(64, activation='relu', input_shape=(self.input_dim,)),
+            Dense(128, activation='swish', kernel_regularizer=reg, input_shape=(self.input_dim,)),
             BatchNormalization(),
             Dropout(0.3),
-            Dense(32, activation='relu'),
+            Dense(64, activation='swish', kernel_regularizer=reg),
+            Dropout(0.3),
+            Dense(32, activation='swish', kernel_regularizer=reg),
             BatchNormalization(),
             Dropout(0.3),
-            Dense(16, activation='relu'),
+            Dense(16, activation='swish', kernel_regularizer=reg),
             Dense(1, activation='sigmoid')
         ])
         model.compile(
@@ -32,7 +36,8 @@ class MLPTrainer:
         print("Training Keras MLP Base Model...")
         
         callbacks = [
-            EarlyStopping(monitor='val_auc', mode='max', patience=10, restore_best_weights=True)
+            EarlyStopping(monitor='val_auc', mode='max', patience=30, restore_best_weights=True),
+            ReduceLROnPlateau(monitor='val_auc', mode='max', factor=0.5, patience=10, min_lr=1e-6)
         ]
         
         if save_path:
@@ -43,7 +48,7 @@ class MLPTrainer:
             X_train, y_train,
             validation_data=(X_val, y_val),
             batch_size=batch_size,
-            epochs=epochs,
+            epochs=500, # Pushed to extreme limit
             callbacks=callbacks,
             verbose=1
         )

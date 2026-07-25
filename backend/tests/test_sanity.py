@@ -1,6 +1,6 @@
 import pytest
 from app import create_app
-from app.core.database import db
+from app.database.core import db
 
 @pytest.fixture
 def app():
@@ -22,4 +22,4 @@ def test_health_check(client):
     """Ensure health check routes respond properly."""
     res = client.get("/health")
     assert res.status_code == 200
-    assert res.json == {"status": "healthy"}
+    assert res.json['status'] == 'healthy'

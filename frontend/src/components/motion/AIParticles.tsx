@@ -10,14 +10,14 @@ export const AIParticles: React.FC = () => {
       <motion.div
         animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute w-8 h-8 rounded-full bg-indigo-500/20 blur-md"
+        className="absolute w-8 h-8 rounded-full bg-primary/20 blur-md"
       />
       
       {/* Orbiting particles */}
       {particles.map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]"
+          className="absolute w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(15,118,110,0.8)]"
           initial={{
             x: Math.cos((i * Math.PI * 2) / particles.length) * 10,
             y: Math.sin((i * Math.PI * 2) / particles.length) * 10,
@@ -46,7 +46,7 @@ export const AIParticles: React.FC = () => {
           }}
         />
       ))}
-      <span className="relative z-10 text-xs font-medium text-indigo-600 dark:text-indigo-400 mt-8 tracking-widest uppercase">
+      <span className="relative z-10 text-xs font-medium text-primary dark:text-indigo-400 mt-8 tracking-widest uppercase">
         Synthesizing
       </span>
     </div>

@@ -8,6 +8,7 @@ export const useKPIs = () => {
       const { data } = await apiClient.get('/telemetry/kpi');
       return data.data;
     },
+    staleTime: 30000,
     refetchInterval: 30000, // Live polling every 30 seconds
   });
 };
@@ -19,6 +20,7 @@ export const useTrends = () => {
       const { data } = await apiClient.get('/telemetry/trends');
       return data.data;
     },
+    staleTime: 60000,
     refetchInterval: 60000,
   });
 };
@@ -30,6 +32,7 @@ export const useSystemHealth = () => {
       const { data } = await apiClient.get('/telemetry/health');
       return data.data;
     },
+    staleTime: 15000,
     refetchInterval: 15000, // High frequency for gauges
   });
 };

@@ -43,7 +43,11 @@ export const SystemGauge = ({ name, value, color }: { name: string, value: numbe
         data: [{ value, name }]
       }
     ],
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
+    animationEasing: 'elasticOut',
+    animationDuration: 2000,
+    animationDurationUpdate: 1500,
+    animationEasingUpdate: 'elasticOut',
   };
 
   return <ReactECharts option={option} style={{ height: '250px', width: '100%' }} />;

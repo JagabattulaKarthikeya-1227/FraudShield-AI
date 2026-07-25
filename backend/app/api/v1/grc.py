@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_current_user
 from app.core.responses import success_response
 from app.core.exceptions import AppError
 from app.models.grc import SecurityIncident, ComplianceScore
-from app.core.database import db
+from app.database.core import db
 
 grc_bp = Blueprint('grc', __name__)
 

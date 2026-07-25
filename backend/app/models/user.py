@@ -20,6 +20,17 @@ class User(UUIDMixin, TimestampMixin, SoftDeleteMixin, db.Model):
     is_active = Column(Boolean, default=True, nullable=False)
     email_verified = Column(Boolean, default=False, nullable=False)
     
+    # Profile Settings Fields
+    organization = Column(String(255), nullable=True)
+    department = Column(String(255), nullable=True)
+    employee_id = Column(String(100), nullable=True)
+    phone = Column(String(50), nullable=True)
+    location = Column(String(255), nullable=True)
+    
+    # Notification Preferences
+    from sqlalchemy.dialects.sqlite import JSON
+    notification_preferences = Column(JSON, nullable=True)
+    
     sessions = relationship("Session", back_populates="user", cascade="all, delete-orphan")
     reviews = relationship("Review", back_populates="analyst")
     audit_logs = relationship("AuditLog", back_populates="user")

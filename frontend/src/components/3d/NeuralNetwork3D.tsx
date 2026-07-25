@@ -1,5 +1,7 @@
+import { useReducedMotion } from '@/utils/useReducedMotion';
+import { VisibleCanvas } from '@/components/3d/VisibleCanvas';
 import React, { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { Sphere, Line, Float, Environment, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -18,7 +20,11 @@ const edges = [
 function Network() {
   const groupRef = useRef<THREE.Group>(null);
 
+  const reducedMotion = useReducedMotion();
+
   useFrame((state) => {
+
+    if (reducedMotion) return;
     if (groupRef.current) {
       // Parallax rotation
       groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, (state.pointer.x * Math.PI) / 10, 0.05);
@@ -30,7 +36,7 @@ function Network() {
     <group ref={groupRef}>
       {/* Draw Nodes */}
       {nodes.map((node, i) => (
-        <Float key={i} speed={2} rotationIntensity={0.5} floatIntensity={1}>
+        <Float key={i} speed={reducedMotion ? 0 : 1.5} rotationIntensity={0.5} floatIntensity={1}>
           <group position={new THREE.Vector3(...node.pos)}>
             <Sphere args={[0.2, 32, 32]}>
               <meshPhysicalMaterial 
@@ -71,14 +77,16 @@ function Network() {
 }
 
 export function NeuralNetwork3D() {
+  const reducedMotion = useReducedMotion();
+
   return (
     <div className="w-full h-[500px] rounded-[32px] overflow-hidden relative">
-      <Canvas camera={{ position: [0, 0, 7], fov: 45 }} dpr={[1, 2]}>
+      <VisibleCanvas camera={{ position: [0, 0, 7], fov: 45 }} dpr={[1, 2]}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1} color="#F3EFE6" />
         <Environment preset="city" />
         <Network />
-      </Canvas>
+      </VisibleCanvas>
     </div>
   );
 }

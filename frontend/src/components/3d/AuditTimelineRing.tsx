@@ -1,5 +1,7 @@
+import { useReducedMotion } from '@/utils/useReducedMotion';
+import { VisibleCanvas } from '@/components/3d/VisibleCanvas';
 import React, { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { Float, Environment, Torus, Sphere } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -13,7 +15,11 @@ const timelineEvents = [
 function TimelineCore() {
   const group = useRef<THREE.Group>(null);
   
+  const reducedMotion = useReducedMotion();
+  
   useFrame((state) => {
+  
+    if (reducedMotion) return;
     if (group.current) {
       group.current.rotation.x = Math.PI / 3;
       group.current.rotation.z = state.clock.elapsedTime * -0.1;
@@ -40,16 +46,18 @@ function TimelineCore() {
 }
 
 export function AuditTimelineRing() {
+  const reducedMotion = useReducedMotion();
+
   return (
     <div className="w-full h-[500px] rounded-[32px] overflow-hidden relative">
-      <Canvas camera={{ position: [0, 0, 5], fov: 45 }} dpr={[1, 2]}>
+      <VisibleCanvas camera={{ position: [0, 0, 5], fov: 45 }} dpr={[1, 2]}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} color="#F3EFE6" />
         <Environment preset="city" />
-        <Float speed={1.5} floatIntensity={0.5}>
+        <Float speed={reducedMotion ? 0 : 1.5} floatIntensity={0.5}>
           <TimelineCore />
         </Float>
-      </Canvas>
+      </VisibleCanvas>
     </div>
   );
 }

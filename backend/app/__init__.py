@@ -22,7 +22,7 @@ def create_app(config_name=None):
     register_error_handlers(app)
 
     # 3. Initialize Extensions
-    from app.core.database import db
+    from app.database.core import db
     from flask_migrate import Migrate
     from app.security.jwt_manager import jwt
     from app.api.v1 import v1_bp

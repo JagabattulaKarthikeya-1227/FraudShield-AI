@@ -1,4 +1,4 @@
-from app.core.database import db
+from app.database.core import db
 from datetime import datetime
 
 class SecurityIncident(db.Model):

@@ -57,12 +57,12 @@ def predict_single():
     db.session.add(tx)
     db.session.flush() # To get tx.id
     
-    # 4. Create Prediction Record
+    # 4. Create Prediction Record (shap_values now returned by InferenceService)
     pred = Prediction(
         transaction_id=tx.id,
         model_version=engine.active_record["version_id"],
         risk_score=result["probability"],
-        shap_values=None # Omitted for brevity in synchronous call; could run async
+        shap_values=result.get("shap_values")  # approximate SHAP from InferenceService
     )
     db.session.add(pred)
     

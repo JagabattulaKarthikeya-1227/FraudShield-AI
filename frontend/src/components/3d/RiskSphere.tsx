@@ -1,5 +1,7 @@
+import { useReducedMotion } from '@/utils/useReducedMotion';
+import { VisibleCanvas } from '@/components/3d/VisibleCanvas';
 import React, { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { Sphere, Float, Environment, Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -22,7 +24,11 @@ function RiskParticles() {
 
   const ref = useRef<THREE.Points>(null);
   
+  const reducedMotion = useReducedMotion();
+  
   useFrame((state) => {
+  
+    if (reducedMotion) return;
     if (ref.current) {
       ref.current.rotation.y = state.clock.elapsedTime * 0.1;
       
@@ -45,14 +51,16 @@ function RiskParticles() {
 }
 
 export function RiskSphere() {
+  const reducedMotion = useReducedMotion();
+
   return (
     <div className="w-full h-[500px] rounded-[32px] overflow-hidden relative">
-      <Canvas camera={{ position: [0, 0, 5], fov: 45 }} dpr={[1, 2]}>
+      <VisibleCanvas camera={{ position: [0, 0, 5], fov: 45 }} dpr={[1, 2]}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} color="#F3EFE6" />
         <Environment preset="city" />
         
-        <Float speed={1.5} rotationIntensity={0.5} floatIntensity={1}>
+        <Float speed={reducedMotion ? 0 : 1.5} rotationIntensity={0.5} floatIntensity={1}>
           <Sphere args={[2, 64, 64]}>
             <meshPhysicalMaterial 
               color="#F3EFE6"
@@ -65,7 +73,7 @@ export function RiskSphere() {
           </Sphere>
           <RiskParticles />
         </Float>
-      </Canvas>
+      </VisibleCanvas>
     </div>
   );
 }

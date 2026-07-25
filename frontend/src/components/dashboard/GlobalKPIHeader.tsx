@@ -31,13 +31,13 @@ export const GlobalKPIHeader: React.FC<GlobalKPIHeaderProps> = ({ kpis }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
-          <InteractiveCard tilt={false} className="p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-full">
+          <InteractiveCard tilt={false} className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-[var(--shadow-elevated)] transition-shadow duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] flex flex-col justify-between h-full rounded-2xl">
             <div className="flex justify-between items-start mb-2">
-              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                 {kpi.label}
               </span>
               {kpi.trend && (
-                <div className={`flex items-center text-xs font-semibold px-2 py-1 rounded-full ${
+                <div className={`flex items-center text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full ${
                   kpi.trend === 'up' ? 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20' :
                   kpi.trend === 'down' ? 'text-rose-600 bg-rose-50 dark:bg-rose-900/20' :
                   'text-slate-600 bg-slate-50 dark:bg-slate-800'

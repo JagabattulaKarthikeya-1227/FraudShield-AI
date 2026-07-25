@@ -18,14 +18,14 @@ export const WorkflowTimeline = () => {
           <div className={`absolute -left-[35px] p-1.5 rounded-full border ${
             step.status === 'complete' ? 'bg-emerald-500/20 border-emerald-500 text-emerald-500' :
             step.status === 'warning' ? 'bg-rose-500/20 border-rose-500 text-rose-500' :
-            step.status === 'current' ? 'bg-blue-500/20 border-blue-500 text-blue-500 animate-pulse' :
+            step.status === 'current' ? 'bg-primary/20 border-primary text-primary animate-pulse' :
             'bg-background border-border text-muted-foreground'
           }`}>
             {step.icon}
           </div>
           <div>
             <h4 className={`text-sm font-medium ${step.status === 'pending' ? 'opacity-50' : ''}`}>{step.label}</h4>
-            {step.status === 'current' && <p className="text-xs text-blue-500 mt-1">Awaiting Analyst Action</p>}
+            {step.status === 'current' && <p className="text-xs text-primary mt-1">Awaiting Analyst Action</p>}
           </div>
         </div>
       ))}

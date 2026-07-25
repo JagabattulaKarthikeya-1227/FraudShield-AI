@@ -13,7 +13,7 @@ def init_security(app):
 
 def hash_password(password: str) -> str:
     """Generate a password hash."""
-    return generate_password_hash(password).decode('utf-8')
+    return generate_password_hash(password)
 
 def verify_password(password: str, hashed: str) -> bool:
     """Check credentials validity."""

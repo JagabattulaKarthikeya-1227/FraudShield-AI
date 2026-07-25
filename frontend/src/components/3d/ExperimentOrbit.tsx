@@ -1,3 +1,4 @@
+import { useReducedMotion } from '@/utils/useReducedMotion';
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -5,7 +6,11 @@ import * as THREE from 'three';
 export const ExperimentOrbit: React.FC = () => {
   const groupRef = useRef<THREE.Group>(null);
 
+  const reducedMotion = useReducedMotion();
+
   useFrame((state) => {
+
+    if (reducedMotion) return;
     if (groupRef.current) {
       groupRef.current.rotation.x = state.clock.getElapsedTime() * 0.2;
       groupRef.current.rotation.y = state.clock.getElapsedTime() * 0.15;
@@ -18,7 +23,7 @@ export const ExperimentOrbit: React.FC = () => {
       {[1, 1.5, 2].map((radius, i) => (
         <mesh key={i} rotation={[Math.PI / 2, 0, 0]}>
           <ringGeometry args={[radius - 0.02, radius + 0.02, 64]} />
-          <meshBasicMaterial color="#6366f1" transparent opacity={0.3 - (i * 0.1)} side={THREE.DoubleSide} />
+          <meshBasicMaterial color="#0F766E" transparent opacity={0.3 - (i * 0.1)} side={THREE.DoubleSide} />
         </mesh>
       ))}
       

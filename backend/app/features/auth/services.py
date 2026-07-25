@@ -1,6 +1,6 @@
 from app.core.security import hash_password, verify_password
 from .models import User
-from app.core.database import db
+from app.database.core import db
 from app.core.errors import AuthenticationException
 
 class AuthService:
