@@ -56,7 +56,7 @@ class MLPTrainer:
         return history
 
     def predict_proba(self, X):
-        return self.model.predict(X).ravel()
+        return self.model(X, training=False).numpy().ravel()
         
     def save(self, path):
         os.makedirs(os.path.dirname(path), exist_ok=True)

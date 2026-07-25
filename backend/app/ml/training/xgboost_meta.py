@@ -43,4 +43,6 @@ class XGBoostMetaTrainer:
     def load(cls, path):
         instance = cls()
         instance.model = joblib.load(path)
+        if hasattr(instance.model, 'n_jobs'):
+            instance.model.n_jobs = 1
         return instance

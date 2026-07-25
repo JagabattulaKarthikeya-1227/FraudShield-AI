@@ -53,4 +53,18 @@ def create_app(config_name=None):
     def health_check():
         return jsonify({"status": "healthy", "version": "1.0.0"})
 
+    # 5. Pre-warm ML Inference Engine in background thread so first user request is instant (<50ms)
+    import threading
+    def _warmup_ml(app_instance):
+        with app_instance.app_context():
+            try:
+                app_instance.logger.info("Pre-warming ML Inference Engine in background...")
+                from app.api.v1.predict import get_inference_service
+                get_inference_service()
+                app_instance.logger.info("ML Inference Engine pre-warmed successfully!")
+            except Exception as e:
+                app_instance.logger.error(f"Failed to pre-warm ML Inference Engine: {e}")
+
+    threading.Thread(target=_warmup_ml, args=(app,), daemon=True).start()
+
     return app
