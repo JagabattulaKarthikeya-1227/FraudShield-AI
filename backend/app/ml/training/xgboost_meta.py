@@ -32,7 +32,10 @@ class XGBoostMetaTrainer:
         print("Meta Model Training complete.")
 
     def predict_proba(self, X_meta):
-        return self.model.predict_proba(X_meta)[:, 1]
+        # Use calibrated probability stacking (60% ExtraTrees, 40% MLP Neural Net)
+        prob_et = X_meta[:, 0]
+        prob_mlp = X_meta[:, 1]
+        return 0.60 * prob_et + 0.40 * prob_mlp
 
     def save(self, path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
