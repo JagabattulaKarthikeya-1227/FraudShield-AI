@@ -136,7 +136,6 @@ export function LiveDemo() {
  <option>Unknown</option>
  <option>iOS</option>
  <option>Android</option>
- <option>Desktop</option>
  </select>
  </div>
  </div>

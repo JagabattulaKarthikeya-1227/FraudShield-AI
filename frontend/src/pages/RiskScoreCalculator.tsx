@@ -33,7 +33,7 @@ const CATEGORIES = [
 
 const COUNTRIES = ['United States', 'United Kingdom', 'Germany', 'Russia', 'Nigeria', 'Singapore', 'Brazil', 'India', 'China', 'Australia'];
 
-const DEVICES = ['Mobile (iOS)', 'Mobile (Android)', 'Mobile (Unknown Number)', 'Desktop', 'Tablet', 'ATM', 'POS Terminal'];
+const DEVICES = ['Mobile (iOS)', 'Mobile (Android)', 'Mobile (Unknown Number)'];
 
 const TIME_SLOTS: { label: string; value: string; seconds: number }[] = [
   { label: 'Morning (06:00–12:00)', value: 'morning', seconds: 32400 },
