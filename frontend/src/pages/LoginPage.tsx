@@ -98,9 +98,14 @@ export const LoginPage = () => {
   }, []);
 
   // ── Login form ──────────────────────────────────────────────────────────────
+  const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
+
   const loginForm = useForm<LoginFields>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: 'demo@fraudshield.dev', password: 'Demo@1234' },
+    defaultValues: { 
+      email: isDemoMode ? 'demo@fraudshield.dev' : '', 
+      password: isDemoMode ? 'Demo@1234' : '' 
+    },
   });
 
   const handleLogin = async (data: LoginFields) => {
