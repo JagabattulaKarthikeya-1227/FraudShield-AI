@@ -38,7 +38,17 @@ def create_app(config_name=None):
 
     db.init_app(app)
     jwt.init_app(app)
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    CORS(
+        app,
+        resources={
+            r"/api/*": {
+                "origins": app.config.get("CORS_ORIGINS", "*"),
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+                "allow_headers": ["Authorization", "Content-Type"],
+                "supports_credentials": False
+            }
+        }
+    )
     migrate.init_app(app, db)
 
     from app.schemas import ma

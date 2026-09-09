@@ -34,15 +34,28 @@ class Config:
     )
 
 
+    CORS_ORIGINS = [
+        origin.strip()
+        for origin in os.environ.get("CORS_ORIGINS", "*").split(",")
+        if origin.strip()
+    ]
+
+
 class DevelopmentConfig(Config):
     DEBUG = True
     ENV = "development"
+    CORS_ORIGINS = [
+        origin.strip()
+        for origin in os.environ.get("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000").split(",")
+        if origin.strip()
+    ]
 
 
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=5)
+    CORS_ORIGINS = ["*"]
 
 
 class ProductionConfig(Config):
@@ -54,6 +67,12 @@ class ProductionConfig(Config):
     # Validation is deferred to app startup (see validate_production_secrets()).
     SECRET_KEY = os.environ.get("SECRET_KEY") or ""
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or ""
+
+    CORS_ORIGINS = [
+        origin.strip()
+        for origin in os.environ.get("CORS_ORIGINS", "").split(",")
+        if origin.strip()
+    ]
 
 
 def validate_production_secrets(config_name: str) -> None:
