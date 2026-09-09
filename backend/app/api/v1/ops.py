@@ -4,6 +4,7 @@ from app.core.responses import success_response
 from app.core.exceptions import AppError
 import datetime
 import random
+from app.middleware.auth import require_role
 
 ops_bp = Blueprint("ops", __name__)
 
@@ -26,10 +27,9 @@ def readiness_probe():
 
 @ops_bp.route("/audit", methods=["GET"])
 @jwt_required()
+@require_role(["Administrator", "Fraud Analyst"])
 def get_audit_logs():
     user = get_current_user()
-    if user.role.value not in ["Administrator", "Fraud Analyst"]:
-        raise AppError("Unauthorized access to audit logs.", 403)
 
     # Simulate immutable audit logs
     events = [
@@ -81,10 +81,9 @@ def get_audit_logs():
 
 @ops_bp.route("/security", methods=["GET"])
 @jwt_required()
+@require_role(["Administrator"])
 def get_security_events():
     user = get_current_user()
-    if user.role.value != "Administrator":
-        raise AppError("Unauthorized access to security center.", 403)
 
     return success_response(
         data={
@@ -98,10 +97,9 @@ def get_security_events():
 
 @ops_bp.route("/mlops", methods=["GET"])
 @jwt_required()
+@require_role(["Administrator", "Fraud Analyst"])
 def get_mlops_registry():
     user = get_current_user()
-    if user.role.value not in ["Administrator", "Fraud Analyst"]:
-        raise AppError("Unauthorized access to MLOps registry.", 403)
 
     return success_response(
         data={

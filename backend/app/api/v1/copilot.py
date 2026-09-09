@@ -4,6 +4,7 @@ from flask_jwt_extended import jwt_required, get_current_user
 from app.core.responses import success_response
 from app.core.exceptions import AppError
 from app.services.llm_service import get_llm_service
+from app.middleware.auth import require_role
 
 copilot_bp = Blueprint("copilot", __name__)
 
@@ -40,10 +41,9 @@ def chat_stream():
 
 @copilot_bp.route("/summarize/<tx_id>", methods=["GET"])
 @jwt_required()
+@require_role(["Administrator", "Fraud Analyst"])
 def summarize_case(tx_id):
     user = get_current_user()
-    if user.role.value not in ["Administrator", "Fraud Analyst"]:
-        raise AppError("Unauthorized.", 403)
 
     summary = f"AI Summary for {tx_id}: This transaction was classified as High Risk (89%). The SHAP TreeExplainer indicates that the primary driving factors were the transaction Amount and the V2 location vector deviating from historic baselines."
 
@@ -52,10 +52,9 @@ def summarize_case(tx_id):
 
 @copilot_bp.route("/report", methods=["GET"])
 @jwt_required()
+@require_role(["Administrator"])
 def generate_report():
     user = get_current_user()
-    if user.role.value != "Administrator":
-        raise AppError("Unauthorized.", 403)
 
     markdown_report = """# Executive Fraud Report
 

@@ -4,17 +4,17 @@ from app.core.responses import success_response
 from app.core.exceptions import AppError
 from app.models.grc import SecurityIncident, ComplianceScore
 from app.database.core import db
+from app.middleware.auth import require_role
 
 grc_bp = Blueprint("grc", __name__)
 
 
 @grc_bp.route("/incidents", methods=["GET"])
 @jwt_required()
+@require_role(["Administrator", "Fraud Analyst"])
 def get_incidents():
     """Returns Security Incidents from the database."""
     user = get_current_user()
-    if user.role.value not in ["Administrator", "Fraud Analyst"]:
-        raise AppError("Unauthorized.", 403)
 
     incidents_db = SecurityIncident.query.all()
     if not incidents_db:
@@ -62,11 +62,10 @@ def get_incidents():
 
 @grc_bp.route("/compliance_scores", methods=["GET"])
 @jwt_required()
+@require_role(["Administrator"])
 def get_compliance_scores():
     """Returns compliance mapping scores from the database."""
     user = get_current_user()
-    if user.role.value != "Administrator":
-        raise AppError("Unauthorized.", 403)
 
     scores_db = ComplianceScore.query.all()
     if not scores_db:

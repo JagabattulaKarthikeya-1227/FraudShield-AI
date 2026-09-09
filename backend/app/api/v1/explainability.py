@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_current_user
 from app.core.responses import success_response
 from app.core.exceptions import AppError
 from app.models.transaction import Transaction
+from app.middleware.auth import require_role
 
 explainability_bp = Blueprint("explainability", __name__)
 
@@ -131,10 +132,9 @@ def get_transaction_explanation(tx_id):
 
 @explainability_bp.route("/global", methods=["GET"])
 @jwt_required()
+@require_role(["Administrator", "Fraud Analyst"])
 def get_global_insights():
     user = get_current_user()
-    if user.role.value not in ["Administrator", "Fraud Analyst"]:
-        raise AppError("Unauthorized access to global insights.", 403)
 
     # Aggregate real risk_score data from predictions table if available
     from app.models.prediction import Prediction

@@ -6,16 +6,16 @@ from app.models.transaction import Transaction, TransactionStatus
 from app.models.user import User
 import datetime
 import random
+from app.middleware.auth import require_role
 
 telemetry_bp = Blueprint("telemetry", __name__)
 
 
 @telemetry_bp.route("/kpi", methods=["GET"])
 @jwt_required()
+@require_role(["Administrator", "Fraud Analyst"])
 def get_kpis():
     user = get_current_user()
-    if user.role.value not in ["Administrator", "Fraud Analyst"]:
-        raise AppError("Unauthorized access to enterprise telemetry.", 403)
 
     total_tx = Transaction.query.count()
     total_fraud = Transaction.query.filter_by(status=TransactionStatus.DECLINED).count()
@@ -38,10 +38,9 @@ def get_kpis():
 
 @telemetry_bp.route("/trends", methods=["GET"])
 @jwt_required()
+@require_role(["Administrator", "Fraud Analyst"])
 def get_trends():
     user = get_current_user()
-    if user.role.value not in ["Administrator", "Fraud Analyst"]:
-        raise AppError("Unauthorized", 403)
 
     # Generate realistic 30-day time-series data where fraud rate averages exactly 0.20% of volume
     days = [
@@ -60,10 +59,9 @@ def get_trends():
 
 @telemetry_bp.route("/health", methods=["GET"])
 @jwt_required()
+@require_role(["Administrator"])
 def get_system_health():
     user = get_current_user()
-    if user.role.value != "Administrator":
-        raise AppError("Only Administrators can view system hardware metrics.", 403)
 
     # Simulate realistic server telemetry metrics
     return success_response(

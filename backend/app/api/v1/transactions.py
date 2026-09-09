@@ -99,13 +99,12 @@ def review_transaction(tx_id):
 
 @transactions_bp.route("/heatmap", methods=["GET"])
 @jwt_required()
+@require_role(["Administrator", "Fraud Analyst"])
 def get_heatmap():
     """Aggregates real fraud instances by Day of Week and Hour of Day."""
     from sqlalchemy import func
 
     user = get_current_user()
-    if user.role.value not in ["Administrator", "Fraud Analyst"]:
-        raise AppError("Unauthorized.", 403)
 
     query = (
         db.session.query(
