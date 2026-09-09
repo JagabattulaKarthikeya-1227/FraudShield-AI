@@ -13,7 +13,9 @@ class Session(UUIDMixin, TimestampMixin, db.Model):
         nullable=False,
         index=True,
     )
-    refresh_token = Column(String(512), unique=True, nullable=False, index=True)
+    # Stores HMAC-SHA256 hash of the raw refresh token — never the raw token.
+    # The raw token is returned to the client once at issuance and never persisted.
+    refresh_token_hash = Column(String(64), unique=True, nullable=False, index=True)
     device_info = Column(String(255), nullable=True)
     ip_address = Column(String(45), nullable=True)
     expires_at = Column(DateTime, nullable=False)

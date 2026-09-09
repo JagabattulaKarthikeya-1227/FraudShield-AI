@@ -2,7 +2,7 @@ from datetime import timedelta, datetime, timezone
 from flask_jwt_extended import create_access_token, create_refresh_token
 from app.repositories.user_repo import UserRepository
 from app.repositories.session_repo import SessionRepository
-from app.security.hashing import hash_password, verify_password
+from app.security.hashing import hash_password, verify_password, hash_token
 from app.core.exceptions import AuthenticationError, ConflictError
 from app.models.user import RoleEnum
 
@@ -31,13 +31,14 @@ class AuthService:
             raise AuthenticationError("Invalid email or password.")
 
         access_token = create_access_token(identity=user)
+        # Raw refresh token — returned to client once, never stored in plaintext
         refresh_token = create_refresh_token(identity=user)
 
-        # Store refresh token session in DB (simplified expiry logic here)
+        # Persist only the HMAC-SHA256 hash of the refresh token
         SessionRepository.create(
             {
                 "user_id": user.id,
-                "refresh_token": refresh_token,
+                "refresh_token_hash": hash_token(refresh_token),
                 "device_info": device_info,
                 "ip_address": ip_address,
                 "expires_at": datetime.now(timezone.utc) + timedelta(days=30),
