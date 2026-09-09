@@ -6,10 +6,20 @@ from app.core.responses import success_response
 from app.core.exceptions import ValidationError
 from marshmallow import ValidationError as MarshmallowError
 
+from app.security.rate_limiter import limiter
+from flask_limiter.util import get_remote_address
+
 auth_bp = Blueprint("auth", __name__)
 
 
+def login_rate_limit_key():
+    """Key the rate limit by IP and the submitted email to prevent targeted and rotating brute-force attacks."""
+    email = request.json.get("email", "") if request.is_json else ""
+    return f"{get_remote_address()}:{email}"
+
+
 @auth_bp.route("/register", methods=["POST"])
+@limiter.limit("3 per hour")
 def register():
     try:
         data = RegisterSchema().load(request.json)
@@ -25,6 +35,7 @@ def register():
 
 
 @auth_bp.route("/login", methods=["POST"])
+@limiter.limit("5 per minute", key_func=login_rate_limit_key)
 def login():
     try:
         data = LoginSchema().load(request.json)

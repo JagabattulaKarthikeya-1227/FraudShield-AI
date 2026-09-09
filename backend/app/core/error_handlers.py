@@ -20,6 +20,11 @@ def register_error_handlers(app):
         current_app.logger.error(f"Database error: {str(e)}")
         return error_response("A database error occurred", None, 500)
 
+    @app.errorhandler(429)
+    def handle_rate_limit(e):
+        current_app.logger.warning(f"Rate limit exceeded: {str(e)}")
+        return error_response(str(e.description) if hasattr(e, "description") else "Too many requests", None, 429)
+
     @app.errorhandler(Exception)
     def handle_generic_error(e):
         current_app.logger.error(
