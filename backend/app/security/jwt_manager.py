@@ -21,6 +21,24 @@ def user_lookup_callback(_jwt_header, jwt_data):
 
 @jwt.token_in_blocklist_loader
 def check_if_token_revoked(jwt_header, jwt_payload):
-    # In a real scenario, check redis or DB for revoked jti
-    # For now, we rely on the DB session is_revoked for refresh tokens
-    return False
+    from app.core.redis import redis_client
+    import logging
+
+    jti = jwt_payload["jti"]
+    token_type = jwt_payload.get("type", "access")
+    
+    # We only blocklist access tokens in Redis (refresh tokens are verified via DB sessions)
+    if token_type != "access":
+        return False
+        
+    try:
+        # If the key exists in Redis, the token is revoked
+        if redis_client:
+            token_in_redis = redis_client.get(f"blocklist:{jti}")
+            return token_in_redis is not None
+        return False
+    except Exception as e:
+        # If Redis is unavailable, log the error but allow the request to proceed.
+        # This prevents a total authentication outage if the cache layer fails.
+        logging.error(f"Redis unavailable for blocklist check: {e}")
+        return False

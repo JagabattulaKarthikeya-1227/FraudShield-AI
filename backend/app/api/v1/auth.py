@@ -61,6 +61,46 @@ def refresh():
     return success_response(data={"access_token": access_token})
 
 
+@auth_bp.route("/logout", methods=["POST"])
+@jwt_required()
+def logout():
+    from flask_jwt_extended import get_jwt
+    from app.core.redis import redis_client
+    from app.repositories.session_repo import SessionRepository
+    from datetime import datetime, timezone
+    import logging
+
+    jwt_data = get_jwt()
+    jti = jwt_data["jti"]
+    
+    # 1. Blocklist the access token in Redis until it expires naturally
+    exp = jwt_data.get("exp")
+    if exp:
+        now = datetime.now(timezone.utc).timestamp()
+        ttl = max(1, int(exp - now))
+    else:
+        ttl = 3600  # Fallback to 1 hour
+    
+    try:
+        if redis_client:
+            redis_client.setex(f"blocklist:{jti}", ttl, "true")
+        else:
+            logging.warning("Redis client is not available. Skipping access token blocklist.")
+    except Exception as e:
+        logging.error(f"Failed to add token to Redis blocklist: {e}")
+        # Proceed with session revocation even if Redis fails
+
+    # 2. Revoke the refresh token session if provided
+    refresh_token = request.json.get("refresh_token") if request.is_json else None
+    if refresh_token:
+        current_user = get_current_user()
+        session = SessionRepository.get_by_refresh_token(refresh_token)
+        if session and session.user_id == current_user.id:
+            SessionRepository.revoke(session)
+
+    return success_response(message="Logged out successfully.")
+
+
 @auth_bp.route("/me", methods=["GET"])
 @jwt_required()
 def get_me():
