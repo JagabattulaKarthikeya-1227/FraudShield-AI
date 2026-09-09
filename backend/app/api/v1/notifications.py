@@ -56,10 +56,16 @@ def get_notifications():
     return success_response(data={"notifications": notifs})
 
 
+from app.security.rate_limiter import limiter
+
 @notifications_bp.route("/stream", methods=["GET"])
+@jwt_required()
+@limiter.limit("5 per minute")
 def notification_stream():
     def generate():
-        while True:
+        # Cap the stream at 60 heartbeats (15 mins) so connections don't hang indefinitely
+        max_heartbeats = 60
+        for _ in range(max_heartbeats):
             # Pushes a heartbeat SSE event every 15 seconds to keep the connection alive
             # In production, this would yield actual events from a Redis Pub/Sub queue
             yield f'data: {{"type": "heartbeat", "timestamp": "{datetime.datetime.utcnow().isoformat()}"}}\n\n'

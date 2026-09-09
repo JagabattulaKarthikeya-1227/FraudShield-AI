@@ -44,4 +44,4 @@ USER fraudshield_user
 EXPOSE 5000
 
 # The default command runs the Gunicorn WSGI server for production
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--threads", "2", "run:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--worker-class", "gevent", "run:app"]
