@@ -48,8 +48,43 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     ENV = "production"
-    # In production, ensure these are strongly defined in ENV
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
+
+    # In production, SECRET_KEY and JWT_SECRET_KEY are read directly from env.
+    # Validation is deferred to app startup (see validate_production_secrets()).
+    SECRET_KEY = os.environ.get("SECRET_KEY") or ""
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or ""
+
+
+def validate_production_secrets(config_name: str) -> None:
+    """Raise RuntimeError early at app startup if production secrets are missing.
+
+    Called from the app factory before any request is served, so the process
+    exits loudly rather than running with a weak or missing signing key.
+    """
+    if config_name != "production":
+        return
+
+    secret_key = os.environ.get("SECRET_KEY", "")
+    jwt_secret = os.environ.get("JWT_SECRET_KEY", "")
+
+    _weak = {"", "default-dev-secret-key", "default-jwt-secret"}
+
+    if secret_key in _weak:
+        raise RuntimeError(
+            "[SECURITY] SECRET_KEY must be set to a strong random value in "
+            "production. Generate one with:\n"
+            "  python -c \"import secrets; print(secrets.token_hex(32))\"\n"
+            "Then set it in your .env file or secrets manager."
+        )
+
+    if jwt_secret in _weak:
+        raise RuntimeError(
+            "[SECURITY] JWT_SECRET_KEY must be set to a strong random value in "
+            "production. Generate one with:\n"
+            "  python -c \"import secrets; print(secrets.token_hex(32))\"\n"
+            "Then set it in your .env file or secrets manager."
+        )
 
 
 config_by_name = {

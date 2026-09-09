@@ -24,9 +24,10 @@ services:
       dockerfile: Dockerfile
     environment:
       - FLASK_ENV=production
-      - DATABASE_URL=mysql+pymysql://fraud_user:fraud_pass@mysql_db:3306/fraudshield
+      - DATABASE_URL=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql_db:3306/${MYSQL_DATABASE}
       - REDIS_URL=redis://redis_cache:6379/0
-      - JWT_SECRET_KEY=production_secret_do_not_use_in_real_life
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     depends_on:
       mysql_db:
         condition: service_healthy
@@ -44,8 +45,10 @@ services:
       dockerfile: Dockerfile
     command: celery -A app.core.celery_app.celery worker --loglevel=info
     environment:
-      - DATABASE_URL=mysql+pymysql://fraud_user:fraud_pass@mysql_db:3306/fraudshield
+      - DATABASE_URL=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql_db:3306/${MYSQL_DATABASE}
       - REDIS_URL=redis://redis_cache:6379/0
+      - SECRET_KEY=${SECRET_KEY}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     depends_on:
       - redis_cache
       - mysql_db
@@ -58,10 +61,10 @@ services:
   mysql_db:
     image: mysql:8.0
     environment:
-      - MYSQL_ROOT_PASSWORD=root_pass
-      - MYSQL_DATABASE=fraudshield
-      - MYSQL_USER=fraud_user
-      - MYSQL_PASSWORD=fraud_pass
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:

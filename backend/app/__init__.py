@@ -12,9 +12,12 @@ def create_app(config_name=None):
     app = Flask(__name__)
 
     # 1. Configuration
-    from app.config.settings import config_by_name
+    from app.config.settings import config_by_name, validate_production_secrets
 
     app.config.from_object(config_by_name[config_name])
+
+    # Fail fast in production if JWT/Flask secret keys are missing or weak
+    validate_production_secrets(config_name)
 
     # 2. Setup Core Services
     from app.core.logging import setup_logging
