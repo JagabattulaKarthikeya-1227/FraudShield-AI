@@ -100,6 +100,23 @@ npm run dev
 4. **Access the Application**
 Navigate to `http://localhost:5173` in your browser.
 
+5. **Provision the First Admin Account**
+
+   No default credentials are seeded. Use the Flask CLI to create the first administrator:
+
+   ```bash
+   cd backend
+   # Activate your virtualenv first, then:
+   flask create-admin
+   ```
+
+   The command will interactively prompt for email, name, and a strong password
+   (minimum 12 characters, mixed case, digit, and special character).
+
+   > ⚠️ **Security note:** Never commit credentials to the repository.
+   > If the app logs `[SECURITY] No active Administrator accounts found`, run
+   > `flask create-admin` to resolve it.
+
 ---
 
 ## 📚 Documentation Directory

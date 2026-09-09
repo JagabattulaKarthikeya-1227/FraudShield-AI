@@ -67,6 +67,7 @@ CREATE TABLE `fraud_alerts` (
   FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Insert initial admin user (password hash corresponds to 'AdminPassword2026!')
-INSERT INTO `users` (`email`, `password_hash`, `first_name`, `last_name`, `role`, `is_active`) 
-VALUES ('admin@fraudshield.ai', '$pbkdf2-sha256$29000$hQ2t6L66kU/$w0V1N.f5bZ4rYyL1u9wPzP/5iZt.b2U3yQ', 'System', 'Administrator', 'admin', 1);
+-- !! No default admin credentials are seeded here.
+-- !! Use the Flask CLI command to provision the first admin account:
+-- !!   flask create-admin
+-- !! See README.md § "First Admin Account" for full instructions.

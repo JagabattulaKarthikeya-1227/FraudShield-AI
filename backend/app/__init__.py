@@ -65,6 +65,14 @@ def create_app(config_name=None):
     # 4. Register API Blueprints
     app.register_blueprint(v1_bp)
 
+    # 5. Register Flask CLI commands
+    from app.cli import register_cli, warn_if_no_admins
+    register_cli(app)
+
+    # 6. Warn at startup if no admin accounts exist (non-blocking)
+    import threading
+    threading.Thread(target=warn_if_no_admins, args=(app,), daemon=True).start()
+
     @app.route("/health")
     def health_check():
         return jsonify({"status": "healthy", "version": "1.0.0"})
