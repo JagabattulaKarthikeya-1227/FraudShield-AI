@@ -102,17 +102,20 @@ def review_transaction(tx_id):
 @require_role(["Administrator", "Fraud Analyst"])
 def get_heatmap():
     """Aggregates real fraud instances by Day of Week and Hour of Day."""
-    from sqlalchemy import func
+    from sqlalchemy import func, extract
 
     user = get_current_user()
 
+    # The extract('dow') function must remain dialect-portable to support both SQLite and MySQL.
+    # Note: SQLite extract('dow') returns 0=Sunday..6=Saturday. 
+    # MySQL DAYOFWEEK() behavior returns 1=Sunday..7=Saturday.
     query = (
         db.session.query(
-            func.dayofweek(Transaction.transaction_date).label("dow"),
-            func.hour(Transaction.transaction_date).label("hour"),
+            extract('dow', Transaction.transaction_date).label("dow"),
+            extract('hour', Transaction.transaction_date).label("hour"),
             func.count(Transaction.id).label("count"),
         )
-        .filter(Transaction.status == "declined")
+        .filter(Transaction.status == TransactionStatus.DECLINED)
         .group_by("dow", "hour")
     )
 
@@ -130,23 +133,18 @@ def get_heatmap():
                     base += random.random() * 10
                 echarts_data.append([j, i, int(base)])
     else:
-        for dow, hour, count in results:
-            if dow == 7:
-                echarts_day = 0
-            elif dow == 6:
-                echarts_day = 1
-            elif dow == 5:
-                echarts_day = 2
-            elif dow == 4:
-                echarts_day = 3
-            elif dow == 3:
-                echarts_day = 4
-            elif dow == 2:
-                echarts_day = 5
-            elif dow == 1:
-                echarts_day = 6
+        is_sqlite = db.engine.dialect.name == "sqlite"
+        for dow_raw, hour, count in results:
+            # Normalize to 0=Sunday, 1=Monday ... 6=Saturday
+            if is_sqlite:
+                standard_dow = int(dow_raw)
             else:
-                echarts_day = 6
-            echarts_data.append([hour, echarts_day, count])
+                # Assuming MySQL 1-7 where 1=Sunday
+                standard_dow = int(dow_raw) - 1
+                
+            # ECharts y-axis maps 0=Saturday, 1=Friday, ..., 6=Sunday
+            echarts_day = 6 - standard_dow
+            
+            echarts_data.append([int(hour), echarts_day, count])
 
     return success_response(data={"heatmap": echarts_data})
