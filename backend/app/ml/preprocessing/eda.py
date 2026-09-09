@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -13,11 +15,11 @@ class EDAGenerator:
         self.df = pd.read_csv(self.data_path)
 
     def generate_all_reports(self):
-        print("Generating EDA Reports...")
+        logger.info("Generating EDA Reports...")
         self._missing_values_report()
         self._class_imbalance_report()
         self._correlation_matrix()
-        print(f"Reports saved to {self.output_dir}")
+        logger.info(f"Reports saved to {self.output_dir}")
 
     def _missing_values_report(self):
         missing = self.df.isnull().sum()

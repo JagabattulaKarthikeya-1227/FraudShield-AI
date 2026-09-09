@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import json
 import os
 import uuid
@@ -35,7 +37,7 @@ class ModelRegistry:
         with open(self.registry_path, "w") as f:
             json.dump(registry, f, indent=4)
 
-        print(f"Model version {version_id} logged to registry.")
+        logger.info(f"Model version {version_id} logged to registry.")
         return version_id
 
     def get_active_model(self):

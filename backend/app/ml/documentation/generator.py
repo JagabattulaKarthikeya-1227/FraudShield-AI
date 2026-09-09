@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import json
 import os
 
@@ -17,12 +19,12 @@ class ModelCardGenerator:
             with open(self.registry_path, "r") as f:
                 registry = json.load(f)
         except FileNotFoundError:
-            print("No registry found. Train a model first.")
+            logger.info("No registry found. Train a model first.")
             return
 
         active_id = registry.get("active_model")
         if not active_id:
-            print("No active model deployed.")
+            logger.info("No active model deployed.")
             return
 
         active_record = next(
@@ -52,7 +54,7 @@ class ModelCardGenerator:
 """
         with open(self.output_path, "w") as f:
             f.write(card)
-        print(f"Model card generated at {self.output_path}")
+        logger.info(f"Model card generated at {self.output_path}")
 
 
 if __name__ == "__main__":

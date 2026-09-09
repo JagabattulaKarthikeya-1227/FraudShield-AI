@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, BatchNormalization, Dropout
@@ -46,7 +48,7 @@ class MLPTrainer:
     def train(
         self, X_train, y_train, X_val, y_val, batch_size=256, epochs=50, save_path=None
     ):
-        print("Training Keras MLP Base Model...")
+        logger.info("Training Keras MLP Base Model...")
 
         callbacks = [
             EarlyStopping(
@@ -74,7 +76,7 @@ class MLPTrainer:
             callbacks=callbacks,
             verbose=1,
         )
-        print("MLP Training complete.")
+        logger.info("MLP Training complete.")
         return history
 
     def predict_proba(self, X):

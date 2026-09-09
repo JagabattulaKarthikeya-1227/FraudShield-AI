@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.metrics import brier_score_loss
 import joblib
@@ -16,13 +18,13 @@ class ProbabilityCalibrator:
         )
 
     def fit(self, X_val, y_val):
-        print(f"Calibrating probabilities using {self.calibrator.method}...")
+        logger.info(f"Calibrating probabilities using {self.calibrator.method}...")
         self.calibrator.fit(X_val, y_val)
 
         # Calculate Brier Score
         probs = self.predict_proba(X_val)
         brier = brier_score_loss(y_val, probs)
-        print(f"Calibration complete. Brier Score: {brier:.4f}")
+        logger.info(f"Calibration complete. Brier Score: {brier:.4f}")
         return brier
 
     def predict_proba(self, X):

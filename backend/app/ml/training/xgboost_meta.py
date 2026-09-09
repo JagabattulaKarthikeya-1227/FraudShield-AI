@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import xgboost as xgb
 import numpy as np
 import joblib
@@ -23,11 +25,11 @@ class XGBoostMetaTrainer:
         return np.column_stack((prob_et, prob_mlp))
 
     def train(self, X_meta_train, y_train, X_meta_val, y_val):
-        print("Training XGBoost Meta Model...")
+        logger.info("Training XGBoost Meta Model...")
         self.model.fit(
             X_meta_train, y_train, eval_set=[(X_meta_val, y_val)], verbose=False
         )
-        print("Meta Model Training complete.")
+        logger.info("Meta Model Training complete.")
 
     def predict_proba(self, X_meta):
         # Use genuine XGBoost meta model probabilities for maximum stacking accuracy
@@ -36,7 +38,7 @@ class XGBoostMetaTrainer:
     def save(self, path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         joblib.dump(self.model, path)
-        print(f"XGBoost Meta Model saved to {path}")
+        logger.info(f"XGBoost Meta Model saved to {path}")
 
     @classmethod
     def load(cls, path):

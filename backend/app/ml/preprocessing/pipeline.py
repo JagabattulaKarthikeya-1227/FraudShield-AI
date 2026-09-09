@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import RobustScaler
@@ -11,19 +13,19 @@ class DataPipeline:
         self.scaler = RobustScaler()
 
     def process(self, df: pd.DataFrame, target_col="Class"):
-        print("Starting data preprocessing pipeline...")
+        logger.info("Starting data preprocessing pipeline...")
 
         # 1. Duplicate Removal
         initial_len = len(df)
         df = df.drop_duplicates()
-        print(f"Removed {initial_len - len(df)} duplicate rows.")
+        logger.info(f"Removed {initial_len - len(df)} duplicate rows.")
 
         # 2. Features and Target
         X = df.drop(columns=[target_col])
         y = df[target_col]
 
         # 3. Train-Validation-Test Split (70-15-15)
-        print("Splitting data into Train/Validation/Test sets...")
+        logger.info("Splitting data into Train/Validation/Test sets...")
         X_temp, X_test, y_temp, y_test = train_test_split(
             X, y, test_size=0.15, stratify=y, random_state=self.random_seed
         )
@@ -39,7 +41,7 @@ class DataPipeline:
         # Assuming 'Time' and 'Amount' need scaling. V1-V28 are already PCA transformed.
         cols_to_scale = ["Time", "Amount"]
 
-        print("Scaling features...")
+        logger.info("Scaling features...")
         X_train.loc[:, cols_to_scale] = self.scaler.fit_transform(
             X_train[cols_to_scale]
         )
@@ -51,4 +53,4 @@ class DataPipeline:
     def save_scaler(self, path: str):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         joblib.dump(self.scaler, path)
-        print(f"Scaler saved to {path}")
+        logger.info(f"Scaler saved to {path}")

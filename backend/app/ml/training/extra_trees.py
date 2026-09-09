@@ -1,3 +1,5 @@
+import logging
+logger = logging.getLogger(__name__)
 from sklearn.ensemble import ExtraTreesClassifier
 import joblib
 import os
@@ -17,9 +19,9 @@ class ExtraTreesTrainer:
         )
 
     def train(self, X_train, y_train):
-        print("Training Extra Trees Base Model...")
+        logger.info("Training Extra Trees Base Model...")
         self.model.fit(X_train, y_train)
-        print("Training complete.")
+        logger.info("Training complete.")
 
     def predict_proba(self, X):
         return self.model.predict_proba(X)[:, 1]
@@ -27,7 +29,7 @@ class ExtraTreesTrainer:
     def save(self, path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         joblib.dump(self.model, path)
-        print(f"Extra Trees model saved to {path}")
+        logger.info(f"Extra Trees model saved to {path}")
 
     @classmethod
     def load(cls, path):

@@ -10,12 +10,14 @@ def user_identity_lookup(user):
     return user.id
 
 
+from flask import current_app
+
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data["sub"]
-    print(f"DEBUG_JWT: Looking up user with identity: {identity}")
+    current_app.logger.debug(f"DEBUG_JWT: Looking up user with identity: {identity}")
     user = db.session.get(User, identity)
-    print(f"DEBUG_JWT: Found user: {user}")
+    current_app.logger.debug(f"DEBUG_JWT: Found user: {user}")
     return user
 
 
