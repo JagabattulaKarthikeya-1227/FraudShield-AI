@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # FraudShield AI
 
 <div align="center">
@@ -58,7 +57,7 @@ graph TD
     Gateway --> Explain[XAI Engine - SHAP]
     
     Inference --> Redis[(Redis Cache)]
-    Auth --> Postgres[(PostgreSQL)]
+    Auth --> MySQL[(MySQL 8)]
     Inference --> Model[(Joblib Ensembles)]
 ```
 
@@ -131,7 +130,4 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-=======
-# FraudShield-AI
-Explainable Hybrid Ensemble Framework for Intelligent Credit Card Fraud Detection
->>>>>>> 72e5ede9a75f4edb2f58e417d702d2749ccb869f
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

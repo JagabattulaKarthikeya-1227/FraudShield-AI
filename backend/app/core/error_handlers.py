@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.core.exceptions import AppError
 from app.core.responses import error_response
 
+
 def register_error_handlers(app):
     @app.errorhandler(AppError)
     def handle_app_error(e):
@@ -21,5 +22,7 @@ def register_error_handlers(app):
 
     @app.errorhandler(Exception)
     def handle_generic_error(e):
-        current_app.logger.error(f"Unhandled exception: {str(e)}\n{traceback.format_exc()}")
+        current_app.logger.error(
+            f"Unhandled exception: {str(e)}\n{traceback.format_exc()}"
+        )
         return error_response("Internal server error", None, 500)

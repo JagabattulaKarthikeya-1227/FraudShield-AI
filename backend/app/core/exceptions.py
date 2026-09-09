@@ -5,21 +5,26 @@ class AppError(Exception):
         self.status_code = status_code
         self.errors = errors
 
+
 class ValidationError(AppError):
     def __init__(self, message="Validation failed", errors=None):
         super().__init__(message, 422, errors)
+
 
 class AuthenticationError(AppError):
     def __init__(self, message="Authentication failed"):
         super().__init__(message, 401)
 
+
 class AuthorizationError(AppError):
     def __init__(self, message="Permission denied"):
         super().__init__(message, 403)
 
+
 class NotFoundError(AppError):
     def __init__(self, message="Resource not found"):
         super().__init__(message, 404)
+
 
 class ConflictError(AppError):
     def __init__(self, message="Resource already exists"):

@@ -34,6 +34,11 @@ describe('RiskScoreCalculator Form Validation', () => {
       </QueryClientProvider>
     );
 
+    const amountInput = screen.getByLabelText(/Transaction Amount/i);
+    const merchantInput = screen.getByLabelText(/Merchant Name/i);
+    fireEvent.change(amountInput, { target: { value: '' } });
+    fireEvent.change(merchantInput, { target: { value: '' } });
+
     const submitBtn = screen.getByRole('button', { name: /Run Fraud Detection/i });
     fireEvent.click(submitBtn);
 

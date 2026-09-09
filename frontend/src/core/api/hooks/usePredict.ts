@@ -13,7 +13,7 @@ export const usePredictSingle = () => {
 
   return useMutation({
     mutationFn: async (data: PredictPayload) => {
-      const response = await apiClient.post('/predict/single', data);
+      const response = await apiClient.post('/fraud/predict', data);
       return response.data;
     },
     onSuccess: () => {
@@ -21,6 +21,15 @@ export const usePredictSingle = () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard_stats'] });
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
+};
+
+export const useLoadSample = () => {
+  return useMutation({
+    mutationFn: async () => {
+      const response = await apiClient.get('/fraud/sample');
+      return response.data;
     },
   });
 };

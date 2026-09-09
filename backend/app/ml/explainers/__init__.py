@@ -1,6 +1,7 @@
 import abc
 from typing import Dict, Any
 
+
 class BaseExplainer(abc.ABC):
     """Abstract base class representing XAI models (SHAP or LIME)."""
 
@@ -11,4 +12,3 @@ class BaseExplainer(abc.ABC):
         Returns:
             Dict containing feature-level contribution details.
         """
-        pass

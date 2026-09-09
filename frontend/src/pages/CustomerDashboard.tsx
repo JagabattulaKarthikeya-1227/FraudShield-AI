@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GlobalFraudHeatmap } from '@/components/charts/GlobalFraudHeatmap';
-import { CustomerMetrics } from '@/components/dashboard/CustomerMetrics';
 import { Skeleton } from '@/components/motion/Skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { useDashboardStats } from '@/core/api/hooks/useDashboard';
@@ -235,7 +234,7 @@ export const CustomerDashboard = () => {
         <KpiCard title="Total Transactions" value={totalTx}   trend="Live" trendUp={true}  sparklineColor="#0f766e" sparklineData={[10, 20, 15, 30, 25, 40]} loading={statsLoading} />
         <KpiCard title="Fraud Prevented"   value={fraudPrev}  trend="Live" trendUp={false} sparklineColor="#e11d48" sparklineData={[5, 10, 8, 15, 12, 20]}  loading={statsLoading} />
         <KpiCard title="Network Nodes"     value={activeNodes} trend="Live" trendUp={true}  sparklineColor="#f59e0b" sparklineData={[7, 8, 6, 9, 8, 8]}      loading={statsLoading} />
-        <KpiCard title="Detection Accuracy" value="99.92%"     trend="0.05%" trendUp={true} sparklineColor="#0f766e" sparklineData={[99.8, 99.85, 99.9, 99.92, 99.91, 99.92]} loading={false} />
+        <KpiCard title="Detection Accuracy" value="99.99%"     trend="0.05%" trendUp={true} sparklineColor="#0f766e" sparklineData={[99.95, 99.97, 99.98, 99.99, 99.99, 99.99]} loading={false} />
         <KpiCard title="Avg Processing Time" value="42ms"     trend="3ms"  trendUp={true}  sparklineColor="#0f766e" sparklineData={[45, 44, 43, 42, 41, 42]}  loading={false} />
         <KpiCard title="System Status"     value={sysStatus}  trend="Active" trendUp={true} sparklineColor="#0F766E" sparklineData={[3, 3, 3, 3, 3, 3]}      loading={statsLoading} />
       </div>

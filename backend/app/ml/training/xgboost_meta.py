@@ -3,19 +3,19 @@ import numpy as np
 import joblib
 import os
 
+
 class XGBoostMetaTrainer:
     def __init__(self, random_seed=42):
         self.model = xgb.XGBClassifier(
-            n_estimators=2000,
-            learning_rate=0.005,
-            max_depth=6,
+            n_estimators=100,
+            learning_rate=0.05,
+            max_depth=3,
             subsample=0.8,
             colsample_bytree=0.8,
-            gamma=0.1,
-            scale_pos_weight=10, # Slight boost to positive class in meta stage
+            gamma=0.0,
             random_state=random_seed,
             eval_metric="aucpr",
-            early_stopping_rounds=50
+            early_stopping_rounds=10,
         )
 
     def prepare_meta_features(self, prob_et, prob_mlp):
@@ -25,17 +25,13 @@ class XGBoostMetaTrainer:
     def train(self, X_meta_train, y_train, X_meta_val, y_val):
         print("Training XGBoost Meta Model...")
         self.model.fit(
-            X_meta_train, y_train,
-            eval_set=[(X_meta_val, y_val)],
-            verbose=False
+            X_meta_train, y_train, eval_set=[(X_meta_val, y_val)], verbose=False
         )
         print("Meta Model Training complete.")
 
     def predict_proba(self, X_meta):
-        # Use calibrated probability stacking (60% ExtraTrees, 40% MLP Neural Net)
-        prob_et = X_meta[:, 0]
-        prob_mlp = X_meta[:, 1]
-        return 0.60 * prob_et + 0.40 * prob_mlp
+        # Use genuine XGBoost meta model probabilities for maximum stacking accuracy
+        return self.model.predict_proba(X_meta)[:, 1]
 
     def save(self, path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -46,6 +42,6 @@ class XGBoostMetaTrainer:
     def load(cls, path):
         instance = cls()
         instance.model = joblib.load(path)
-        if hasattr(instance.model, 'n_jobs'):
+        if hasattr(instance.model, "n_jobs"):
             instance.model.n_jobs = 1
         return instance

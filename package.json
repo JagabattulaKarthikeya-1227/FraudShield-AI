@@ -6,7 +6,7 @@
   "scripts": {
     "docker:dev": "docker-compose up --build",
     "docker:down": "docker-compose down -v",
-    "dev:backend": "cd backend && python run.py",
+    "dev:backend": "cd backend && venv312\\Scripts\\python.exe run.py",
     "dev:frontend": "cd frontend && npm run dev",
     "build:frontend": "cd frontend && npm run build",
     "lint:frontend": "cd frontend && npm run lint",

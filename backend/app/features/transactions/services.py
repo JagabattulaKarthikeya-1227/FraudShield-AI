@@ -3,6 +3,7 @@ from app.database.core import db
 from .models import Transaction
 from app.core.errors import ResourceNotFoundException
 
+
 class TransactionService:
     """Business service orchestrating database interactions and ML scoring triggers."""
 
@@ -16,7 +17,9 @@ class TransactionService:
         """Find a single transaction, throwing ResourceNotFoundException if absent."""
         transaction = Transaction.query.get(transaction_id)
         if not transaction:
-            raise ResourceNotFoundException(f"Transaction ID {transaction_id} not found.")
+            raise ResourceNotFoundException(
+                f"Transaction ID {transaction_id} not found."
+            )
         return transaction
 
     @staticmethod
@@ -40,7 +43,7 @@ class TransactionService:
             location_long=data.get("location_long"),
             status=status,
             is_fraud=is_fraud,
-            fraud_probability=score
+            fraud_probability=score,
         )
 
         db.session.add(new_transaction)

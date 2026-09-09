@@ -1,8 +1,10 @@
 from datetime import datetime
 from app.database.core import db
 
+
 class Transaction(db.Model):
     """SQLAlchemy model representing credit card transactions."""
+
     __tablename__ = "transactions"
 
     id = db.Column(db.String(50), primary_key=True)
@@ -14,7 +16,9 @@ class Transaction(db.Model):
     card_type = db.Column(db.String(20), nullable=False)
     location_lat = db.Column(db.Numeric(9, 6), nullable=True)
     location_long = db.Column(db.Numeric(9, 6), nullable=True)
-    status = db.Column(db.String(20), nullable=False, default="pending")  # approved, declined, suspicious
+    status = db.Column(
+        db.String(20), nullable=False, default="pending"
+    )  # approved, declined, suspicious
     is_fraud = db.Column(db.Boolean, nullable=False, default=False)
     fraud_probability = db.Column(db.Numeric(5, 4), nullable=False, default=0.0000)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -33,6 +37,8 @@ class Transaction(db.Model):
             "location_long": float(self.location_long) if self.location_long else None,
             "status": self.status,
             "is_fraud": self.is_fraud,
-            "fraud_probability": float(self.fraud_probability) if self.fraud_probability else 0.0,
+            "fraud_probability": (
+                float(self.fraud_probability) if self.fraud_probability else 0.0
+            ),
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }

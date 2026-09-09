@@ -19,7 +19,7 @@ vi.mock('@/core/api/client', () => ({
 }));
 
 vi.mock('@/store/authStore', () => ({
-  useAuthStore: { getState: () => ({ accessToken: 'mock-token', refreshToken: null, logout: vi.fn() }) },
+  useAuthStore: { getState: () => ({ logout: vi.fn() }) },
 }));
 
 import { usePredictSingle } from '@/core/api/hooks/usePredict';

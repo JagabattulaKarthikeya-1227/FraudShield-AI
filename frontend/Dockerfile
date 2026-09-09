@@ -23,9 +23,7 @@ FROM nginx:1.25-alpine
 # Copy the compiled Vite dist folder to the Nginx html directory
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# We don't overwrite the default nginx.conf here because the docker-compose 
-# will mount a custom global nginx.conf that handles both frontend static 
-# serving AND backend reverse proxying.
+COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 

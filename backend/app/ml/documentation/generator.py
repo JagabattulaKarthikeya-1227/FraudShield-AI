@@ -1,15 +1,20 @@
 import json
 import os
 
+
 class ModelCardGenerator:
-    def __init__(self, registry_path="../models/model_registry.json", output_path="../documentation/Model_Card.md"):
+    def __init__(
+        self,
+        registry_path="../models/model_registry.json",
+        output_path="../documentation/Model_Card.md",
+    ):
         self.registry_path = registry_path
         self.output_path = output_path
         os.makedirs(os.path.dirname(self.output_path), exist_ok=True)
 
     def generate(self):
         try:
-            with open(self.registry_path, 'r') as f:
+            with open(self.registry_path, "r") as f:
                 registry = json.load(f)
         except FileNotFoundError:
             print("No registry found. Train a model first.")
@@ -19,12 +24,14 @@ class ModelCardGenerator:
         if not active_id:
             print("No active model deployed.")
             return
-            
-        active_record = next(r for r in registry["history"] if r["version_id"] == active_id)
+
+        active_record = next(
+            r for r in registry["history"] if r["version_id"] == active_id
+        )
         metrics = active_record.get("metrics", {})
-        
+
         card = f"""# Model Card: FraudShield AI Hybrid Ensemble
-        
+
 ## 1. Model Details
 - **Version ID:** `{active_id}`
 - **Training Date:** `{active_record.get('training_date')}`
@@ -43,9 +50,10 @@ class ModelCardGenerator:
 - The model employs SMOTE synthetics during training to offset severe class imbalance. Synthetic sampling is verified via unit testing to exclusively apply to training data, preventing data leakage and ensuring fair evaluation on real distributions.
 - Explainability (SHAP & LIME) is integrated to allow analysts to audit why a transaction was flagged, reducing opaque algorithmic bias.
 """
-        with open(self.output_path, 'w') as f:
+        with open(self.output_path, "w") as f:
             f.write(card)
         print(f"Model card generated at {self.output_path}")
+
 
 if __name__ == "__main__":
     ModelCardGenerator().generate()

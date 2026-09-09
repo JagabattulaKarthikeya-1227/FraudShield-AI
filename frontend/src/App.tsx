@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ErrorBoundary } from '@/components/system/ErrorBoundary';
 import React, { Suspense, lazy } from 'react';
 import { GlobalLoader } from '@/components/layout/GlobalLoader';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 const DashboardLayout = lazy(() => import('@/components/layout/DashboardLayout').then(m => ({ default: m.DashboardLayout })));
 const LandingPage = lazy(() => import('@/pages/LandingPage').then(m => ({ default: m.LandingPage })));
 import { 
@@ -57,14 +58,22 @@ function App() {
                 <Route path="/register" element={<PageTransition><LoginPage /></PageTransition>} />
                 
                 {/* Authenticated Dashboard Routes */}
-                <Route element={<PageTransition><DashboardLayout /></PageTransition>}>
+                <Route element={<ProtectedRoute><PageTransition><DashboardLayout /></PageTransition></ProtectedRoute>}>
                   <Route path="/calculate" element={<RiskScoreCalculator />} />
                   <Route path="/dashboard" element={<CustomerDashboard />} />
-                  <Route path="/transactions" element={<FraudAnalystWorkspace />} />
+                  
+                  <Route element={<ProtectedRoute allowedRoles={['Administrator', 'Fraud Analyst']} />}>
+                    <Route path="/transactions" element={<FraudAnalystWorkspace />} />
+                    <Route path="/explainability" element={<ExplainabilityStudio />} />
+                  </Route>
+
                   <Route path="/alerts" element={<AlertsCenter />} />
                   <Route path="/analytics" element={<AnalyticsCenter />} />
-                  <Route path="/explainability" element={<ExplainabilityStudio />} />
-                  <Route path="/models" element={<ModelRegistry />} />
+                  
+                  <Route element={<ProtectedRoute allowedRoles={['Administrator']} />}>
+                    <Route path="/models" element={<ModelRegistry />} />
+                  </Route>
+                  
                   <Route path="/settings" element={<Settings />} />
                   
                   <Route path="*" element={<NotFound />} />

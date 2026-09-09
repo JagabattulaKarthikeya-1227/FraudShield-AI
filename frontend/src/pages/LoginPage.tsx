@@ -83,7 +83,6 @@ export const LoginPage = () => {
   const [serverError, setServerError] = useState('');
   const [load3D, setLoad3D]     = useState(false);
 
-  const setTokens  = useAuthStore(s => s.setTokens);
   const setUser    = useAuthStore(s => s.setUser);
   const navigate   = useNavigate();
   const from       = (location.state as any)?.from || '/calculate';
@@ -107,8 +106,7 @@ export const LoginPage = () => {
     setServerError('');
     try {
       const res = await apiClient.post('/auth/login', data);
-      const { access_token, refresh_token, user } = res.data.data;
-      setTokens(access_token, refresh_token);
+      const { user } = res.data.data;
       setUser(user);
       navigate(from, { replace: true });
     } catch (err: any) {
@@ -128,8 +126,7 @@ export const LoginPage = () => {
       await apiClient.post('/auth/register', data);
       // Auto-login after registration
       const res = await apiClient.post('/auth/login', { email: data.email, password: data.password });
-      const { access_token, refresh_token, user } = res.data.data;
-      setTokens(access_token, refresh_token);
+      const { user } = res.data.data;
       setUser(user);
       navigate('/calculate', { replace: true });
     } catch (err: any) {

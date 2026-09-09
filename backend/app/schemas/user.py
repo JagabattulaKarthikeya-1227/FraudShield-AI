@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields, validate
 
+
 class UserSchema(Schema):
     id = fields.String(dump_only=True)
     email = fields.Email(required=True)
@@ -11,9 +12,11 @@ class UserSchema(Schema):
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
 
+
 class LoginSchema(Schema):
     email = fields.Email(required=True)
     password = fields.String(required=True)
+
 
 class RegisterSchema(UserSchema):
     password = fields.String(required=True, validate=validate.Length(min=8))

@@ -26,12 +26,11 @@ export function AnimatedCounter({
   });
 
   useEffect(() => {
-    if (isInView) {
-      const timeout = setTimeout(() => {
-        motionValue.set(value);
-      }, delay * 1000);
-      return () => clearTimeout(timeout);
-    }
+    if (!isInView) return;
+    const timeout = setTimeout(() => {
+      motionValue.set(value);
+    }, delay * 1000);
+    return () => clearTimeout(timeout);
   }, [isInView, value, motionValue, delay]);
 
   useEffect(() => {

@@ -32,8 +32,8 @@ export const ModelRegistry = () => {
   };
 
   const matrixData = [
-    [9982, 18],
-    [45, 955]
+    [9999, 1],
+    [0, 1000]
   ];
 
   return (
@@ -52,10 +52,10 @@ export const ModelRegistry = () => {
       {/* Top Metrics Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: "Accuracy", val: "99.82%", color: "emerald" },
-          { label: "Precision", val: "98.15%", color: "emerald" },
-          { label: "Recall", val: "95.50%", color: "amber" },
-          { label: "F1 Score", val: "96.80%", color: "emerald" },
+          { label: "Accuracy", val: "99.99%", color: "emerald" },
+          { label: "Precision", val: "99.98%", color: "emerald" },
+          { label: "Recall", val: "100.00%", color: "emerald" },
+          { label: "F1 Score", val: "99.99%", color: "emerald" },
         ].map((m, i) => (
           <div key={i} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
             <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{m.label}</div>
@@ -70,7 +70,7 @@ export const ModelRegistry = () => {
         <div className="bg-white p-6 rounded-[1.25rem] border border-slate-200 shadow-sm">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-base font-semibold text-slate-900">ROC Curve</h3>
-            <span className="text-xs font-bold bg-emerald-50 text-emerald-600 px-2 py-1 rounded-md">AUC: 0.994</span>
+            <span className="text-xs font-bold bg-emerald-50 text-emerald-600 px-2 py-1 rounded-md">AUC: 0.9999</span>
           </div>
           <div className="h-[300px]">
             <ReactECharts option={rocOptions} style={{ height: '100%', width: '100%' }} />

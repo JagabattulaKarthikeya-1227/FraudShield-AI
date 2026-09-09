@@ -1,7 +1,7 @@
-from app.core.security import hash_password, verify_password
+from app.core.security import verify_password
 from .models import User
-from app.database.core import db
 from app.core.errors import AuthenticationException
+
 
 class AuthService:
     """Mock identity provider business services skeleton."""

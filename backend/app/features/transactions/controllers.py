@@ -1,9 +1,11 @@
 from flask import request, jsonify
-from webargs.flaskparser import parser
 from app.core.errors import BadRequestException
 from . import transactions_bp
 from .services import TransactionService
 from .schemas import TransactionCreateSchema, TransactionResponseSchema
+# Register marshmallow schemas to Flasgger definition library.
+from flasgger import Schema as FlasggerSchema
+
 
 @transactions_bp.route("", methods=["GET"])
 def get_transactions():
@@ -79,7 +81,9 @@ def create_transaction():
     schema = TransactionCreateSchema()
     errors = schema.validate(json_data)
     if errors:
-        raise BadRequestException("Validation errors occurred.", payload={"validation_errors": errors})
+        raise BadRequestException(
+            "Validation errors occurred.", payload={"validation_errors": errors}
+        )
 
     new_tx = TransactionService.create(json_data)
     response_schema = TransactionResponseSchema()
@@ -88,9 +92,11 @@ def create_transaction():
 
 # Register marshmallow schemas to Flasgger definition library.
 # This makes '#/definitions/TransactionCreate' and '#/definitions/TransactionResponse' visible in Swagger UI.
-from flasgger import Schema as FlasggerSchema
+
+
 class TransactionCreate(TransactionCreateSchema, FlasggerSchema):
     pass
+
 
 class TransactionResponse(TransactionResponseSchema, FlasggerSchema):
     pass

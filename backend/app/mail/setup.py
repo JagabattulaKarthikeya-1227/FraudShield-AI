@@ -3,6 +3,7 @@ from flask import render_template_string
 
 mail = Mail()
 
+
 def send_email(to, subject, html_template_string, **kwargs):
     """
     Sends an email using a raw HTML template string.
@@ -11,6 +12,7 @@ def send_email(to, subject, html_template_string, **kwargs):
     msg = Message(subject, recipients=[to])
     msg.html = render_template_string(html_template_string, **kwargs)
     mail.send(msg)
+
 
 # Basic templates
 WELCOME_TEMPLATE = """

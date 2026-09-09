@@ -3,21 +3,22 @@ from sklearn.metrics import brier_score_loss
 import joblib
 import os
 
+
 class ProbabilityCalibrator:
-    def __init__(self, base_estimator, method='sigmoid'):
+    def __init__(self, base_estimator, method="sigmoid"):
         """
         method: 'sigmoid' (Platt Scaling) or 'isotonic'
         """
         self.calibrator = CalibratedClassifierCV(
-            estimator=base_estimator, 
-            method=method, 
-            cv='prefit' # Because we fit it on the validation set after training
+            estimator=base_estimator,
+            method=method,
+            cv="prefit",  # Because we fit it on the validation set after training
         )
 
     def fit(self, X_val, y_val):
         print(f"Calibrating probabilities using {self.calibrator.method}...")
         self.calibrator.fit(X_val, y_val)
-        
+
         # Calculate Brier Score
         probs = self.predict_proba(X_val)
         brier = brier_score_loss(y_val, probs)
@@ -30,7 +31,7 @@ class ProbabilityCalibrator:
     def save(self, path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         joblib.dump(self.calibrator, path)
-        
+
     @classmethod
     def load(cls, path):
         instance = cls(base_estimator=None)

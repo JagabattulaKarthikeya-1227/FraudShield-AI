@@ -6,7 +6,7 @@ from .errors import (
     ResourceNotFoundException,
     BadRequestException,
     AuthenticationException,
-    AuthorizationException
+    AuthorizationException,
 )
 
 __all__ = [
@@ -23,5 +23,5 @@ __all__ = [
     "ResourceNotFoundException",
     "BadRequestException",
     "AuthenticationException",
-    "AuthorizationException"
+    "AuthorizationException",
 ]
