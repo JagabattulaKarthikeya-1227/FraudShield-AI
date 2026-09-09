@@ -53,13 +53,18 @@ jobs:
         # but here we run it as a warning or strict check for major orphans.
         vulture backend/app --min-confidence 100 || echo "Vulture found potential dead code!"
         
-    - name: Run Pytest
+    - name: Run Pytest & Schema Validation
       env:
         DATABASE_URL: mysql+pymysql://root:root@127.0.0.1:3306/fraudshield_test
         REDIS_URL: redis://127.0.0.1:6379/0
         JWT_SECRET_KEY: test_secret_key
       run: |
         cd backend
+        
+        # Verify that Alembic migrations are perfectly in sync with SQLAlchemy models
+        # If models have changed but migrations were not generated, this will fail the CI.
+        flask db check
+        
         pytest tests/ --cov=app --cov-report=xml
 
   frontend-build:

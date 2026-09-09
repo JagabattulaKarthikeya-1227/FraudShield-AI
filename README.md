@@ -87,6 +87,8 @@ python -m venv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 pip install -r requirements.txt
 cp .env.example .env
+flask db upgrade
+python scripts/seed_dev_db.py
 flask run
 ```
 
