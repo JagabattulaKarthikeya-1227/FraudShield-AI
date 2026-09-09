@@ -84,6 +84,7 @@ export const LoginPage = () => {
   const [load3D, setLoad3D]     = useState(false);
 
   const setUser    = useAuthStore(s => s.setUser);
+  const setTokens  = useAuthStore(s => s.setTokens);
   const navigate   = useNavigate();
   const from       = (location.state as any)?.from || '/calculate';
 
@@ -106,8 +107,9 @@ export const LoginPage = () => {
     setServerError('');
     try {
       const res = await apiClient.post('/auth/login', data);
-      const { user } = res.data.data;
+      const { user, access_token, refresh_token } = res.data.data;
       setUser(user);
+      setTokens(access_token, refresh_token);
       navigate(from, { replace: true });
     } catch (err: any) {
       setServerError(err?.response?.data?.message || 'Invalid credentials. Please try again.');
@@ -124,10 +126,11 @@ export const LoginPage = () => {
     setServerError('');
     try {
       await apiClient.post('/auth/register', data);
-      // Auto-login after registration
+      // Auto-login after registration to obtain tokens
       const res = await apiClient.post('/auth/login', { email: data.email, password: data.password });
-      const { user } = res.data.data;
+      const { user, access_token, refresh_token } = res.data.data;
       setUser(user);
+      setTokens(access_token, refresh_token);
       navigate('/calculate', { replace: true });
     } catch (err: any) {
       const msgs = err?.response?.data?.errors;
