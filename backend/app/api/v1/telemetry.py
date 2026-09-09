@@ -30,8 +30,10 @@ def get_kpis():
             "fraud_rate": round(fraud_rate, 2),
             "detection_accuracy": 99.99,
             "review_queue": total_queue,
+            # avg_decision_time_ms is simulated; no real latency tracking yet
             "avg_decision_time_ms": random.randint(45, 60),
             "active_users": User.query.count(),
+            "is_synthetic": total_tx == 0,  # Only fully synthetic when no real transactions exist
         }
     )
 
@@ -53,7 +55,12 @@ def get_trends():
     ]  # ~0.20%
 
     return success_response(
-        data={"labels": days, "legitimate": legit_volume, "fraudulent": fraud_volume}
+        data={
+            "labels": days,
+            "legitimate": legit_volume,
+            "fraudulent": fraud_volume,
+            "is_synthetic": True,  # Time-series trend data is currently illustrative; no real historical aggregation yet
+        }
     )
 
 
@@ -73,5 +80,6 @@ def get_system_health():
             "database_status": "Online",
             "smtp_status": "Idle",
             "active_model_version": "v1.4.2-hybrid",
+            "is_synthetic": True,  # Resource metrics are simulated; integrate psutil/prometheus for real values
         }
     )

@@ -2,13 +2,15 @@ import ReactEChartsCore from 'echarts-for-react/lib/core';
 import echarts from '@/lib/echarts';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/client';
+import { FlaskConical } from 'lucide-react';
 
 export const FraudHeatmapChart = () => {
-  const { data, isLoading, isError } = useQuery({
+  const { data: responseData, isLoading, isError } = useQuery({
     queryKey: ['fraudHeatmap'],
     queryFn: async () => {
       const response = await apiClient.get('/transactions/heatmap');
-      return response.data.data.heatmap;
+      // Return both the heatmap data AND the is_synthetic flag
+      return response.data.data as { heatmap: number[][], is_synthetic: boolean };
     }
   });
 
@@ -16,9 +18,11 @@ export const FraudHeatmapChart = () => {
     return <div className="h-[350px] w-full flex items-center justify-center text-slate-500">Loading spatial density data...</div>;
   }
 
-  if (isError || !data) {
+  if (isError || !responseData) {
     return <div className="h-[350px] w-full flex items-center justify-center text-red-500">Failed to load heatmap data.</div>;
   }
+
+  const { heatmap: data, is_synthetic } = responseData;
 
   const hours = ['12a', '1a', '2a', '3a', '4a', '5a', '6a',
     '7a', '8a', '9a','10a','11a', '12p', '1p', '2p', '3p', '4p', '5p',
@@ -64,5 +68,19 @@ export const FraudHeatmapChart = () => {
     backgroundColor: 'transparent'
   };
 
-  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: '350px', width: '100%' }} />;
+  return (
+    <div className="relative">
+      {is_synthetic && (
+        <div
+          className="absolute top-2 right-2 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold
+                     bg-amber-500/15 text-amber-400 border border-amber-500/30 backdrop-blur-sm"
+          title="This chart shows illustrative demo data. Real fraud patterns will appear once declined transactions are recorded."
+        >
+          <FlaskConical className="w-3 h-3" />
+          Demo data — no real transactions yet
+        </div>
+      )}
+      <ReactEChartsCore echarts={echarts} option={option} style={{ height: '350px', width: '100%' }} />
+    </div>
+  );
 };

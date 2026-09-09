@@ -122,9 +122,13 @@ def get_heatmap():
     results = query.all()
 
     echarts_data = []
-    # Fallback/seed mechanism to ensure the chart renders beautifully if DB is empty
+    is_synthetic = False
+
     if not results:
+        # No real declined transactions in DB yet — generate illustrative demo data.
+        # is_synthetic=True is returned so the frontend can badge this as demo data.
         import random
+        is_synthetic = True
 
         for i in range(7):
             for j in range(24):
@@ -141,10 +145,11 @@ def get_heatmap():
             else:
                 # Assuming MySQL 1-7 where 1=Sunday
                 standard_dow = int(dow_raw) - 1
-                
+
             # ECharts y-axis maps 0=Saturday, 1=Friday, ..., 6=Sunday
             echarts_day = 6 - standard_dow
-            
+
             echarts_data.append([int(hour), echarts_day, count])
 
-    return success_response(data={"heatmap": echarts_data})
+    return success_response(data={"heatmap": echarts_data, "is_synthetic": is_synthetic})
+

@@ -385,10 +385,18 @@ export const CustomerDashboard = () => {
 
         {/* Prediction Volume Trend — real data from useTrends */}
         <div className="xl:col-span-2 bg-white rounded-[20px] border border-slate-200 shadow-sm p-6">
-          <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-6">
-            Prediction Volume Trend
-            {!trendsData && <span className="ml-2 text-[10px] text-slate-400 font-normal normal-case">(illustrative — connect telemetry endpoint for live data)</span>}
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">
+              Prediction Volume Trend
+            </h2>
+            {trendsData?.is_synthetic && (
+              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold
+                               bg-amber-50 text-amber-600 border border-amber-200">
+                <span className="text-amber-500">⚗</span>
+                Demo data
+              </span>
+            )}
+          </div>
           <div className="h-[220px]">
             <ReactEChartsCore echarts={echarts} option={trendChartOptions} style={{ height: '100%', width: '100%' }} />
           </div>

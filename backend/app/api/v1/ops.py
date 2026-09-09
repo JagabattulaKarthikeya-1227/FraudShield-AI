@@ -104,6 +104,7 @@ def get_security_events():
             "rate_limit_violations": random.randint(100, 300),
             "jwt_revocations": random.randint(2, 5),
             "owasp_score": 98.5,
+            "is_synthetic": True,  # Security event counts are illustrative; wire to real log aggregation for production
         }
     )
 
