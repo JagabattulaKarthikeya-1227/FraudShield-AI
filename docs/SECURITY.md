@@ -1,22 +1,23 @@
 # Security & Governance
 
+*Last verified against commit/date: September 2026*
+
 FraudShield AI simulates a SOC 2 Type II compliant enterprise application. The security architecture is designed using a Zero-Trust methodology.
 
 ## Authentication & Authorization
 
 ### JSON Web Tokens (JWT)
 The application uses stateless JWTs signed via the `HS256` algorithm. 
-To prevent Cross-Site Scripting (XSS) attacks from stealing tokens:
-- **Refresh Tokens** are stored exclusively in `HttpOnly, SameSite=Strict` cookies. JavaScript cannot access them.
-- **Access Tokens** are kept in memory and are extremely short-lived (e.g., 15 minutes).
+- **Refresh & Access Tokens** are returned to the client in the JSON response body and expected to be transmitted in the `Authorization` header (`JWT_TOKEN_LOCATION = ["headers"]`).
+- **Access Tokens** are short-lived with a lifetime of **1 hour** (`JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)`).
 
 ### Password Hashing
-We utilize **Argon2id**, the current industry standard recommended by OWASP, for password hashing. Argon2id is specifically designed to be resistant to both GPU cracking and side-channel attacks.
+We utilize **bcrypt** (or Werkzeug's default `pbkdf2:sha256`) for password hashing. `bcrypt` is included in our `requirements.txt` as the preferred hashing library.
 
 ## Data Governance & Privacy
 
-### 100% Synthetic Data Guarantee
-This platform operates strictly as an academic/portfolio demonstration. **No real Personally Identifiable Information (PII), Credit Card PANs, or actual human data is stored or processed.** The 14-million row dataset was mathematically generated to mirror fraud distributions without violating privacy laws.
+### Kaggle Dataset
+This platform operates strictly as an academic/portfolio demonstration. The dataset used for model training and simulation is the **Kaggle Credit Card Fraud Detection dataset**, which contains **284,807 real, anonymized transactions** rather than a purely synthetic 14-million row dataset.
 
 ### Immutable Audit Logs
 All administrative actions (e.g., changing risk thresholds, manually blocking an account) are written to an `AUDIT_LOGS` table. 
@@ -26,7 +27,7 @@ All administrative actions (e.g., changing risk thresholds, manually blocking an
 ## OWASP Top 10 Defenses
 - **A01 Broken Access Control**: Mitigated via strict RBAC (Role-Based Access Control) decorators (`@require_role`) on the Flask API.
 - **A03 Injection**: Mitigated by utilizing SQLAlchemy/Prisma ORMs, inherently preventing SQL injection. React DOM auto-escapes HTML, mitigating XSS.
-- **A05 Security Misconfiguration**: Strict CORS (Cross-Origin Resource Sharing) headers ensure the API only accepts requests from the specific frontend origin.
+- **A05 Security Misconfiguration**: CORS (Cross-Origin Resource Sharing) headers are currently configured to allow wildcard (`*`) origins by default, though this can be overridden via the `CORS_ORIGINS` environment variable for scoped production deployments.
 
 ## Secrets Management
-Zero secrets (API keys, Database URIs, JWT Secrets) are hardcoded. Everything is injected at runtime via Environment Variables, adhering to the Twelve-Factor App methodology.
+The application supports injecting secrets via Environment Variables, adhering to the Twelve-Factor App methodology. Note that for local development convenience, `settings.py` and `docker-compose.yml` contain hardcoded fallback default secrets (e.g., `default-dev-secret-key`), but the backend enforces strong secret requirements at startup when running in the `production` environment.
