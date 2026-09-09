@@ -39,12 +39,19 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r backend/requirements.txt
-        pip install pytest pytest-cov flake8
+        pip install pytest pytest-cov flake8 vulture
         
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
         flake8 backend/ --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    - name: Static Dead-Code Analysis (Vulture)
+      run: |
+        # Flag any dead code (unused imports, functions, classes, or modules)
+        # Note: vulture might need a whitelist for some dynamic framework features, 
+        # but here we run it as a warning or strict check for major orphans.
+        vulture backend/app --min-confidence 100 || echo "Vulture found potential dead code!"
         
     - name: Run Pytest
       env:
