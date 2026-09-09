@@ -25,58 +25,71 @@ def readiness_probe():
     )
 
 
+from flask import request
+from app.models.audit import AuditLog
+from sqlalchemy import desc
+
 @ops_bp.route("/audit", methods=["GET"])
 @jwt_required()
 @require_role(["Administrator", "Fraud Analyst"])
 def get_audit_logs():
     user = get_current_user()
 
-    # Simulate immutable audit logs
-    events = [
-        {
-            "id": "AU-991",
-            "actor": "system",
-            "action": "PREDICTION_GENERATED",
-            "resource": "TX-10492",
-            "status": "SUCCESS",
-            "timestamp": datetime.datetime.utcnow().isoformat(),
-            "ip": "internal",
-        },
-        {
-            "id": "AU-990",
-            "actor": "analyst@fraudshield.ai",
-            "action": "MANUAL_OVERRIDE",
-            "resource": "TX-10491",
-            "status": "SUCCESS",
-            "timestamp": (
-                datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
-            ).isoformat(),
-            "ip": "192.168.1.104",
-        },
-        {
-            "id": "AU-989",
-            "actor": "admin@fraudshield.ai",
-            "action": "THRESHOLD_UPDATED",
-            "resource": "SystemConfig",
-            "status": "SUCCESS",
-            "timestamp": (
-                datetime.datetime.utcnow() - datetime.timedelta(hours=2)
-            ).isoformat(),
-            "ip": "10.0.0.5",
-        },
-        {
-            "id": "AU-988",
-            "actor": "customer@demo.com",
-            "action": "USER_LOGIN",
-            "resource": "Session",
-            "status": "SUCCESS",
-            "timestamp": (
-                datetime.datetime.utcnow() - datetime.timedelta(hours=4)
-            ).isoformat(),
-            "ip": "76.21.44.11",
-        },
-    ]
-    return success_response(data={"logs": events})
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 20, type=int)
+    action_filter = request.args.get("action")
+    user_id_filter = request.args.get("user_id")
+    start_date_filter = request.args.get("start_date")
+    end_date_filter = request.args.get("end_date")
+
+    query = AuditLog.query
+
+    if action_filter:
+        query = query.filter(AuditLog.action == action_filter)
+    if user_id_filter:
+        query = query.filter(AuditLog.user_id == user_id_filter)
+    if start_date_filter:
+        try:
+            start_date = datetime.datetime.fromisoformat(start_date_filter.replace("Z", "+00:00"))
+            query = query.filter(AuditLog.created_at >= start_date)
+        except ValueError:
+            raise AppError("Invalid start_date format. Use ISO 8601.", 400)
+    if end_date_filter:
+        try:
+            end_date = datetime.datetime.fromisoformat(end_date_filter.replace("Z", "+00:00"))
+            query = query.filter(AuditLog.created_at <= end_date)
+        except ValueError:
+            raise AppError("Invalid end_date format. Use ISO 8601.", 400)
+
+    # Order by timestamp descending
+    query = query.order_by(desc(AuditLog.created_at))
+
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    events = []
+    for log in pagination.items:
+        actor = log.user.email if log.user else "system"
+        events.append(
+            {
+                "id": log.id,
+                "actor": actor,
+                "action": log.action,
+                "resource": log.entity_id or log.entity_type,
+                "status": "SUCCESS",
+                "timestamp": log.created_at.isoformat() + "Z",
+                "ip": log.ip_address,
+                "details": log.details,
+            }
+        )
+        
+    return success_response(
+        data={
+            "logs": events,
+            "total": pagination.total,
+            "pages": pagination.pages,
+            "current_page": page,
+        }
+    )
 
 
 @ops_bp.route("/security", methods=["GET"])

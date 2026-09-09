@@ -20,3 +20,7 @@ class AuditLog(UUIDMixin, TimestampMixin, db.Model):
     ip_address = Column(String(45), nullable=True)
 
     user = relationship("User", back_populates="audit_logs")
+
+    __table_args__ = (
+        db.Index("idx_audit_logs_created_at", "created_at"),
+    )
