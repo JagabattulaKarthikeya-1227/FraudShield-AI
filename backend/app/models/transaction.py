@@ -15,6 +15,11 @@ class TransactionStatus(enum.Enum):
 class Transaction(UUIDMixin, TimestampMixin, db.Model):
     __tablename__ = "transactions"
 
+    __table_args__ = (
+        db.Index("idx_transactions_user_status", "user_id", "status"),
+        db.Index("idx_transactions_status_date", "status", "transaction_date"),
+    )
+
     user_id = Column(
         String(36),
         ForeignKey("users.id", ondelete="CASCADE"),
