@@ -55,7 +55,7 @@ export const RiskScoreCalculator = () => {
     // The backend securely loads the confidential V1-V28 features directly from the database/CSV
     // and runs the actual Hugging Face LightGBM model. 
     predict(
-      { transaction_index: data.transaction_index },
+      { transaction_index: data.transaction_index ?? 0 },
       {
         onSuccess: (result: any) => {
           const txId = result?.data?.transaction_id;

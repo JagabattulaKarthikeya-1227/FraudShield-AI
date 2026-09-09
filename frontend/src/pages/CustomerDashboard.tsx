@@ -1,5 +1,6 @@
 import React from 'react';
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import echarts from '@/lib/echarts';
 import {
   Activity, CheckCircle2, Clock,
   Cpu, AlertTriangle, Loader2, RefreshCw,
@@ -160,7 +161,7 @@ const KpiCard = React.memo(({ title, value, trend, trendUp, sparklineColor, spar
             </div>
           </div>
           <div className="h-10 w-full opacity-60 group-hover:opacity-100 transition-opacity">
-            <ReactECharts option={sparklineOptions(sparklineColor, sparklineData)} style={{ height: '100%', width: '100%' }} />
+            <ReactEChartsCore echarts={echarts} option={sparklineOptions(sparklineColor, sparklineData)} style={{ height: '100%', width: '100%' }} />
           </div>
         </>
       )}
@@ -389,7 +390,7 @@ export const CustomerDashboard = () => {
             {!trendsData && <span className="ml-2 text-[10px] text-slate-400 font-normal normal-case">(illustrative — connect telemetry endpoint for live data)</span>}
           </h2>
           <div className="h-[220px]">
-            <ReactECharts option={trendChartOptions} style={{ height: '100%', width: '100%' }} />
+            <ReactEChartsCore echarts={echarts} option={trendChartOptions} style={{ height: '100%', width: '100%' }} />
           </div>
         </div>
 
@@ -399,7 +400,8 @@ export const CustomerDashboard = () => {
           {txLoading ? (
             <Skeleton className="h-[200px] w-full rounded-xl" />
           ) : (
-            <ReactECharts
+            <ReactEChartsCore
+              echarts={echarts}
               option={buildRiskDistributionOptions(riskCounts.low, riskCounts.medium, riskCounts.high, riskCounts.critical)}
               style={{ height: '220px', width: '100%' }}
             />

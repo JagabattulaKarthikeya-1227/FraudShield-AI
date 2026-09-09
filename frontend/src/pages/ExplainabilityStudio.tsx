@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { PageHeader } from "@/components/layout/PageHeader";
 import { BrainCircuit, Fingerprint, Activity, Network, Loader2, Play, RefreshCw, AlertTriangle } from "lucide-react";
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import echarts from '@/lib/echarts';
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/motion/Skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -320,7 +321,7 @@ export const ExplainabilityStudio = () => {
                   icon={<Network className="w-6 h-6" />}
                 />
               ) : (
-                <ReactECharts option={buildShapOptions(shapFeatures)} style={{ height: '100%', width: '100%' }} />
+                <ReactEChartsCore echarts={echarts} option={buildShapOptions(shapFeatures)} style={{ height: '100%', width: '100%' }} />
               )}
             </div>
 

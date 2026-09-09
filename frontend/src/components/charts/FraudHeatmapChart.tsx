@@ -1,4 +1,5 @@
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import echarts from '@/lib/echarts';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/core/api/client';
 
@@ -63,5 +64,5 @@ export const FraudHeatmapChart = () => {
     backgroundColor: 'transparent'
   };
 
-  return <ReactECharts option={option} style={{ height: '350px', width: '100%' }} />;
+  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: '350px', width: '100%' }} />;
 };

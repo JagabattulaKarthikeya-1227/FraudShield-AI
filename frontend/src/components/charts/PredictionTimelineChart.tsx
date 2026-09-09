@@ -1,4 +1,5 @@
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import echarts from '@/lib/echarts';
 
 interface PredictionTimelineProps {
   labels: string[];
@@ -65,5 +66,5 @@ export const PredictionTimelineChart = ({ labels, legitimate, fraudulent }: Pred
     backgroundColor: 'transparent'
   };
 
-  return <ReactECharts option={option} style={{ height: '350px', width: '100%' }} />;
+  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: '350px', width: '100%' }} />;
 };

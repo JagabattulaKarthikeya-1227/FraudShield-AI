@@ -1,5 +1,6 @@
 import React from 'react';
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import echarts from '@/lib/echarts';
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Database, GitCompare, Activity } from "lucide-react";
 import { Button } from '@/components/ui/button';
@@ -73,7 +74,7 @@ export const ModelRegistry = () => {
             <span className="text-xs font-bold bg-emerald-50 text-emerald-600 px-2 py-1 rounded-md">AUC: 0.9999</span>
           </div>
           <div className="h-[300px]">
-            <ReactECharts option={rocOptions} style={{ height: '100%', width: '100%' }} />
+            <ReactEChartsCore echarts={echarts} option={rocOptions} style={{ height: '100%', width: '100%' }} />
           </div>
         </div>
 

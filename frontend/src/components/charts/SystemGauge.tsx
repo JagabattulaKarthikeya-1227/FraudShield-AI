@@ -1,4 +1,5 @@
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import echarts from '@/lib/echarts';
 
 export const SystemGauge = ({ name, value, color }: { name: string, value: number, color?: string }) => {
   const option = {
@@ -50,5 +51,5 @@ export const SystemGauge = ({ name, value, color }: { name: string, value: numbe
     animationEasingUpdate: 'elasticOut',
   };
 
-  return <ReactECharts option={option} style={{ height: '250px', width: '100%' }} />;
+  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: '250px', width: '100%' }} />;
 };

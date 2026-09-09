@@ -2,10 +2,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../client';
 
 export interface PredictPayload {
-  Amount: number;
-  Merchant: string;
-  Category: string;
-  [key: string]: string | number;
+  Amount?: number;
+  Merchant?: string;
+  Category?: string;
+  transaction_index?: number;
+  [key: string]: string | number | undefined;
 }
 
 export const usePredictSingle = () => {

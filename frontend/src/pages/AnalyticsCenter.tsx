@@ -1,5 +1,6 @@
 import React from 'react';
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import echarts from '@/lib/echarts';
 import { PageHeader } from "@/components/layout/PageHeader";
 
 export const AnalyticsCenter = () => {
@@ -116,7 +117,7 @@ export const AnalyticsCenter = () => {
         <div className="bg-white p-6 rounded-[1.25rem] border border-slate-200 shadow-sm lg:col-span-2">
           <h3 className="text-base font-semibold text-slate-900 mb-6">Volume vs Fraud</h3>
           <div className="h-[300px]">
-            <ReactECharts option={areaOptions} style={{ height: '100%', width: '100%' }} />
+            <ReactEChartsCore echarts={echarts} option={areaOptions} style={{ height: '100%', width: '100%' }} />
           </div>
         </div>
 
@@ -124,7 +125,7 @@ export const AnalyticsCenter = () => {
         <div className="bg-white p-6 rounded-[1.25rem] border border-slate-200 shadow-sm">
           <h3 className="text-base font-semibold text-slate-900 mb-6">Alert Composition</h3>
           <div className="h-[300px]">
-            <ReactECharts option={pieOptions} style={{ height: '100%', width: '100%' }} />
+            <ReactEChartsCore echarts={echarts} option={pieOptions} style={{ height: '100%', width: '100%' }} />
           </div>
         </div>
 
@@ -132,7 +133,7 @@ export const AnalyticsCenter = () => {
         <div className="bg-white p-6 rounded-[1.25rem] border border-slate-200 shadow-sm lg:col-span-3">
           <h3 className="text-base font-semibold text-slate-900 mb-6">Risk Exposure by Category</h3>
           <div className="h-[300px]">
-            <ReactECharts option={barOptions} style={{ height: '100%', width: '100%' }} />
+            <ReactEChartsCore echarts={echarts} option={barOptions} style={{ height: '100%', width: '100%' }} />
           </div>
         </div>
 

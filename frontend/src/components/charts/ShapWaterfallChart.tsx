@@ -1,4 +1,5 @@
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import echarts from '@/lib/echarts';
 
 interface Feature {
   name: string;
@@ -45,5 +46,5 @@ export const ShapWaterfallChart = ({ baseValue, features }: ShapWaterfallChartPr
     backgroundColor: 'transparent'
   };
 
-  return <ReactECharts option={option} style={{ height: '400px', width: '100%' }} theme="dark" />;
+  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: '400px', width: '100%' }} theme="dark" />;
 };

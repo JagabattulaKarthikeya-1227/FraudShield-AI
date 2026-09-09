@@ -1,4 +1,5 @@
-import ReactECharts from 'echarts-for-react';
+import ReactEChartsCore from 'echarts-for-react/lib/core';
+import echarts from '@/lib/echarts';
 
 interface ModelComparison {
   name: string;
@@ -40,5 +41,5 @@ export const ModelRadarChart = ({ models }: { models: ModelComparison[] }) => {
     backgroundColor: 'transparent'
   };
 
-  return <ReactECharts option={option} style={{ height: '450px', width: '100%' }} />;
+  return <ReactEChartsCore echarts={echarts} option={option} style={{ height: '450px', width: '100%' }} />;
 };
