@@ -34,7 +34,7 @@ function riskStyles(prob: number) {
 export const RiskScoreCalculator = () => {
   const [selectedTxId, setSelectedTxId] = useState<string | null>(null);
 
-  const { mutate: predict, isPending, isSuccess, isError, data: predictionData } = usePredictSingle();
+  const { mutate: predict, isPending, isSuccess, isError, data: predictionData, error } = usePredictSingle();
   const {
     data: explanationData,
     isLoading: explanationLoading,
@@ -126,7 +126,7 @@ export const RiskScoreCalculator = () => {
 
               {isError && (
                 <p className="text-xs text-rose-600 text-center flex items-center justify-center gap-1">
-                  <AlertTriangle className="w-3.5 h-3.5" /> Backend unreachable — is the Flask server running?
+                  <AlertTriangle className="w-3.5 h-3.5" /> {(error as any)?.response?.data?.message || "Backend unreachable — is the Flask server running?"}
                 </p>
               )}
             </form>
