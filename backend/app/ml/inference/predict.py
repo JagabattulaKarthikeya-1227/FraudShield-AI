@@ -168,6 +168,57 @@ def _generate_feature_vector(
     return features, total_bias
 
 
+def _generate_feature_vector_batch(
+    amounts: np.ndarray, time_seconds: np.ndarray, categories: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Vectorized generation of feature vectors.
+    """
+    n = len(amounts)
+    
+    # Pre-compute risk biases
+    risk_bias = np.zeros(n)
+    category_lower = np.char.lower(np.char.strip(categories.astype(str)))
+    high_risk_mask = np.isin(category_lower, list(_HIGH_RISK_CATEGORIES))
+    medium_risk_mask = np.isin(category_lower, list(_MEDIUM_RISK_CATEGORIES))
+    
+    risk_bias[high_risk_mask] = 1.0
+    risk_bias[medium_risk_mask] = 0.4
+    
+    # Pre-compute amount biases
+    amount_bias = np.zeros(n)
+    amount_bias[amounts > 5000] = 0.9
+    amount_bias[(amounts > 1000) & (amounts <= 5000)] = 0.55
+    amount_bias[(amounts > 500) & (amounts <= 1000)] = 0.25
+    amount_bias[(amounts > 100) & (amounts <= 500)] = 0.05
+    
+    combined_bias = np.minimum(risk_bias + amount_bias, 1.5)
+    
+    # Time bias
+    hour_of_day = ((time_seconds % 86400) // 3600).astype(int)
+    time_bias = np.zeros(n)
+    time_bias[(hour_of_day >= 22) | (hour_of_day <= 5)] = 0.3
+    
+    total_bias = combined_bias + time_bias
+    
+    variance_scale = 0.12
+    rng = np.random.default_rng(seed=42)
+    
+    features = np.zeros((n, 30))
+    features[:, 0] = time_seconds
+    features[:, 29] = amounts
+    
+    feature_names = list(_FEATURE_STATS.keys())
+    
+    for i, (fname, (mean, std)) in enumerate(_FEATURE_STATS.items()):
+        v = rng.normal(mean, std * variance_scale, size=n)
+        direction = _FRAUD_SIGNAL_FEATURES.get(fname, 0.0)
+        v += direction * total_bias * std
+        features[:, i + 1] = v
+        
+    return features, total_bias
+
+
 class InferenceService:
     def __init__(
         self, registry_path=None, config_path="app/ml/config/risk_thresholds.yaml"
@@ -297,6 +348,81 @@ class InferenceService:
             "shap_values": shap_approx,
             "feature_mode": feature_mode,
         }
+
+    def predict_batch(self, df) -> list[dict]:
+        """
+        Vectorized batch inference over a Pandas DataFrame.
+        """
+        import pandas as pd
+        
+        n = len(df)
+        if n == 0:
+            return []
+            
+        amounts = df.get("Amount", pd.Series(np.zeros(n))).astype(float).to_numpy()
+        time_vals = df.get("Time", pd.Series(np.full(n, 43200.0))).astype(float).to_numpy()
+        categories = df.get("Category", pd.Series(np.full(n, ""))).astype(str).to_numpy()
+        
+        # Check if caller sent full feature vector
+        has_full_features = any(f"V{i}" in df.columns for i in range(1, 5))
+        
+        if has_full_features:
+            logger.info(f"[InferenceService] full-feature mode for batch of {n}")
+            features = np.zeros((n, 30))
+            features[:, 0] = time_vals
+            features[:, 29] = amounts
+            for i in range(1, 29):
+                key = f"V{i}"
+                if key in df.columns:
+                    features[:, i] = df[key].astype(float).to_numpy()
+            total_biases = np.zeros(n)
+        else:
+            features, total_biases = _generate_feature_vector_batch(amounts, time_vals, categories)
+            
+        if self.mock_mode:
+            final_probs = np.full(n, 0.04)
+            final_probs[total_biases > 0.15] = 0.35
+            final_probs[total_biases > 0.50] = 0.75
+            final_probs[total_biases > 0.90] = 0.95
+            
+            prob_et = final_probs
+            prob_mlp = final_probs
+            feature_mode = "mock"
+        else:
+            X_scaled = self.scaler.transform(features)
+            
+            # Predict Proba usually returns 1D or 2D. 
+            prob_et = self.et_model.predict_proba(X_scaled)
+            prob_mlp = self.mlp_model.predict_proba(X_scaled)
+            
+            X_meta = self.meta_model.prepare_meta_features(prob_et, prob_mlp)
+            final_probs = self.meta_model.predict_proba(X_meta)
+            
+            if not has_full_features:
+                cond_low = total_biases <= 0.15
+                cond_med = (total_biases > 0.15) & (total_biases <= 0.50)
+                cond_high = (total_biases > 0.50) & (total_biases <= 0.90)
+                cond_crit = total_biases > 0.90
+                
+                final_probs[cond_low] = np.minimum(final_probs[cond_low], 0.04)
+                final_probs[cond_med] = np.clip(final_probs[cond_med], 0.15, 0.40)
+                final_probs[cond_high] = np.clip(final_probs[cond_high], 0.55, 0.78)
+                final_probs[cond_crit] = np.maximum(final_probs[cond_crit], 0.88)
+                
+            feature_mode = "full" if has_full_features else "demo-distribution"
+            
+        results = []
+        for i in range(n):
+            prob = float(final_probs[i])
+            risk_level, action = self._determine_risk(prob)
+            results.append({
+                "Amount": float(amounts[i]),
+                "Probability": round(prob, 4),
+                "Risk": risk_level,
+                "Action": action
+            })
+            
+        return results
 
     def _compute_approximate_shap(
         self, features: np.ndarray, probability: float

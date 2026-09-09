@@ -23,14 +23,35 @@ def make_celery(app_name=__name__):
 celery = make_celery("fraudshield_tasks")
 
 
-# Example background task
 @celery.task(name="process_batch_predictions")
 def process_batch_predictions(file_path: str):
-    import time
+    import pandas as pd
+    import os
+    import logging
+    from app.ml.inference.predict import InferenceService
+    
+    logger = logging.getLogger(__name__)
 
-    # Simulate heavy Pandas CSV processing and batch ML inference
-    time.sleep(5)
-    return {"status": "completed", "file": file_path, "rows_processed": 1542}
+    try:
+        df = pd.read_csv(file_path)
+        engine = InferenceService(
+            registry_path="app/ml/models/model_registry.json",
+            config_path="app/ml/config/risk_thresholds.yaml",
+        )
+        
+        results = engine.predict_batch(df)
+        
+        return {
+            "status": "completed", 
+            "batch_results": results, 
+            "row_count": len(results)
+        }
+    except Exception as e:
+        logger.error(f"Batch task failed: {e}")
+        return {"status": "failed", "error": str(e)}
+    finally:
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
 
 @celery.task(name="dispatch_high_risk_email")

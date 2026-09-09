@@ -133,58 +133,73 @@ def predict_single():
 @predict_bp.route("/batch", methods=["POST"])
 @jwt_required()
 def predict_batch():
-    MAX_FILE_BYTES = 10 * 1024 * 1024  # 10 MB
-    MAX_ROWS = 5_000
+    import tempfile
+    import os
+    from app.core.celery_app import process_batch_predictions
+    
+    MAX_FILE_BYTES = 50 * 1024 * 1024  # Increased to 50 MB for async processing
+    MAX_ROWS_SYNC = 500
+    MAX_ROWS_ASYNC = 100_000
 
     if "file" not in request.files:
         raise AppError("No file provided", 400)
 
     file = request.files["file"]
 
-    # Guard against oversized uploads before reading into memory
-    file.seek(0, 2)  # seek to end
+    file.seek(0, 2)
     file_size = file.tell()
     file.seek(0)
     if file_size > MAX_FILE_BYTES:
-        raise AppError(
-            f"File too large ({file_size // (1024 * 1024)} MB). Maximum allowed is 10 MB. "
-            "For large batch jobs, use the async /batch/task endpoint.",
-            413,
-        )
+        raise AppError(f"File too large ({file_size // (1024 * 1024)} MB). Maximum allowed is 50 MB.", 413)
 
     try:
         import pandas as pd
     except ImportError as e:
         current_app.logger.error(f"Batch prediction unavailable: {e}")
-        raise AppError(
-            "Batch prediction requires pandas. Please install it on the server.", 503
-        )
+        raise AppError("Batch prediction requires pandas. Please install it on the server.", 503)
 
     df = pd.read_csv(file)
+    row_count = len(df)
 
-    if len(df) > MAX_ROWS:
-        raise AppError(
-            f"Too many rows ({len(df):,}). Maximum per synchronous request is {MAX_ROWS:,}. "
-            "For larger datasets, split the file or use the async /batch/task endpoint.",
-            413,
+    if row_count > MAX_ROWS_ASYNC:
+        raise AppError(f"Too many rows ({row_count:,}). Maximum allowed is {MAX_ROWS_ASYNC:,}.", 413)
+
+    if row_count <= MAX_ROWS_SYNC:
+        # Synchronous vectorized processing for small batches
+        engine = get_inference_service()
+        results = engine.predict_batch(df)
+        return success_response(
+            data={"batch_results": results, "row_count": len(results)},
+            message=f"Batch processed: {len(results)} transactions.",
+        )
+    else:
+        # Asynchronous processing for large batches
+        temp_fd, temp_path = tempfile.mkstemp(suffix=".csv")
+        os.close(temp_fd)
+        df.to_csv(temp_path, index=False)
+        
+        task = process_batch_predictions.delay(temp_path)
+        
+        return success_response(
+            data={"task_id": task.id, "row_count": row_count},
+            message=f"Batch accepted for background processing. Poll /batch/task/{task.id} for status.",
+            status=202
         )
 
-    # Synchronous processing — suitable for small files only.
-    # TODO: For production, dispatch a Celery task and return a task_id for polling.
-    engine = get_inference_service()
 
-    results = []
-    for _, row in df.iterrows():
-        res = engine.predict_single(row.to_dict())
-        results.append(
-            {
-                "Amount": row.get("Amount"),
-                "Probability": round(res["probability"], 4),
-                "Risk": res["risk_level"],
-            }
-        )
-
-    return success_response(
-        data={"batch_results": results, "row_count": len(results)},
-        message=f"Batch processed: {len(results)} transactions.",
-    )
+@predict_bp.route("/batch/task/<task_id>", methods=["GET"])
+@jwt_required()
+def get_batch_task_status(task_id):
+    from celery.result import AsyncResult
+    from flask import jsonify
+    
+    task_result = AsyncResult(task_id)
+    
+    if task_result.state == 'PENDING':
+        return success_response(data={"state": task_result.state, "status": "Task is waiting to be processed or is currently running..."})
+    elif task_result.state == 'SUCCESS':
+        return success_response(data={"state": task_result.state, "result": task_result.result})
+    elif task_result.state == 'FAILURE':
+        return success_response(data={"state": task_result.state, "error": str(task_result.info)}, status=500)
+    else:
+        return success_response(data={"state": task_result.state, "status": str(task_result.info)})
