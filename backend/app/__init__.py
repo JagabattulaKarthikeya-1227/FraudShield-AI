@@ -42,6 +42,13 @@ def create_app(config_name=None):
 
     ma.init_app(app)
 
+    # Import ALL models so SQLAlchemy discovers them before create_all()
+    from app.models import user, session, prediction, audit, grc, misc, mlops, review, transaction, verification_token  # noqa: F401
+
+    # Auto-create tables if they don't exist (safe for dev & first-run)
+    with app.app_context():
+        db.create_all()
+
     from app.security.rate_limiter import limiter
 
     limiter.init_app(app)

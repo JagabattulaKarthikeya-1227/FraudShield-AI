@@ -4,6 +4,7 @@ from app.repositories.user_repo import UserRepository
 from app.repositories.session_repo import SessionRepository
 from app.security.hashing import hash_password, verify_password
 from app.core.exceptions import AuthenticationError, ConflictError
+from app.models.user import RoleEnum
 
 
 class AuthService:
@@ -13,6 +14,12 @@ class AuthService:
             raise ConflictError("User with this email already exists.")
 
         data["password_hash"] = hash_password(data.pop("password"))
+
+        # Map role string -> RoleEnum (e.g. "Administrator" -> RoleEnum.ADMIN)
+        role_str = data.pop("role", "Customer")
+        role_map = {r.value: r for r in RoleEnum}
+        data["role"] = role_map.get(role_str, RoleEnum.CUSTOMER)
+
         return UserRepository.create(data)
 
     @staticmethod
