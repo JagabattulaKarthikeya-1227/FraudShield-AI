@@ -8,67 +8,7 @@ from app.middleware.auth import require_role
 explainability_bp = Blueprint("explainability", __name__)
 
 
-def _compute_shap_features(tx, probability: float, is_high_risk: bool):
-    """
-    Build a realistic SHAP feature contribution list for a stored transaction.
-    Uses the risk score and amount to reconstruct directionally-correct contributions
-    consistent with what InferenceService._compute_approximate_shap produced at
-    inference time.
 
-    If the prediction stored real shap_values (Phase 2+), those take priority.
-    """
-    amount = float(tx.amount)
-
-    # Try to use stored shap_values from prediction record first
-    if tx.prediction and tx.prediction.shap_values:
-        stored = tx.prediction.shap_values
-        if isinstance(stored, dict) and len(stored) > 0:
-            return [
-                {
-                    "name": k,
-                    "value": round(float(v) * amount * 0.01 + probability * 0.3, 4),
-                    "contribution": round(float(v), 4),
-                }
-                for k, v in stored.items()
-            ]
-
-    # Heuristic reconstruction — directionally consistent with InferenceService
-    # The signs and magnitudes mirror what the model actually penalises
-    direction = 1 if is_high_risk else -1
-
-    features = [
-        {
-            "name": "Amount",
-            "value": amount,
-            "contribution": round(direction * min(0.45, amount / 20000.0), 4),
-        },
-        {
-            "name": "V17 (Location Anomaly)",
-            "value": round(-2.5 * probability, 4),
-            "contribution": round(direction * 0.30 * probability, 4),
-        },
-        {
-            "name": "V14 (Velocity Pattern)",
-            "value": round(-1.8 * probability, 4),
-            "contribution": round(direction * 0.25 * probability, 4),
-        },
-        {
-            "name": "V12 (Spending History)",
-            "value": round(-1.1 * (1 - probability), 4),
-            "contribution": round(-direction * 0.18 * (1 - probability), 4),
-        },
-        {
-            "name": "V10 (Time Pattern)",
-            "value": round(3.4 * probability, 4),
-            "contribution": round(direction * 0.15 * probability, 4),
-        },
-        {
-            "name": "V3 (Merchant History)",
-            "value": round(0.8 * (1 - probability), 4),
-            "contribution": round(-direction * 0.10 * (1 - probability), 4),
-        },
-    ]
-    return features
 
 
 @explainability_bp.route("/transaction/<string:tx_id>", methods=["GET"])
@@ -103,7 +43,20 @@ def get_transaction_explanation(tx_id):
         )
 
     # Analyst / Admin View: dynamic SHAP feature contributions
-    shap_features = _compute_shap_features(tx, probability, is_high_risk)
+    shap_features = []
+    base_value = 0.0
+
+    # Read from database if already computed
+    if tx.prediction and tx.prediction.shap_values and isinstance(tx.prediction.shap_values, dict):
+        base_value = tx.prediction.shap_values.get("base_value", 0.0)
+        features_dict = tx.prediction.shap_values.get("features", {})
+        shap_features = [
+            {"name": k, "value": round(float(v), 4), "contribution": round(float(v), 4)}
+            for k, v in features_dict.items()
+        ]
+    else:
+        from app.core.exceptions import ModelNotReadyError
+        raise ModelNotReadyError("SHAP explainer is unavailable.")
 
     return success_response(
         data={
@@ -114,17 +67,11 @@ def get_transaction_explanation(tx_id):
                 if is_high_risk
                 else ("Review Required" if is_medium_risk else "Low Risk")
             ),
-            "shap_summary": {"base_value": 0.15, "features": shap_features},
+            "shap_summary": {"base_value": base_value, "features": shap_features},
             "model_contributions": {
-                "extra_trees": round(
-                    (tx.prediction.risk_score if tx.prediction else 0.05) + 0.02, 4
-                ),
-                "mlp_neural_net": round(
-                    (tx.prediction.risk_score if tx.prediction else 0.05) - 0.03, 4
-                ),
-                "xgboost_meta": round(
-                    tx.prediction.risk_score if tx.prediction else 0.05, 4
-                ),
+                "extra_trees": 0.0,
+                "mlp_neural_net": 0.0,
+                "xgboost_meta": 0.0,
             },
         }
     )

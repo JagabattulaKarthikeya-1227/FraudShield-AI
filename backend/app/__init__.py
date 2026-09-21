@@ -42,7 +42,9 @@ def create_app(config_name=None):
         app,
         resources={
             r"/api/*": {
-                "origins": app.config.get("CORS_ORIGINS", "*"),
+                # Fallback to [] (deny all) instead of '*' to prevent accidental
+                # wildcard CORS in production when CORS_ORIGINS is not set.
+                "origins": app.config.get("CORS_ORIGINS") or [],
                 "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
                 "allow_headers": ["Authorization", "Content-Type"],
                 "supports_credentials": False
@@ -52,15 +54,15 @@ def create_app(config_name=None):
     migrate.init_app(app, db)
 
     from app.schemas import ma
-
     ma.init_app(app)
 
-    # Import ALL models so SQLAlchemy discovers them before create_all()
+    if not app.config.get("TESTING"):
+        from app.core.celery_app import celery_init_app
+        celery_init_app(app)
+
+    # Import ALL models so Alembic/SQLAlchemy can discover them
     from app.models import user, session, prediction, audit, grc, misc, mlops, review, transaction, verification_token  # noqa: F401
 
-    # Auto-create tables if they don't exist (safe for dev & first-run)
-    with app.app_context():
-        db.create_all()
 
     from app.security.rate_limiter import limiter
 

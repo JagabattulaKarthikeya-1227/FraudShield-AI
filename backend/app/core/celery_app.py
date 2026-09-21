@@ -1,13 +1,22 @@
 import os
-from celery import Celery
+from celery import Celery, Task
 
+# Create a global celery instance that is configured later during app creation
+celery = Celery("fraudshield_tasks")
 
-def make_celery(app_name=__name__):
+def celery_init_app(app):
+    class FlaskTask(Task):
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery_app = Celery(app.name, task_cls=FlaskTask)
+    # Configure celery based on flask config if available, fallback to env
     redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
-
-    celery = Celery(app_name, backend=redis_url, broker=redis_url)
-
-    celery.conf.update(
+    
+    celery_app.conf.update(
+        broker_url=redis_url,
+        result_backend=redis_url,
         task_serializer="json",
         accept_content=["json"],
         result_serializer="json",
@@ -16,11 +25,13 @@ def make_celery(app_name=__name__):
         # Ensure we don't accidentally consume too much memory in production workers
         worker_max_tasks_per_child=50,
     )
-
-    return celery
-
-
-celery = make_celery("fraudshield_tasks")
+    celery_app.set_default()
+    app.extensions["celery"] = celery_app
+    
+    # Also update the global celery instance for decorators
+    global celery
+    celery = celery_app
+    return celery_app
 
 
 @celery.task(name="process_batch_predictions")
@@ -35,8 +46,7 @@ def process_batch_predictions(file_path: str):
     try:
         df = pd.read_csv(file_path)
         engine = InferenceService(
-            registry_path="app/ml/models/model_registry.json",
-            config_path="app/ml/config/risk_thresholds.yaml",
+            config_path=None,  # Uses default absolute path derived from __file__
         )
         
         results = engine.predict_batch(df)
@@ -50,8 +60,18 @@ def process_batch_predictions(file_path: str):
         logger.error(f"Batch task failed: {e}")
         return {"status": "failed", "error": str(e)}
     finally:
+        # Secure deletion: ensure file path is actually in the batch directory
+        # and doesn't contain path traversal tokens
+        from flask import current_app
+        batch_dir = current_app.config.get("BATCH_DATA_DIR", "/app/batch_data")
+        abs_file_path = os.path.abspath(file_path)
+        abs_batch_dir = os.path.abspath(batch_dir)
+        
         if os.path.exists(file_path):
-            os.remove(file_path)
+            if abs_file_path.startswith(abs_batch_dir):
+                os.remove(file_path)
+            else:
+                logger.warning(f"Attempted to delete file outside batch directory: {file_path}")
 
 
 @celery.task(name="dispatch_high_risk_email")

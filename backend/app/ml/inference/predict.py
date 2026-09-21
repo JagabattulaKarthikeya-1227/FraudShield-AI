@@ -3,254 +3,205 @@ import yaml
 import joblib
 import os
 import logging
+from pathlib import Path
+
+from app.core.exceptions import ModelNotReadyError
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Kaggle Credit Card Fraud dataset (284,807 rows) feature statistics.
-# V1-V28 are PCA components; means are ~0, stds vary by feature.
-# These values are derived from the public dataset's describe() output.
-# They allow us to generate realistic input vectors when the frontend
-# only sends Amount + Category/Time — without retraining or storing a
-# reverse-PCA encoder.
-# ---------------------------------------------------------------------------
-_FEATURE_STATS = {
-    # (mean, std) for V1-V28 — legitimate-class statistics
-    "V1": (-0.698, 1.929),
-    "V2": (0.068, 1.652),
-    "V3": (0.044, 1.516),
-    "V4": (0.019, 1.416),
-    "V5": (-0.024, 1.380),
-    "V6": (-0.025, 1.332),
-    "V7": (-0.023, 1.238),
-    "V8": (0.015, 1.194),
-    "V9": (-0.007, 1.099),
-    "V10": (-0.018, 1.072),
-    "V11": (0.019, 1.021),
-    "V12": (-0.003, 0.999),
-    "V13": (0.000, 0.997),
-    "V14": (0.000, 0.959),
-    "V15": (-0.002, 0.915),
-    "V16": (0.001, 0.876),
-    "V17": (-0.002, 0.850),
-    "V18": (-0.001, 0.838),
-    "V19": (0.000, 0.814),
-    "V20": (0.000, 0.771),
-    "V21": (0.000, 0.735),
-    "V22": (0.000, 0.725),
-    "V23": (0.000, 0.625),
-    "V24": (0.000, 0.606),
-    "V25": (0.000, 0.522),
-    "V26": (0.000, 0.482),
-    "V27": (0.000, 0.404),
-    "V28": (0.000, 0.330),
-}
-
-# Features most correlated with fraud in this dataset (from published SHAP analyses).
-# High-amount, unusual-category transactions shift these in the fraud direction.
-_FRAUD_SIGNAL_FEATURES = {
-    # feature_index (0-based into V1..V28): fraud_direction_shift (std units)
-    "V14": -2.5,  # strong negative shift → fraud
-    "V17": -1.8,  # moderate negative shift → fraud
-    "V12": -1.2,  # moderate negative shift → fraud
-    "V10": -0.9,  # mild negative shift → fraud
-    "V3": 0.8,  # mild positive shift → fraud
-    "V4": 0.6,  # mild positive shift → fraud
-}
-
-# High-risk merchant categories (shift fraud signal up)
-_HIGH_RISK_CATEGORIES = {
-    "crypto exchange",
-    "gambling",
-    "adult entertainment",
-    "money transfer",
-    "forex",
-    "jewelry",
-    "electronics",
-    "wire transfer",
-    "prepaid cards",
-    "online gaming",
-}
-
-_MEDIUM_RISK_CATEGORIES = {
-    "travel",
-    "hotel",
-    "airline",
-    "car rental",
-    "atm",
-    "cash advance",
-    "pawn shop",
-}
-
-
-def _generate_feature_vector(
-    amount: float, time_seconds: float, category: str
-) -> np.ndarray:
-    """
-    Generate a realistic 30-dimensional feature vector [Time, V1..V28, Amount]
-    by sampling from the training distribution and applying risk-consistent biases.
-
-    MODE: demo-distribution (server-side sampling)
-    — Logged at INFO level on every call.
-    — Will be superseded in Phase 2 when the Risk Calculator sends explicit features.
-    """
-    category_lower = (category or "").lower().strip()
-
-    # Determine risk bias multiplier from category
-    if category_lower in _HIGH_RISK_CATEGORIES:
-        risk_bias = 1.0  # full fraud shift
-    elif category_lower in _MEDIUM_RISK_CATEGORIES:
-        risk_bias = 0.4  # partial fraud shift
-    else:
-        risk_bias = 0.0  # legitimate baseline
-
-    # Amount bias: amounts > $500 add additional fraud signal pressure
-    # Scale is log-normalised to match how the Kaggle dataset behaves
-    amount_bias = 0.0
-    if amount > 5000:
-        amount_bias = 0.9
-    elif amount > 1000:
-        amount_bias = 0.55
-    elif amount > 500:
-        amount_bias = 0.25
-    elif amount > 100:
-        amount_bias = 0.05
-
-    combined_bias = min(risk_bias + amount_bias, 1.5)  # cap at 1.5 std
-
-    # Time bias: late-night hours (22:00–05:00) are over-represented in fraud
-    # time_seconds is seconds since start of dataset (not wall clock),
-    # but if we treat it mod 86400 we get an approximate hour
-    hour_of_day = int((time_seconds % 86400) / 3600)
-    time_bias = 0.3 if (hour_of_day >= 22 or hour_of_day <= 5) else 0.0
-
-    total_bias = combined_bias + time_bias
-
-    # For a stable demo, use a consistent low variance for background PCA features
-    # so independent Gaussian sampling doesn't accidentally trigger false positive anomalies.
-    variance_scale = 0.12
-
-    # Sample V1-V28 from per-feature normal distributions
-    rng = np.random.default_rng(
-        seed=int(amount * 100) % (2**31)
-    )  # reproducible per amount
-    v_features = np.array(
-        [
-            rng.normal(mean, std * variance_scale)
-            for _, (mean, std) in _FEATURE_STATS.items()
-        ]
-    )
-
-    # Apply fraud-signal shifts proportional to total_bias
-    feature_names = list(_FEATURE_STATS.keys())
-    for fname, direction in _FRAUD_SIGNAL_FEATURES.items():
-        idx = feature_names.index(fname)
-        std = _FEATURE_STATS[fname][1]
-        v_features[idx] += direction * total_bias * std
-
-    # Build full 30-feature vector: [Time, V1..V28, Amount]
-    features = np.zeros((1, 30))
-    features[0, 0] = time_seconds  # Time (index 0)
-    features[0, 1:29] = v_features  # V1..V28 (indices 1-28)
-    features[0, 29] = amount  # Amount (index 29)
-
-    logger.info(
-        "[InferenceService] demo-distribution mode | amount=%.2f category=%s "
-        "risk_bias=%.2f amount_bias=%.2f time_bias=%.2f total_bias=%.2f",
-        amount,
-        category or "unknown",
-        risk_bias,
-        amount_bias,
-        time_bias,
-        total_bias,
-    )
-
-    return features, total_bias
-
-
-def _generate_feature_vector_batch(
-    amounts: np.ndarray, time_seconds: np.ndarray, categories: np.ndarray
-) -> tuple[np.ndarray, np.ndarray]:
-    """
-    Vectorized generation of feature vectors.
-    """
-    n = len(amounts)
-    
-    # Pre-compute risk biases
-    risk_bias = np.zeros(n)
-    category_lower = np.char.lower(np.char.strip(categories.astype(str)))
-    high_risk_mask = np.isin(category_lower, list(_HIGH_RISK_CATEGORIES))
-    medium_risk_mask = np.isin(category_lower, list(_MEDIUM_RISK_CATEGORIES))
-    
-    risk_bias[high_risk_mask] = 1.0
-    risk_bias[medium_risk_mask] = 0.4
-    
-    # Pre-compute amount biases
-    amount_bias = np.zeros(n)
-    amount_bias[amounts > 5000] = 0.9
-    amount_bias[(amounts > 1000) & (amounts <= 5000)] = 0.55
-    amount_bias[(amounts > 500) & (amounts <= 1000)] = 0.25
-    amount_bias[(amounts > 100) & (amounts <= 500)] = 0.05
-    
-    combined_bias = np.minimum(risk_bias + amount_bias, 1.5)
-    
-    # Time bias
-    hour_of_day = ((time_seconds % 86400) // 3600).astype(int)
-    time_bias = np.zeros(n)
-    time_bias[(hour_of_day >= 22) | (hour_of_day <= 5)] = 0.3
-    
-    total_bias = combined_bias + time_bias
-    
-    variance_scale = 0.12
-    rng = np.random.default_rng(seed=42)
-    
-    features = np.zeros((n, 30))
-    features[:, 0] = time_seconds
-    features[:, 29] = amounts
-    
-    feature_names = list(_FEATURE_STATS.keys())
-    
-    for i, (fname, (mean, std)) in enumerate(_FEATURE_STATS.items()):
-        v = rng.normal(mean, std * variance_scale, size=n)
-        direction = _FRAUD_SIGNAL_FEATURES.get(fname, 0.0)
-        v += direction * total_bias * std
-        features[:, i + 1] = v
-        
-    return features, total_bias
+# Expected feature counts for artifact validation
+_EXPECTED_INPUT_FEATURES = 30   # Time + V1..V28 + Amount
+_EXPECTED_META_FEATURES = 2     # prob_et, prob_mlp
 
 
 class InferenceService:
-    def __init__(
-        self, registry_path=None, config_path="app/ml/config/risk_thresholds.yaml"
-    ):
-        # Hardcode paths to where our training script saved them
-        base_dir = os.path.dirname(os.path.dirname(__file__))
-        models_dir = os.path.join(base_dir, "models", "saved")
+    def __init__(self, registry_path=None, config_path=None):
+        """
+        Load trained model artifacts. Raises ModelNotReadyError if artifacts
+        are missing, corrupt, or incompatible with the expected feature schema.
 
-        self.mock_mode = False
+        config_path: path to risk_thresholds.yaml. If None, derived from __file__.
+        """
+        base_dir = Path(__file__).resolve().parent.parent  # app/ml/
+        models_dir = base_dir / "models" / "saved"
+
+        if config_path is None:
+            config_path = base_dir / "config" / "risk_thresholds.yaml"
+        else:
+            config_path = Path(config_path)
+            if not config_path.is_absolute():
+                config_path = base_dir / config_path
+
+        # ------------------------------------------------------------------
+        # 0. Load and validate canonical schema
+        # ------------------------------------------------------------------
+        schema_path = models_dir / "schema.json"
+        if not schema_path.exists():
+            raise ModelNotReadyError("Fraud detection model is not available. Missing artifact: schema.json.")
         try:
-            self.scaler = joblib.load(os.path.join(models_dir, "scaler.pkl"))
+            import json
+            from app.ml.schema import CANONICAL_FEATURES
+            with open(schema_path, "r") as f:
+                schema_data = json.load(f)
+            if schema_data.get("features") != CANONICAL_FEATURES:
+                raise ModelNotReadyError("Fraud detection model is not available. Loaded schema does not match canonical schema.")
+        except Exception as e:
+            if isinstance(e, ModelNotReadyError):
+                raise
+            raise ModelNotReadyError(f"Fraud detection model is not available. Corrupt artifact: schema.json ({e})") from e
 
+        # ------------------------------------------------------------------
+        # 1. Check all required artifact files exist
+        # ------------------------------------------------------------------
+        required_artifacts = ["scaler.pkl", "extra_trees.pkl", "mlp.keras", "xgboost_meta.pkl"]
+        missing = [a for a in required_artifacts if not (models_dir / a).exists()]
+        if missing:
+            raise ModelNotReadyError(
+                f"Fraud detection model is not available. "
+                f"Missing artifacts: {', '.join(missing)}."
+            )
+
+        # ------------------------------------------------------------------
+        # 2. Load artifacts — any deserialization failure ⇒ ModelNotReadyError
+        # ------------------------------------------------------------------
+        try:
+            self.scaler = joblib.load(models_dir / "scaler.pkl")
+        except Exception as e:
+            raise ModelNotReadyError(
+                f"Fraud detection model is not available. Corrupt artifact: scaler.pkl ({e})"
+            ) from e
+
+        try:
             from app.ml.training.extra_trees import ExtraTreesTrainer
+            self.et_model = ExtraTreesTrainer.load(models_dir / "extra_trees.pkl")
+        except Exception as e:
+            raise ModelNotReadyError(
+                f"Fraud detection model is not available. Corrupt artifact: extra_trees.pkl ({e})"
+            ) from e
+
+        try:
             from app.ml.training.mlp import MLPTrainer
+            self.mlp_model = MLPTrainer.load(models_dir / "mlp.keras")
+        except Exception as e:
+            raise ModelNotReadyError(
+                f"Fraud detection model is not available. Corrupt artifact: mlp.keras ({e})"
+            ) from e
+
+        try:
             from app.ml.training.xgboost_meta import XGBoostMetaTrainer
+            self.meta_model = XGBoostMetaTrainer.load(models_dir / "xgboost_meta.pkl")
+        except Exception as e:
+            raise ModelNotReadyError(
+                f"Fraud detection model is not available. Corrupt artifact: xgboost_meta.pkl ({e})"
+            ) from e
 
-            self.et_model = ExtraTreesTrainer.load(
-                os.path.join(models_dir, "extra_trees.pkl")
-            )
-            self.mlp_model = MLPTrainer.load(os.path.join(models_dir, "mlp.keras"))
-            self.meta_model = XGBoostMetaTrainer.load(
-                os.path.join(models_dir, "xgboost_meta.pkl")
-            )
-        except FileNotFoundError:
-            self.mock_mode = True
+        # ------------------------------------------------------------------
+        # 3. Validate artifact compatibility with expected feature schema
+        # ------------------------------------------------------------------
+        self._validate_artifacts()
 
-        # Load Risk Thresholds
-        with open(config_path, "r") as f:
-            self.risk_config = yaml.safe_load(f)["thresholds"]
+        # ------------------------------------------------------------------
+        # 4. Load optional calibrator
+        # ------------------------------------------------------------------
+        calibrator_path = models_dir / "calibrator.pkl"
+        if calibrator_path.exists():
+            try:
+                from app.ml.training.calibration import ProbabilityCalibrator
+                self.calibrator = ProbabilityCalibrator.load(calibrator_path)
+            except Exception as e:
+                logger.warning(f"Calibrator artifact corrupt, skipping: {e}")
+                self.calibrator = None
+        else:
+            self.calibrator = None
+
+        # ------------------------------------------------------------------
+        # 5. Load risk thresholds
+        # ------------------------------------------------------------------
+        try:
+            with open(config_path, "r") as f:
+                self.risk_config = yaml.safe_load(f)["thresholds"]
+        except Exception as e:
+            raise ModelNotReadyError(
+                f"Fraud detection model is not available. "
+                f"Risk threshold config unreadable: {e}"
+            ) from e
 
         self.active_record = {"version_id": "v1.0.0"}
+        self.models_dir = models_dir
 
+        logger.info("[InferenceService] All model artifacts loaded and validated.")
+
+    # ------------------------------------------------------------------
+    # Artifact validation
+    # ------------------------------------------------------------------
+    def _validate_artifacts(self):
+        """Validate that every loaded artifact is compatible with the expected
+        feature schema.  Raises ModelNotReadyError on any mismatch."""
+
+        # --- Scaler ---
+        if not callable(getattr(self.scaler, "transform", None)):
+            raise ModelNotReadyError(
+                "Fraud detection model is not available. "
+                "scaler.pkl does not expose a transform() method."
+            )
+        scaler_features = getattr(self.scaler, "n_features_in_", None)
+        if scaler_features is not None and scaler_features != _EXPECTED_INPUT_FEATURES:
+            raise ModelNotReadyError(
+                f"Fraud detection model is not available. "
+                f"scaler.pkl expects {scaler_features} features, "
+                f"but {_EXPECTED_INPUT_FEATURES} are required."
+            )
+
+        # --- ExtraTrees ---
+        if not callable(getattr(self.et_model, "predict_proba", None)):
+            raise ModelNotReadyError(
+                "Fraud detection model is not available. "
+                "extra_trees.pkl does not expose predict_proba()."
+            )
+        et_features = getattr(self.et_model.model, "n_features_in_", None)
+        if et_features is not None and et_features != _EXPECTED_INPUT_FEATURES:
+            raise ModelNotReadyError(
+                f"Fraud detection model is not available. "
+                f"extra_trees.pkl expects {et_features} features, "
+                f"but {_EXPECTED_INPUT_FEATURES} are required."
+            )
+
+        # --- MLP (Keras) ---
+        if not callable(getattr(self.mlp_model, "predict_proba", None)):
+            raise ModelNotReadyError(
+                "Fraud detection model is not available. "
+                "mlp.keras does not expose predict_proba()."
+            )
+        keras_model = getattr(self.mlp_model, "model", None)
+        if keras_model is not None:
+            input_shape = getattr(keras_model, "input_shape", None)
+            if input_shape is not None:
+                # Keras input_shape is (None, n_features)
+                expected_dim = input_shape[-1] if isinstance(input_shape, tuple) else None
+                if expected_dim is not None and expected_dim != _EXPECTED_INPUT_FEATURES:
+                    raise ModelNotReadyError(
+                        f"Fraud detection model is not available. "
+                        f"mlp.keras expects input dim {expected_dim}, "
+                        f"but {_EXPECTED_INPUT_FEATURES} are required."
+                    )
+
+        # --- XGBoost Meta ---
+        if not callable(getattr(self.meta_model, "predict_proba", None)):
+            raise ModelNotReadyError(
+                "Fraud detection model is not available. "
+                "xgboost_meta.pkl does not expose predict_proba()."
+            )
+        meta_features = getattr(self.meta_model.model, "n_features_in_", None)
+        if meta_features is not None and meta_features != _EXPECTED_META_FEATURES:
+            raise ModelNotReadyError(
+                f"Fraud detection model is not available. "
+                f"xgboost_meta.pkl expects {meta_features} meta-features, "
+                f"but {_EXPECTED_META_FEATURES} are required."
+            )
+
+    # ------------------------------------------------------------------
+    # Risk classification
+    # ------------------------------------------------------------------
     def _determine_risk(self, probability: float):
         if probability < self.risk_config["low_risk"]["max_probability"]:
             return "Low Risk", self.risk_config["low_risk"]["action"]
@@ -259,83 +210,43 @@ class InferenceService:
         else:
             return "High Risk", self.risk_config["high_risk"]["action"]
 
+    # ------------------------------------------------------------------
+    # Single-transaction inference
+    # ------------------------------------------------------------------
     def predict_single(self, transaction_dict: dict) -> dict:
         """
         Run a single-transaction inference through the full ensemble.
 
-        Accepts either:
-          (a) A simplified payload {Amount, Category, Time?, Merchant} →
-              V1-V28 generated server-side from training distribution.
-          (b) A full 30-feature payload {Time, V1..V28, Amount} →
-              used directly (Phase 2 Risk Calculator).
+        Expects a full feature payload strictly matching CANONICAL_FEATURES.
         """
-        amount = float(transaction_dict.get("Amount", 0.0))
-        time_val = float(transaction_dict.get("Time", 43200.0))  # default midday
-        category = str(transaction_dict.get("Category", ""))
+        from app.ml.schema import CANONICAL_FEATURES
+        from app.core.exceptions import AppError
 
-        # Check if caller sent full feature vector (Phase 2 mode)
-        has_full_features = any(f"V{i}" in transaction_dict for i in range(1, 5))
+        features = np.zeros((1, len(CANONICAL_FEATURES)))
+        for i, name in enumerate(CANONICAL_FEATURES):
+            if name not in transaction_dict:
+                raise AppError(f"Incomplete feature vector: missing '{name}'", 422)
+            try:
+                features[0, i] = float(transaction_dict[name])
+            except (ValueError, TypeError):
+                raise AppError(f"Invalid value for feature '{name}'", 422)
 
-        if has_full_features:
-            logger.info("[InferenceService] full-feature mode (Phase 2 payload)")
-            features = np.zeros((1, 30))
-            features[0, 0] = time_val
-            features[0, 29] = amount
-            for i in range(1, 29):
-                key = f"V{i}"
-                if key in transaction_dict:
-                    features[0, i] = float(transaction_dict[key])
-            total_bias = 0.0  # Not used for full features
-        else:
-            # Approach (b): generate realistic distribution-based feature vector
-            features, total_bias = _generate_feature_vector(amount, time_val, category)
+        # Scale
+        X_scaled = self.scaler.transform(features)
 
-        if self.mock_mode:
-            if total_bias <= 0.15:
-                final_prob = 0.04
-            elif total_bias <= 0.50:
-                final_prob = 0.35
-            elif total_bias <= 0.90:
-                final_prob = 0.75
-            else:
-                final_prob = 0.95
-            prob_et = np.array([final_prob])
-            prob_mlp = np.array([final_prob])
-            feature_mode = "mock"
-        else:
-            # Scale exactly as training
-            X_scaled = self.scaler.transform(features)
+        # Base model predictions
+        prob_et = self.et_model.predict_proba(X_scaled)
+        prob_mlp = self.mlp_model.predict_proba(X_scaled)
 
-            # Base model predictions
-            prob_et = self.et_model.predict_proba(X_scaled)
-            prob_mlp = self.mlp_model.predict_proba(X_scaled)
+        # Meta-learner
+        X_meta = self.meta_model.prepare_meta_features(prob_et, prob_mlp)
+        final_prob = float(self.meta_model.predict_proba(X_meta)[0])
 
-            # Meta-learner
-            X_meta = self.meta_model.prepare_meta_features(prob_et, prob_mlp)
-            final_prob = float(self.meta_model.predict_proba(X_meta)[0])
-
-            # Demo adjustment: when running in simplified UI mode without V1-V28 PCA features,
-            # calibrate probabilities monotonically so demo testing is reliable and accurate.
-            if not has_full_features:
-                if total_bias <= 0.15:
-                    final_prob = min(final_prob, 0.04)  # strictly low risk
-                elif total_bias <= 0.50:
-                    final_prob = np.clip(final_prob, 0.15, 0.40)  # moderate / baseline
-                elif total_bias <= 0.90:
-                    final_prob = np.clip(
-                        final_prob, 0.55, 0.78
-                    )  # flagged / review required
-                else:
-                    final_prob = max(final_prob, 0.88)  # high risk fraud
-                prob_et = np.array([final_prob])
-                prob_mlp = np.array([final_prob])
-
-            feature_mode = "full" if has_full_features else "demo-distribution"
+        # Apply calibration if available
+        if self.calibrator is not None:
+            final_prob = float(self.calibrator.predict_proba(X_meta)[0])
 
         risk_level, action = self._determine_risk(final_prob)
-
-        # Compute approximate SHAP-style feature contributions for display
-        shap_approx = self._compute_approximate_shap(features[0], final_prob)
 
         return {
             "probability": final_prob,
@@ -345,72 +256,102 @@ class InferenceService:
                 "extra_trees": float(prob_et[0]),
                 "mlp": float(prob_mlp[0]),
             },
-            "shap_values": shap_approx,
-            "feature_mode": feature_mode,
+            "shap_values": {},
+            "feature_mode": "full",
         }
 
+    # ------------------------------------------------------------------
+    # SHAP Explanations
+    # ------------------------------------------------------------------
+    def get_shap_explanation(self, transaction_dict: dict):
+        """
+        Compute real SHAP values for a given transaction using the full ensemble.
+        Returns (base_value, shap_values_list).
+        """
+        from app.ml.explainability.engine import ExplainabilityEngine
+        from app.ml.schema import CANONICAL_FEATURES
+        from app.core.exceptions import AppError
+
+        features = np.zeros((1, len(CANONICAL_FEATURES)))
+        for i, name in enumerate(CANONICAL_FEATURES):
+            if name not in transaction_dict:
+                raise AppError(f"Incomplete feature vector: missing '{name}'", 422)
+            try:
+                features[0, i] = float(transaction_dict[name])
+            except (ValueError, TypeError):
+                raise AppError(f"Invalid value for feature '{name}'", 422)
+
+        # Define the predict_proba pipeline wrapper
+        def predict_proba_pipeline(X_raw):
+            X_scaled = self.scaler.transform(X_raw)
+            prob_et = self.et_model.predict_proba(X_scaled)
+            prob_mlp = self.mlp_model.predict_proba(X_scaled)
+            X_meta = self.meta_model.prepare_meta_features(prob_et, prob_mlp)
+            probs = self.meta_model.predict_proba(X_meta)
+            if self.calibrator is not None:
+                probs = self.calibrator.predict_proba(X_meta)
+            
+            # predict_proba for binary classification usually returns shape (N, 2)
+            # XGBoostMetaTrainer predict_proba currently returns (N, 1) or a 1D array of probabilities for class 1.
+            # We need to reshape it to (N, 2) for KernelExplainer standard interface
+            probs = np.array(probs).flatten()
+            return np.vstack([1 - probs, probs]).T
+
+        # Use the scaler's mean as the background instance (1 sample)
+        # scaler.mean_ is the mean of the training data before scaling
+        background_data = self.scaler.mean_.reshape(1, -1)
+
+        engine = ExplainabilityEngine(
+            predict_proba_fn=predict_proba_pipeline,
+            background_data=background_data,
+            feature_names=CANONICAL_FEATURES
+        )
+
+        base_value, shap_values = engine.explain_local_shap(features[0])
+        return base_value, shap_values
+
+    # ------------------------------------------------------------------
+    # Batch inference
+    # ------------------------------------------------------------------
     def predict_batch(self, df) -> list[dict]:
         """
         Vectorized batch inference over a Pandas DataFrame.
+        Expects columns exactly matching CANONICAL_FEATURES.
         """
         import pandas as pd
-        
+        from app.ml.schema import CANONICAL_FEATURES
+        from app.core.exceptions import AppError
+
         n = len(df)
         if n == 0:
             return []
-            
+
+        features = np.zeros((n, len(CANONICAL_FEATURES)))
+        for i, name in enumerate(CANONICAL_FEATURES):
+            if name not in df.columns:
+                raise AppError(f"Incomplete batch feature vector: missing '{name}' column", 422)
+            try:
+                features[:, i] = df[name].astype(float).to_numpy()
+            except (ValueError, TypeError):
+                raise AppError(f"Invalid values in feature column '{name}'", 422)
+
+        # Scale
+        X_scaled = self.scaler.transform(features)
+
+        # Base model predictions
+        prob_et = self.et_model.predict_proba(X_scaled)
+        prob_mlp = self.mlp_model.predict_proba(X_scaled)
+
+        # Meta-learner
+        X_meta = self.meta_model.prepare_meta_features(prob_et, prob_mlp)
+        final_probs = self.meta_model.predict_proba(X_meta)
+
+        # Calibrate if available
+        if self.calibrator is not None:
+            final_probs = self.calibrator.predict_proba(X_meta)
+
         amounts = df.get("Amount", pd.Series(np.zeros(n))).astype(float).to_numpy()
-        time_vals = df.get("Time", pd.Series(np.full(n, 43200.0))).astype(float).to_numpy()
-        categories = df.get("Category", pd.Series(np.full(n, ""))).astype(str).to_numpy()
-        
-        # Check if caller sent full feature vector
-        has_full_features = any(f"V{i}" in df.columns for i in range(1, 5))
-        
-        if has_full_features:
-            logger.info(f"[InferenceService] full-feature mode for batch of {n}")
-            features = np.zeros((n, 30))
-            features[:, 0] = time_vals
-            features[:, 29] = amounts
-            for i in range(1, 29):
-                key = f"V{i}"
-                if key in df.columns:
-                    features[:, i] = df[key].astype(float).to_numpy()
-            total_biases = np.zeros(n)
-        else:
-            features, total_biases = _generate_feature_vector_batch(amounts, time_vals, categories)
-            
-        if self.mock_mode:
-            final_probs = np.full(n, 0.04)
-            final_probs[total_biases > 0.15] = 0.35
-            final_probs[total_biases > 0.50] = 0.75
-            final_probs[total_biases > 0.90] = 0.95
-            
-            prob_et = final_probs
-            prob_mlp = final_probs
-            feature_mode = "mock"
-        else:
-            X_scaled = self.scaler.transform(features)
-            
-            # Predict Proba usually returns 1D or 2D. 
-            prob_et = self.et_model.predict_proba(X_scaled)
-            prob_mlp = self.mlp_model.predict_proba(X_scaled)
-            
-            X_meta = self.meta_model.prepare_meta_features(prob_et, prob_mlp)
-            final_probs = self.meta_model.predict_proba(X_meta)
-            
-            if not has_full_features:
-                cond_low = total_biases <= 0.15
-                cond_med = (total_biases > 0.15) & (total_biases <= 0.50)
-                cond_high = (total_biases > 0.50) & (total_biases <= 0.90)
-                cond_crit = total_biases > 0.90
-                
-                final_probs[cond_low] = np.minimum(final_probs[cond_low], 0.04)
-                final_probs[cond_med] = np.clip(final_probs[cond_med], 0.15, 0.40)
-                final_probs[cond_high] = np.clip(final_probs[cond_high], 0.55, 0.78)
-                final_probs[cond_crit] = np.maximum(final_probs[cond_crit], 0.88)
-                
-            feature_mode = "full" if has_full_features else "demo-distribution"
-            
+
         results = []
         for i in range(n):
             prob = float(final_probs[i])
@@ -421,42 +362,5 @@ class InferenceService:
                 "Risk": risk_level,
                 "Action": action
             })
-            
+
         return results
-
-    def _compute_approximate_shap(
-        self, features: np.ndarray, probability: float
-    ) -> dict:
-        """
-        Heuristic SHAP-like contributions for display purposes.
-        Returns a dict {feature_name: contribution} for the top features.
-        Not true TreeExplainer SHAP — that would require storing raw features at prediction time.
-        """
-        # Map feature index to name
-        feature_names = ["Time"] + [f"V{i}" for i in range(1, 29)] + ["Amount"]
-
-        # Means for legitimate transactions (Time and Amount means approximated from Kaggle dataset)
-        normal_means = (
-            [94813.0] + [_FEATURE_STATS[f"V{i}"][0] for i in range(1, 29)] + [88.0]
-        )
-        normal_stds = (
-            [47400.0] + [_FEATURE_STATS[f"V{i}"][1] for i in range(1, 29)] + [250.0]
-        )
-
-        # Use the feature values (pre-scaling) to estimate contribution direction
-        contributions = {}
-
-        for i, (name, mean, std) in enumerate(
-            zip(feature_names, normal_means, normal_stds)
-        ):
-            if std > 0:
-                # Normalised deviation from mean
-                deviation = (features[i] - mean) / std
-                # Scale contribution by probability and deviation
-                contributions[name] = round(float(deviation * probability * 0.15), 4)
-
-        # Return only top 8 by absolute value
-        sorted_contribs = sorted(
-            contributions.items(), key=lambda x: abs(x[1]), reverse=True
-        )
-        return dict(sorted_contribs[:8])

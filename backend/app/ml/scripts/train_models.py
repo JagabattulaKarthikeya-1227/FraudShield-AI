@@ -13,14 +13,17 @@ import joblib
 
 def main():
     base_dir = os.path.dirname(os.path.dirname(__file__))
-    # Fix 4: Load from raw dataset, removing dependency on enhanced dataset
+    # Load from raw dataset
     data_path = os.path.join(base_dir, "data", "raw", "creditcard.csv")
     models_dir = os.path.join(base_dir, "models", "saved")
 
     print(f"Loading raw dataset from {data_path}...")
     df = pd.read_csv(data_path).dropna()
 
-    X = df.drop(columns=["Class"])
+    from app.ml.schema import CANONICAL_FEATURES
+    
+    # Enforce exact ordering of the 30 canonical features
+    X = df[CANONICAL_FEATURES].copy()
     y = df["Class"].values
 
     # Fix 1: Split data BEFORE scaling and SMOTE
@@ -45,6 +48,12 @@ def main():
     os.makedirs(models_dir, exist_ok=True)
     joblib.dump(scaler, os.path.join(models_dir, "scaler.pkl"))
     print("Saved feature scaler.")
+    
+    # Save the canonical schema alongside artifacts
+    schema_path = os.path.join(models_dir, "schema.json")
+    with open(schema_path, "w") as f:
+        json.dump({"features": CANONICAL_FEATURES}, f, indent=2)
+    print("Saved feature schema.")
 
     # Fix 3: Apply SMOTE only to the training fold
     print("Applying SMOTE to training fold...")

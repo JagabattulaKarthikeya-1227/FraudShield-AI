@@ -72,9 +72,13 @@ apiClient.interceptors.response.use(
           { headers: { Authorization: `Bearer ${refreshToken}` } }
         );
         const newAccessToken: string = res.data.data.access_token;
+        // Also capture the new refresh_token returned by token rotation.
+        // The old refresh token is now revoked server-side; using the new one
+        // on the next expiry ensures the rotation chain stays intact.
+        const newRefreshToken: string = res.data.data.refresh_token ?? refreshToken ?? '';
 
-        // Persist the new access token in the store
-        useAuthStore.getState().setTokens(newAccessToken, refreshToken ?? '');
+        // Persist both new tokens in the store
+        useAuthStore.getState().setTokens(newAccessToken, newRefreshToken);
 
         processQueue(null, newAccessToken);
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;

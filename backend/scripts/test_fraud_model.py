@@ -9,9 +9,7 @@ sys.path.append(base_dir)
 from app.services.fraud_model import FraudDetectionModel
 
 def run_tests():
-    data_path = os.path.join(base_dir, "app", "ml", "data", "processed", "creditcard_enhanced.csv")
-    if not os.path.exists(data_path):
-        data_path = os.path.join(base_dir, "app", "ml", "data", "raw", "creditcard.csv")
+    data_path = os.path.join(base_dir, "app", "ml", "data", "raw", "creditcard.csv")
         
     print(f"Loading test data from {data_path}...")
     df = pd.read_csv(data_path)

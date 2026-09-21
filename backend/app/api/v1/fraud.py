@@ -31,14 +31,10 @@ def _get_dataset() -> pd.DataFrame:
             os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         )
         data_path = os.path.join(
-            base_dir, "app", "ml", "data", "processed", "creditcard_enhanced.csv"
+            base_dir, "app", "ml", "data", "raw", "creditcard.csv"
         )
         if not os.path.exists(data_path):
-            data_path = os.path.join(
-                base_dir, "app", "ml", "data", "raw", "creditcard.csv"
-            )
-        if not os.path.exists(data_path):
-            raise AppError("Dataset not found on server", 404)
+            raise AppError("Dataset not found", 404)
         current_app.logger.info(
             f"[fraud_bp] Loading dataset into cache from {data_path}"
         )

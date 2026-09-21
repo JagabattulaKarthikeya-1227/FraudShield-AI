@@ -1,7 +1,7 @@
 from flask import Blueprint, request, current_app
 from flask_jwt_extended import jwt_required, get_current_user
 from app.core.responses import success_response
-from app.core.exceptions import AppError
+from app.core.exceptions import AppError, ModelNotReadyError
 from app.database.core import db
 from app.models.transaction import Transaction, TransactionStatus
 from app.models.prediction import Prediction
@@ -13,49 +13,18 @@ predict_bp = Blueprint("predict", __name__)
 inference_service = None
 
 
-class DummyInferenceService:
-    def __init__(self):
-        self.active_record = {"version_id": "fallback"}
-
-    def predict_single(self, transaction_dict: dict) -> dict:
-        amount = float(transaction_dict.get("Amount", 0.0))
-        probability = 0.03 if amount <= 500 else min(0.92, 0.03 + (amount / 10000.0))
-        if probability < 0.4:
-            risk_level = "Low Risk"
-            action = "approve"
-        elif probability < 0.7:
-            risk_level = "Review Required"
-            action = "flag"
-        else:
-            risk_level = "High Risk"
-            action = "decline"
-
-        return {
-            "probability": float(probability),
-            "risk_level": risk_level,
-            "suggested_action": action,
-            "base_models": {
-                "extra_trees": float(min(0.9, probability + 0.02)),
-                "mlp": float(min(0.92, probability + 0.05)),
-            },
-            "shap_values": {},
-            "feature_mode": "fallback",
-        }
-
-
 def get_inference_service():
+    """Return the cached InferenceService, or create one.
+
+    Raises ModelNotReadyError if model artifacts are missing, corrupt,
+    or incompatible — the Flask error handler will return HTTP 503.
+    """
     global inference_service
     if inference_service is None:
-        try:
-            inference_service = InferenceService(
-                registry_path="app/ml/models/model_registry.json",
-                config_path="app/ml/config/risk_thresholds.yaml",
-            )
-        except Exception as e:
-            current_app.logger.error(
-                f"Inference Engine unavailable: {e}. Using fallback inference service."
-            )
-            inference_service = DummyInferenceService()
+        # ModelNotReadyError propagates directly to the caller / error handler.
+        inference_service = InferenceService(
+            config_path=None,  # Uses default absolute path derived from __file__
+        )
     return inference_service
 
 
@@ -80,23 +49,36 @@ def predict_single():
     )
 
     # 3. Create Transaction Record
+    from datetime import datetime, timezone
     tx = Transaction(
         user_id=user.id,
         merchant=data.get("Merchant", "Unknown"),
         category=data.get("Category", "General"),
         amount=data.get("Amount", 0.0),
         status=tx_status,
-        transaction_date=db.func.now(),
+        transaction_date=datetime.now(timezone.utc),
     )
     db.session.add(tx)
     db.session.flush()  # To get tx.id
 
-    # 4. Create Prediction Record (shap_values now returned by InferenceService)
+    # 4. Create Prediction Record
+    # Compute real SHAP values for storage
+    shap_values_dict = {}
+    try:
+        base_value, shap_features = engine.get_shap_explanation(data)
+        from app.ml.schema import CANONICAL_FEATURES
+        shap_values_dict = {
+            "base_value": base_value,
+            "features": {CANONICAL_FEATURES[i]: float(shap_features[i]) for i in range(len(CANONICAL_FEATURES))}
+        }
+    except Exception as e:
+        current_app.logger.warning(f"Failed to compute SHAP values at inference time: {e}")
+
     pred = Prediction(
         transaction_id=tx.id,
         model_version=engine.active_record["version_id"],
         risk_score=result["probability"],
-        shap_values=result.get("shap_values"),  # approximate SHAP from InferenceService
+        shap_values=shap_values_dict if shap_values_dict else None,
     )
     db.session.add(pred)
 
@@ -133,8 +115,9 @@ def predict_single():
 @predict_bp.route("/batch", methods=["POST"])
 @jwt_required()
 def predict_batch():
-    import tempfile
     import os
+    import uuid
+    from werkzeug.utils import secure_filename
     from app.core.celery_app import process_batch_predictions
     
     MAX_FILE_BYTES = 50 * 1024 * 1024  # Increased to 50 MB for async processing
@@ -174,16 +157,20 @@ def predict_batch():
         )
     else:
         # Asynchronous processing for large batches
-        temp_fd, temp_path = tempfile.mkstemp(suffix=".csv")
-        os.close(temp_fd)
-        df.to_csv(temp_path, index=False)
+        batch_dir = current_app.config.get("BATCH_DATA_DIR", "/app/batch_data")
+        os.makedirs(batch_dir, exist_ok=True)
         
+        # Use secure_filename just in case, though we generate the uuid ourselves
+        safe_filename = secure_filename(f"batch_{uuid.uuid4().hex}.csv")
+        temp_path = os.path.join(batch_dir, safe_filename)
+        
+        df.to_csv(temp_path, index=False)
         task = process_batch_predictions.delay(temp_path)
         
         return success_response(
             data={"task_id": task.id, "row_count": row_count},
             message=f"Batch accepted for background processing. Poll /batch/task/{task.id} for status.",
-            status=202
+            status_code=202
         )
 
 

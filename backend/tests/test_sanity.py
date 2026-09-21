@@ -7,7 +7,8 @@ def app():
     """Setup app context fixture in testing mode."""
     app = create_app("testing")
     with app.app_context():
-        db.create_all()
+        from flask_migrate import upgrade
+        upgrade()
         yield app
         db.drop_all()
 

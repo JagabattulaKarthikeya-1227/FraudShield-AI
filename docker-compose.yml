@@ -22,6 +22,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    volumes:
+      - fraudshield_batch_data:/app/batch_data
     environment:
       - FLASK_ENV=production
       - DATABASE_URL=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql_db:3306/${MYSQL_DATABASE}
@@ -32,7 +34,7 @@ services:
       mysql_db:
         condition: service_healthy
       redis_cache:
-        condition: service_started
+        condition: service_healthy
     networks:
       - fraudshield_net
 
@@ -43,15 +45,19 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    command: celery -A app.core.celery_app.celery worker --loglevel=info
+    command: celery -A celery_worker.celery worker --loglevel=info
+    volumes:
+      - fraudshield_batch_data:/app/batch_data
     environment:
       - DATABASE_URL=mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql_db:3306/${MYSQL_DATABASE}
       - REDIS_URL=redis://redis_cache:6379/0
       - SECRET_KEY=${SECRET_KEY}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
     depends_on:
-      - redis_cache
-      - mysql_db
+      redis_cache:
+        condition: service_healthy
+      mysql_db:
+        condition: service_healthy
     networks:
       - fraudshield_net
 
@@ -82,12 +88,18 @@ services:
     image: redis:7.2-alpine
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - fraudshield_net
 
 volumes:
   mysql_data:
   redis_data:
+  fraudshield_batch_data:
 
 networks:
   fraudshield_net:

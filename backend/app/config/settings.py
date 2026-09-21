@@ -15,6 +15,7 @@ class Config:
 
     # JWT Extended
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "default-jwt-secret")
+    JWT_ALGORITHM = "HS256"  # Explicitly set; never rely on library default
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
     JWT_BLACKLIST_ENABLED = True
@@ -56,6 +57,12 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=5)
     CORS_ORIGINS = ["*"]
+    import tempfile
+    BATCH_DATA_DIR = tempfile.gettempdir()
+    CELERY = {
+        "task_always_eager": True,
+        "task_eager_propagates": True,
+    }
 
 
 class ProductionConfig(Config):
@@ -68,6 +75,9 @@ class ProductionConfig(Config):
     SECRET_KEY = os.environ.get("SECRET_KEY") or ""
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY") or ""
 
+    # Production CORS: CORS_ORIGINS env var MUST be set to explicit trusted origins.
+    # An empty result means no cross-origin requests are permitted, which is the
+    # secure default. Do NOT set CORS_ORIGINS=* in production.
     CORS_ORIGINS = [
         origin.strip()
         for origin in os.environ.get("CORS_ORIGINS", "").split(",")

@@ -1,6 +1,15 @@
 import os
-import redis
 import logging
+
+try:
+    if os.environ.get("FLASK_ENV") == "testing":
+        REDIS_AVAILABLE = False
+    else:
+        import redis
+        REDIS_AVAILABLE = True
+except Exception as e:
+    logging.warning(f"Failed to import redis library: {e}")
+    REDIS_AVAILABLE = False
 
 # Initialize a lazy Redis client for blocklisting and caching
 redis_url = os.environ.get("REDIS_URL", "").strip()
@@ -17,8 +26,11 @@ class InMemoryRedisMock:
         self.store[key] = value
 
 try:
-    redis_client = redis.from_url(redis_url, decode_responses=True)
-    redis_client.ping() # Force connection attempt
+    if REDIS_AVAILABLE:
+        redis_client = redis.from_url(redis_url, decode_responses=True)
+        redis_client.ping() # Force connection attempt
+    else:
+        raise Exception("Redis library not available")
 except Exception as e:
     logging.warning(f"Failed to connect to Redis at '{redis_url}': {e}. Falling back to in-memory dict for local dev.")
     redis_client = InMemoryRedisMock()

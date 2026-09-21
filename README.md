@@ -102,6 +102,14 @@ npm run dev
 4. **Access the Application**
 Navigate to `http://localhost:5173` in your browser.
 
+### Database Migrations
+
+This project uses Flask-Migrate (Alembic) to handle database schema changes.
+
+- **`flask db upgrade`**: Applies all pending migrations to the database. Run this whenever you pull new code that changes the schema.
+- **`flask db downgrade`**: Reverts the last applied migration.
+- **`flask db check`**: Verifies that the current database schema matches the SQLAlchemy models (used in CI to prevent drift).
+
 5. **Provision the First Admin Account**
 
    No default credentials are seeded. Use the Flask CLI to create the first administrator:

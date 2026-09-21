@@ -29,3 +29,9 @@ class NotFoundError(AppError):
 class ConflictError(AppError):
     def __init__(self, message="Resource already exists"):
         super().__init__(message, 409)
+
+
+class ModelNotReadyError(AppError):
+    """Raised when ML model artifacts are missing, corrupt, or incompatible."""
+    def __init__(self, message="Fraud detection model is not available."):
+        super().__init__(message, 503)

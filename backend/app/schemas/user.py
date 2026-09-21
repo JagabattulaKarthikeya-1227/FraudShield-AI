@@ -1,4 +1,6 @@
+import marshmallow
 from marshmallow import Schema, fields, validate
+
 
 
 class UserSchema(Schema):
@@ -23,5 +25,9 @@ class LoginSchema(Schema):
 
 class RegisterSchema(UserSchema):
     password = fields.String(required=True, validate=validate.Length(min=8))
-    # Override role so it can be provided during registration (not dump_only)
-    role = fields.String(required=False, load_default="Customer")
+
+    class Meta:
+        # Silently ignore any extra fields sent by the client (including 'role').
+        # Role is enforced exclusively by the backend service layer.
+        unknown = marshmallow.EXCLUDE
+

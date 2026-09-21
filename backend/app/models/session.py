@@ -13,6 +13,7 @@ class Session(UUIDMixin, TimestampMixin, db.Model):
         nullable=False,
         index=True,
     )
+    family_id = Column(String(36), nullable=False, index=True)
     # Stores HMAC-SHA256 hash of the raw refresh token — never the raw token.
     # The raw token is returned to the client once at issuance and never persisted.
     refresh_token_hash = Column(String(64), unique=True, nullable=False, index=True)

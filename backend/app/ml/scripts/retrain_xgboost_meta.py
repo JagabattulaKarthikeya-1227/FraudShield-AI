@@ -24,11 +24,12 @@ from app.ml.training.xgboost_meta import XGBoostMetaTrainer  # noqa: E402
 def main():
     base_dir = os.path.normpath(os.path.join(_SCRIPT_DIR, ".."))
     models_dir = os.path.join(base_dir, "models", "saved")
-    data_path = os.path.join(base_dir, "data", "processed", "creditcard_enhanced.csv")
+    data_path = os.path.join(base_dir, "data", "raw", "creditcard.csv")
 
     print(f"[retrain_xgboost_meta] Loading dataset from: {data_path}")
     df = pd.read_csv(data_path)
-    X = df.drop(columns=["Class"]).values
+    from app.ml.schema import CANONICAL_FEATURES
+    X = df[CANONICAL_FEATURES].values
     y = df["Class"].values
 
     print("[retrain_xgboost_meta] Loading scaler ...")

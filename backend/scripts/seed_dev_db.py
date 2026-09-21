@@ -16,10 +16,6 @@ from app.security.hashing import hash_password
 def seed():
     app = create_app()
     with app.app_context():
-        print("Creating all tables based on ORM models...")
-        # create_all is safe to run; it will create missing tables based on the live models
-        db.create_all()
-
         print("Checking for existing users...")
         if User.query.first():
             print("Database already contains data. Skipping seed to prevent duplication.")

@@ -6,7 +6,7 @@ import sys
 
 # Paths
 base_dir = r"c:\Users\J.Karthikeya\OneDrive\Desktop\credit 3.0"
-data_path = os.path.join(base_dir, "backend", "app", "ml", "data", "processed", "creditcard_enhanced.csv")
+data_path = os.path.join(base_dir, "backend", "app", "ml", "data", "raw", "creditcard.csv")
 output_pdf = os.path.join(base_dir, "dataset_report.pdf")
 
 def generate_report():

@@ -21,7 +21,8 @@ class DataPipeline:
         logger.info(f"Removed {initial_len - len(df)} duplicate rows.")
 
         # 2. Features and Target
-        X = df.drop(columns=[target_col])
+        from app.ml.schema import CANONICAL_FEATURES
+        X = df[CANONICAL_FEATURES].copy()
         y = df[target_col]
 
         # 3. Train-Validation-Test Split (70-15-15)

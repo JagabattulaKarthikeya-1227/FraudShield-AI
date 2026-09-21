@@ -1,12 +1,26 @@
 import traceback
-from flask import current_app
+from flask import current_app, jsonify
 from marshmallow import ValidationError as MarshmallowValidationError
 from sqlalchemy.exc import SQLAlchemyError
-from app.core.exceptions import AppError
+from app.core.exceptions import AppError, ModelNotReadyError
 from app.core.responses import error_response
 
 
 def register_error_handlers(app):
+    @app.errorhandler(ModelNotReadyError)
+    def handle_model_not_ready(e):
+        """Return the exact structured 503 required by the API contract."""
+        return (
+            jsonify({
+                "success": False,
+                "error": {
+                    "code": "MODEL_NOT_READY",
+                    "message": e.message,
+                },
+            }),
+            503,
+        )
+
     @app.errorhandler(AppError)
     def handle_app_error(e):
         return error_response(e.message, e.errors, e.status_code)

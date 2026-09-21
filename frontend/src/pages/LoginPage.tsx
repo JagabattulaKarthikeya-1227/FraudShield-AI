@@ -20,7 +20,6 @@ const registerSchema = z.object({
   last_name:  z.string().min(1, 'Last name is required'),
   email:      z.string().email('Enter a valid email address'),
   password:   z.string().min(8, 'Password must be at least 8 characters'),
-  role:       z.enum(['Customer', 'Fraud Analyst', 'Administrator']),
 });
 
 type LoginFields    = z.infer<typeof loginSchema>;
@@ -124,7 +123,6 @@ export const LoginPage = () => {
   // ── Register form ───────────────────────────────────────────────────────────
   const registerForm = useForm<RegisterFields>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { role: 'Customer' },
   });
 
   const handleRegister = async (data: RegisterFields) => {
@@ -363,18 +361,7 @@ export const LoginPage = () => {
                       <Field id="reg-email" label="Work Email" type="email" placeholder="you@company.com" error={registerForm.formState.errors.email?.message} registration={registerForm.register('email')} />
                       <Field id="reg-password" label="Password" type="password" placeholder="Min 8 characters" error={registerForm.formState.errors.password?.message} registration={registerForm.register('password')} />
                       
-                      <div className="space-y-1.5">
-                        <label htmlFor="reg-role" className="text-sm font-semibold text-slate-700">Role</label>
-                        <select
-                          id="reg-role"
-                          className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
-                          {...registerForm.register('role')}
-                        >
-                          <option value="Customer">Customer</option>
-                          <option value="Fraud Analyst">Fraud Analyst</option>
-                          <option value="Administrator">Administrator</option>
-                        </select>
-                      </div>
+
 
                       {serverError && (
                         <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 p-3 bg-rose-50 border border-rose-200 rounded-xl text-sm text-rose-700">

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Enum, Boolean
+from sqlalchemy import Column, String, Enum, Boolean, JSON
 from sqlalchemy.orm import relationship
 from app.database.core import db
 from app.models.mixins import UUIDMixin, TimestampMixin, SoftDeleteMixin
@@ -30,8 +30,6 @@ class User(UUIDMixin, TimestampMixin, SoftDeleteMixin, db.Model):
     location = Column(String(255), nullable=True)
 
     # Notification Preferences
-    from sqlalchemy.dialects.sqlite import JSON
-
     notification_preferences = Column(JSON, nullable=True)
 
     sessions = relationship(
