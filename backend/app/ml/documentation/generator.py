@@ -50,7 +50,7 @@ class ModelCardGenerator:
 
 ## 4. Ethical Considerations
 - The model employs SMOTE synthetics during training to offset severe class imbalance. Synthetic sampling is verified via unit testing to exclusively apply to training data, preventing data leakage and ensuring fair evaluation on real distributions.
-- Explainability (SHAP & LIME) is integrated to allow analysts to audit why a transaction was flagged, reducing opaque algorithmic bias.
+- Explainability (SHAP) is integrated to allow analysts to audit why a transaction was flagged, reducing opaque algorithmic bias.
 """
         with open(self.output_path, "w") as f:
             f.write(card)

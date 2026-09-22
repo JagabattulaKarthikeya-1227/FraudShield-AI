@@ -17,21 +17,17 @@ Instead of relying on a single algorithm, we use a **Stacking Classifier**.
 
 ```mermaid
 graph TD
-    Data[Preprocessed Transaction] --> ET[Extra Trees Classifier]
-    Data --> RF[MLP]
-    Data --> MLP[Multilayer Perceptron]
-    
-    ET --> |Prediction| Meta[XGBoost Meta-Learner]
-    RF --> |Prediction| Meta
-    MLP --> |Prediction| Meta
-    
-    Meta --> Result(Final Probability Score)
+    Data[Canonical 30 Features] --> Prep[Preprocessing / Scaler]
+    Prep --> ET[Extra Trees]
+    Prep --> MLP[Multilayer Perceptron]
+    ET --> Meta[XGBoost Meta-Learner]
+    MLP --> Meta
+    Meta --> Result[Final Fraud Probability]
 ```
 
 1. **Extra Trees**: Highly randomized, excellent for reducing variance.
-2. **MLP**: Strong baseline tabular data performer.
-3. **Multilayer Perceptron (MLP)**: Captures complex non-linear relationships that tree-based models might miss.
-4. **XGBoost (Meta)**: Meta-learner that learns which base model to trust in specific scenarios.
+2. **Multilayer Perceptron (MLP)**: Captures complex non-linear relationships that tree-based models might miss.
+3. **XGBoost (Meta)**: Meta-learner that learns which base model to trust in specific scenarios.
 
 ### Why optimize for PR-AUC?
 Traditional ROC-AUC is misleading on imbalanced datasets because a model can achieve a high score simply by guessing the majority class correctly. We explicitly optimize for **Precision-Recall Area Under Curve (PR-AUC)**, prioritizing the accurate identification of the minority class (fraud).
@@ -40,5 +36,5 @@ Traditional ROC-AUC is misleading on imbalanced datasets because a model can ach
 
 In regulated financial environments, models cannot be black boxes.
 - We implement **SHAP** to analyze the ensemble's decision.
-- When a transaction is blocked, SHAP calculates the marginal contribution of each feature (`V14`, `Amount`, etc.).
+- When a transaction is blocked, SHAP calculates the local feature attribution of each feature (`V14`, `Amount`, etc.).
 - This output is visualized in the Fraud Analyst Workspace and fed into our LLM Copilot to generate human-readable narratives.

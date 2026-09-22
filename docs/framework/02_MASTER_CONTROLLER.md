@@ -58,7 +58,7 @@ This document serves as the global index and progress tracker for the FraudShiel
 - [ ] 40_Deep_Learning.md
 - [ ] 41_Model_Comparison.md
 - [ ] 42_SHAP.md
-- [ ] 43_LIME.md
+
 - [ ] 44_MLOps.md
 
 ### STAGE 6 — QUALITY

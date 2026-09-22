@@ -14,11 +14,11 @@ Use these scripts for Hackathons, Academic Presentations, or Job Interviews. Kee
 
 **[1:00 - The Infrastructure]**
 *Action: Scroll down slowly to show the ECharts Timeline and Heatmap.*
-"This is the Command Center. The React frontend is streaming live Server-Sent Events from a Flask Python backend. Under the hood, I'm orchestrating Nginx, Redis, Celery, and MySQL via Docker Compose. The telemetry you see here updates asynchronously without blocking the UI thread."
+"This is the Command Center. The dashboard retrieves recent transaction and telemetry data from the backend, while the Copilot supports streamed responses using Server-Sent Events. Under the hood, I'm orchestrating Nginx, Redis, Celery, and MySQL via Docker Compose. The telemetry you see here updates asynchronously without blocking the UI thread."
 
 **[2:00 - The ML Engine]**
 *Action: Click into `MLOpsCenter`.*
-"To detect fraud on a heavily imbalanced dataset (99.8% legitimate), I engineered a Stacking Meta-Ensemble. I combined XGBoost, Extra Trees, and a Deep Neural Net, balanced the classes using SMOTE, and calibrated the output probabilities using Isotonic Regression."
+"To detect fraud on a heavily imbalanced dataset (99.8% legitimate), I engineered a Stacking Meta-Ensemble. I combined Extra Trees and a Deep Neural Net as base learners, with an XGBoost meta-learner, balanced the classes using SMOTE, and supported probability calibration."
 
 **[3:00 - The Killer Feature (Explainability)]**
 *Action: Click into `DecisionLab`. Select a High-Risk transaction.*
@@ -39,4 +39,4 @@ Use these scripts for Hackathons, Academic Presentations, or Job Interviews. Kee
 
 **[Add at 3:30 - Asynchronous Workers]**
 *Action: Open the `AuditCenter` page to show the Workflow Timeline.*
-"Handling a massive CSV batch upload of 10,000 transactions would normally crash a synchronous web server. I solved this by separating concerns. The Flask API simply validates the payload and drops it onto a Redis message broker. A background Celery worker consumes the queue, processes the predictions, and dispatches SMTP emails independently. This guarantees our API latency remains under 100 milliseconds."
+"In a hypothetical large batch scenario, handling a massive CSV batch upload would normally crash a synchronous web server. I solved this by separating concerns. The Flask API simply validates the payload and drops it onto a Redis message broker. A background Celery worker consumes the queue, processes the predictions, and dispatches SMTP emails independently. The architecture supports asynchronous background processing through Redis and Celery."

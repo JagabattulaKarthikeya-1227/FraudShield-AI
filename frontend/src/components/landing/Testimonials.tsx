@@ -2,24 +2,24 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const TESTIMONIALS = [
- {
- author:"Sarah Chen",
- role:"VP of Risk, GlobalPay",
- quote:"FraudShield AI reduced our chargeback rate by 60% in the first month. The engine's ability to cross-reference transactions and block anomalies in milliseconds is unmatched.",
- avatar:"https://i.pravatar.cc/150?u=sarah"
- },
- {
- author:"Marcus Rodriguez",
- role:"CTO, FinTrust Bank",
- quote:"The context awareness is incredible. We integrated the API directly into our payment gateway and the models automatically adapt to new fraud patterns without manual rules.",
- avatar:"https://i.pravatar.cc/150?u=marcus"
- },
- {
- author:"Emily Watson",
- role:"Director of Security, NeoBank",
- quote:"Unlike basic rule engines, FraudShield actually understands complex behavioral patterns. It's exactly what enterprise financial teams need to scale securely.",
- avatar:"https://i.pravatar.cc/150?u=emily"
- }
+  {
+    author: "Representative analyst scenario",
+    role: "Fraud Analyst Workflow",
+    quote: "Example workflow showing how a fraud analyst could use local model explanations to cross-reference transactions and block anomalies.",
+    avatar: "https://i.pravatar.cc/150?u=sarah"
+  },
+  {
+    author: "Illustrative security scenario",
+    role: "Enterprise Security Integration",
+    quote: "Example workflow showing authentication, RBAC, and audit capabilities within a simulated payment gateway environment.",
+    avatar: "https://i.pravatar.cc/150?u=marcus"
+  },
+  {
+    author: "Demonstration workflow",
+    role: "System Administrator",
+    quote: "Example of how the platform could support transaction review, role management, and scalable security patterns.",
+    avatar: "https://i.pravatar.cc/150?u=emily"
+  }
 ];
 
 export function Testimonials() {
@@ -33,7 +33,7 @@ export function Testimonials() {
  viewport={{ once: true, margin:"-100px" }}
  className="text-3xl md:text-5xl font-bold tracking-tight text-foreground mb-6"
  >
- Trusted by the world's most secure financial institutions.
+ Representative Demo Scenarios
  </motion.h2>
  <motion.p 
  initial={{ opacity: 0, y: 15 }}
@@ -42,7 +42,7 @@ export function Testimonials() {
  transition={{ delay: 0.1 }}
  className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed"
  >
- See how top financial teams use FraudShield AI to accelerate transaction approvals and stop fraud with confidence.
+ Explore illustrative workflows demonstrating how FraudShield AI could be utilized in an enterprise environment.
  </motion.p>
  </div>
 

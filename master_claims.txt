@@ -1,0 +1,352 @@
+./QA_CHECKLIST.md: - [x] **Recruiter / Interview Assets**: The Recruiter Showcase Drawer is integrated into the Topbar, and the `docs/career` files provide excellent STAR-method interview prep.
+./QA_CHECKLIST.md: ## Overall Status: `PASSED`
+./README.md: Proxy --> Frontend[Static Assets]
+./README.md: ### Career & Reviewer Assets
+.\backend/verify_settings.py: assert resp.status_code == 200
+.\backend/verify_settings.py: assert resp.status_code == 200
+.\backend/verify_settings.py: assert resp.status_code == 200
+.\backend/verify_settings.py: assert resp.status_code == 200
+.\backend/verify_settings.py: print("\nALL VERIFICATIONS PASSED SUCCESSFULLY!")
+.\backend\app\api\v1/copilot.py: Streams a response back to the client using Server-Sent Events (SSE).
+.\backend\app\api\v1/copilot.py: # SSE format: data: {"token": "hello"}\n\n
+.\backend\app\api\v1/ml.py: "psi_score": d.psi_score,
+.\backend\app\api\v1/ml.py: "status": "Warning" if d.psi_score is not None and d.psi_score > 0.1 else "Stable",
+.\backend\app\api\v1/notifications.py: # Pushes a heartbeat SSE event every 15 seconds to keep the connection alive
+.\backend\app\api\v1/ops.py: "calibration": "Isotonic Regression",
+.\backend\app\api\v1/predict.py: data={"transaction_id": tx.id, "risk_assessment": result},
+.\backend\app\api\v1/predict.py: message=f"Batch processed: {len(results)} transactions.",
+.\backend\app\api\v1/predict.py: return success_response(data={"state": task_result.state, "status": "Task is waiting to be processed or is currently running..."})
+.\backend\app\ml\documentation/generator.py: - Explainability (SHAP & LIME) is integrated to allow analysts to audit why a transaction was flagged, reducing opaque algorithmic bias.
+.\backend\app\ml\explainers/__init__.py: """Abstract base class representing XAI models (SHAP or LIME)."""
+.\backend\app\ml\training/mlp.py: loss="binary_crossentropy",
+.\backend\app\models/grc.py: last_assessed = db.Column(db.DateTime, default=datetime.utcnow)
+.\backend\app\models/mlops.py: psi_score = db.Column(db.Float)
+.\backend\app\services/llm_service.py: - Transaction risk analysis and SHAP/LIME explainability
+.\backend\app\services/llm_service.py: """Stream word-by-word for SSE."""
+.\backend\app\services/llm_service.py: """Simulates fast token-by-token streaming of an LLM via SSE (<0.1s total delay)."""
+.\backend\migrations\versions/83162e50a75b_initial_schema.py: sa.Column('last_assessed', sa.DateTime(), nullable=True),
+.\backend\migrations\versions/83162e50a75b_initial_schema.py: sa.Column('psi_score', sa.Float(), nullable=True),
+.\backend\tests/test_auth.py: assert response.status_code == 201
+.\backend\tests/test_auth.py: assert data["success"] is True
+.\backend\tests/test_auth.py: assert data["data"]["user"]["email"] == "analyst@fraudshield.ai"
+.\backend\tests/test_auth.py: assert response.status_code == 200
+.\backend\tests/test_auth.py: assert data["success"] is True
+.\backend\tests/test_auth.py: assert "access_token" in data["data"]
+.\backend\tests/test_auth.py: assert "refresh_token" in data["data"]
+.\backend\tests/test_auth.py: assert response.status_code == 401
+.\backend\tests/test_auth_security.py: assert res.status_code == 201
+.\backend\tests/test_auth_security.py: assert data["success"] is True
+.\backend\tests/test_auth_security.py: assert data["data"]["user"]["role"] == "Customer"
+.\backend\tests/test_auth_security.py: assert res.status_code == 201
+.\backend\tests/test_auth_security.py: assert data["data"]["user"]["role"] == "Customer", \
+.\backend\tests/test_auth_security.py: assert res.status_code == 201
+.\backend\tests/test_auth_security.py: assert data["data"]["user"]["role"] == "Customer", \
+.\backend\tests/test_auth_security.py: assert res.status_code == 201
+.\backend\tests/test_auth_security.py: assert data["data"]["user"]["role"] == "Customer"
+.\backend\tests/test_auth_security.py: assert res.status_code == 201
+.\backend\tests/test_auth_security.py: assert data["data"]["user"]["role"] == "Customer"
+.\backend\tests/test_auth_security.py: assert res.status_code == 200
+.\backend\tests/test_auth_security.py: assert "access_token" in data["data"]
+.\backend\tests/test_auth_security.py: assert "refresh_token" in data["data"]
+.\backend\tests/test_auth_security.py: assert res.status_code == 401
+.\backend\tests/test_auth_security.py: assert res.status_code == 401
+.\backend\tests/test_auth_security.py: assert data["data"]["user"]["role"] == "Customer"
+.\backend\tests/test_auth_security.py: assert res.status_code == 200
+.\backend\tests/test_auth_security.py: assert "access_token" in data["data"]
+.\backend\tests/test_auth_security.py: assert "refresh_token" in data["data"]
+.\backend\tests/test_auth_security.py: assert data["data"]["refresh_token"] != refresh_token
+.\backend\tests/test_auth_security.py: assert me_res.status_code == 200
+.\backend\tests/test_auth_security.py: assert reuse_res.status_code == 401
+.\backend\tests/test_auth_security.py: assert rt2_res.status_code == 401, "SECURITY FAILURE: new token survived after old token reuse!"
+.\backend\tests/test_auth_security.py: assert reuse_res.status_code == 401
+.\backend\tests/test_auth_security.py: assert rt2_res.status_code == 200, "Concurrent refresh incorrectly revoked the token family!"
+.\backend\tests/test_auth_security.py: assert res2.status_code == 200
+.\backend\tests/test_auth_security.py: assert rt3 != rt2
+.\backend\tests/test_auth_security.py: assert res.status_code == 422
+.\backend\tests/test_auth_security.py: assert res.status_code == 200
+.\backend\tests/test_auth_security.py: assert session is not None
+.\backend\tests/test_auth_security.py: assert res.status_code == 401, "SECURITY FAILURE: expired session was accepted!"
+.\backend\tests/test_auth_security.py: assert res.status_code == 401, "SECURITY FAILURE: revoked session was accepted!"
+.\backend\tests/test_auth_security.py: assert res.status_code == 200
+.\backend\tests/test_auth_security.py: assert me_res.status_code == 401, \
+.\backend\tests/test_auth_security.py: assert refresh_res.status_code == 401, \
+.\backend\tests/test_auth_security.py: assert active == 0, \
+.\backend\tests/test_auth_security.py: assert res.status_code == 401
+.\backend\tests/test_auth_security.py: assert res.status_code == 401
+.\backend\tests/test_auth_security.py: assert res.status_code == 200
+.\backend\tests/test_auth_security.py: assert res.status_code == 401
+.\backend\tests/test_auth_security.py: assert res.status_code == 422
+.\backend\tests/test_auth_security.py: assert res.status_code == 401
+.\backend\tests/test_auth_security.py: assert app.config.get("JWT_ALGORITHM") == "HS256", \
+.\backend\tests/test_auth_security.py: assert header.get("alg") == "HS256", \
+.\backend\tests/test_auth_security.py: assert hashed.startswith("$2"), \
+.\backend\tests/test_auth_security.py: assert verify_password("TestPassword123!", hashed) is True
+.\backend\tests/test_auth_security.py: assert verify_password("WrongPassword!", hashed) is False
+.\backend\tests/test_auth_security.py: assert isinstance(origins, list), "CORS_ORIGINS must be a list, not a bare string."
+.\backend\tests/test_auth_security.py: assert "*" not in origins, \
+.\backend\tests/test_auth_security.py: assert res.status_code == 401
+.\backend\tests/test_auth_security.py: assert res.status_code == 403, (
+.\backend\tests/test_auth_security.py: assert res.status_code == 401
+.\backend\tests/test_auth_security.py: assert res.status_code == 403
+.\backend\tests/test_auth_security.py: assert res.status_code == 403
+.\backend\tests/test_auth_security.py: assert res.status_code == 200
+.\backend\tests/test_auth_security.py: assert updated_user.role == RoleEnum.ANALYST
+.\backend\tests/test_auth_security.py: assert res.status_code == 403
+.\backend\tests/test_route_security.py: assert response.status_code in [401, 405], (
+.\backend\tests/test_sanity.py: assert res.status_code == 200
+.\backend\tests/test_sanity.py: assert res.json['status'] == 'healthy'
+.\backend\tests\api/test_batch_celery.py: assert response.status_code == 202
+.\backend\tests\api/test_batch_celery.py: assert resp_data["success"] is True
+.\backend\tests\api/test_batch_celery.py: assert "task_id" in resp_data["data"]
+.\backend\tests\api/test_batch_celery.py: assert status_resp.status_code == 200
+.\backend\tests\api/test_batch_celery.py: assert status_data["success"] is True
+.\backend\tests\api/test_batch_celery.py: assert status_data["data"]["state"] == "SUCCESS"
+.\backend\tests\api/test_batch_celery.py: assert status_data["data"]["result"]["row_count"] == rows
+.\backend\tests\api/test_copilot.py: assert resp.status_code == 401
+.\backend\tests\api/test_copilot.py: # We expect a 200 OK and a Server-Sent Events stream
+.\backend\tests\api/test_copilot.py: assert resp.status_code == 200
+.\backend\tests\api/test_copilot.py: assert resp.mimetype == 'text/event-stream'
+.\backend\tests\api/test_copilot.py: assert "data:" in stream_data
+.\backend\tests\api/test_copilot.py: assert "done" in stream_data
+.\backend\tests\api/test_copilot.py: assert resp.status_code == 200
+.\backend\tests\api/test_copilot.py: assert "System Status" not in stream_data
+.\backend\tests\api/test_copilot.py: assert resp.status_code == 404
+.\backend\tests\api/test_copilot.py: assert resp.status_code == 200
+.\backend\tests\api/test_copilot.py: assert "99.99 USD" in data
+.\backend\tests\api/test_copilot.py: assert "TestMerchant" in data
+.\backend\tests\api/test_copilot.py: assert "declined" in data.lower()
+.\backend\tests\api/test_copilot.py: assert "95.0%" in data
+.\backend\tests\api/test_copilot.py: assert "AttributeError" not in data
+.\backend\tests\api/test_copilot.py: assert resp.status_code == 200
+.\backend\tests\api/test_copilot.py: assert "unavailable" in data.lower()
+.\backend\tests\api/test_copilot.py: assert resp.status_code == 200
+.\backend\tests\api/test_copilot.py: assert "**Global Fraud Rate**: Unavailable" in data
+.\backend\tests\api/test_copilot.py: assert resp.status_code == 200
+.\backend\tests\api/test_copilot.py: assert "**Global Fraud Rate**: 25.0%" in data
+.\backend\tests\api/test_copilot.py: assert "2 active critical security incidents" in data
+.\backend\tests\api/test_explainability.py: assert global_resp.status_code == 403
+.\backend\tests\api/test_explainability.py: assert pred_resp.status_code == 200
+.\backend\tests\api/test_explainability.py: assert exp_resp.status_code == 200
+.\backend\tests\api/test_explainability.py: assert data["explanation_type"] == "technical"
+.\backend\tests\api/test_explainability.py: assert "shap_summary" in data
+.\backend\tests\api/test_explainability.py: assert "base_value" in shap_summary
+.\backend\tests\api/test_explainability.py: assert "features" in shap_summary
+.\backend\tests\api/test_explainability.py: assert len(shap_summary["features"]) == 30 # Time + 28 Vs + Amount
+.\backend\tests\api/test_explainability.py: assert abs((base_val + sum_features) - expected_prob) < 0.05, f"SHAP sum {base_val + sum_features} != {expected_prob}"
+.\backend\tests\api/test_explainability.py: assert exp_resp.status_code == 503
+.\backend\tests\api/test_explainability.py: assert not err_data["success"]
+.\backend\tests\api/test_explainability.py: assert err_data["error"]["code"] == "MODEL_NOT_READY"
+.\backend\tests\api/test_explainability.py: assert "SHAP explainer is unavailable" in err_data["error"]["message"]
+.\backend\tests\api/test_explainability.py: assert exp_resp.status_code == 404
+.\backend\tests\api/test_explainability.py: assert not err_data["success"]
+.\backend\tests\api/test_explainability.py: assert "Prediction/explanation unavailable" in err_data["error"]["message"]
+.\backend\tests\api/test_ml_metrics.py: assert response.status_code == 200
+.\backend\tests\api/test_ml_metrics.py: assert "registry" in data
+.\backend\tests\api/test_ml_metrics.py: assert len(data["registry"]) == 0
+.\backend\tests\api/test_ml_metrics.py: assert response.status_code == 200
+.\backend\tests\api/test_ml_metrics.py: assert "experiments" in data
+.\backend\tests\api/test_ml_metrics.py: assert len(data["experiments"]) == 0
+.\backend\tests\api/test_ml_metrics.py: assert response.status_code == 200
+.\backend\tests\api/test_ml_metrics.py: assert data["status"] == "unavailable"
+.\backend\tests\api/test_ml_metrics.py: assert len(data["features"]) == 0
+.\backend\tests\api/test_ml_metrics.py: assert data["concept_drift"]["status"] == "unavailable"
+.\backend\tests\api/test_ops.py: assert resp.status_code == 200
+.\backend\tests\api/test_ops.py: assert data["status"] == "alive"
+.\backend\tests\api/test_ops.py: assert resp.status_code == 200
+.\backend\tests\api/test_ops.py: assert data["status"] == "ready"
+.\backend\tests\api/test_ops.py: assert data["database"] == "connected"
+.\backend\tests\api/test_ops.py: assert audit_resp.status_code == 403
+.\backend\tests\api/test_predict.py: assert resp.status_code == 401
+.\backend\tests\api/test_predict.py: assert resp.status_code == 503
+.\backend\tests\api/test_predict.py: assert body["success"] is False
+.\backend\tests\api/test_predict.py: assert body["error"]["code"] == "MODEL_NOT_READY"
+.\backend\tests\api/test_predict.py: assert "not available" in body["error"]["message"]
+.\backend\tests\api/test_predict.py: the expected response shape (transaction_id + risk_assessment)."""
+.\backend\tests\api/test_predict.py: assert resp.status_code == 200
+.\backend\tests\api/test_predict.py: assert "transaction_id" in data
+.\backend\tests\api/test_predict.py: assert "risk_assessment" in data
+.\backend\tests\api/test_predict.py: ra = data["risk_assessment"]
+.\backend\tests\api/test_predict.py: assert ra["probability"] == 0.12
+.\backend\tests\api/test_predict.py: assert ra["risk_level"] == "Low Risk"
+.\backend\tests\api/test_predict.py: assert ra["suggested_action"] == "approve"
+.\backend\tests\api/test_predict.py: assert "base_models" in ra
+.\backend\tests\api/test_settings.py: assert resp.status_code == 200
+.\backend\tests\api/test_settings.py: assert data["status"] == "success"
+.\backend\tests\api/test_settings.py: assert "data" in data
+.\backend\tests\api/test_settings.py: assert "email" in data["data"]
+.\backend\tests\api/test_settings.py: assert "fullName" in data["data"]
+.\backend\tests\api/test_settings.py: assert resp.status_code == 200
+.\backend\tests\api/test_settings.py: assert resp.json["status"] == "success"
+.\backend\tests\api/test_settings.py: assert user.first_name == "Jane"
+.\backend\tests\api/test_settings.py: assert user.last_name == "Doe"
+.\backend\tests\api/test_settings.py: assert user.organization == "New Org"
+.\backend\tests\api/test_settings.py: assert user.department == "Engineering"
+.\backend\tests\api/test_settings.py: assert user.employee_id == "EMP-001"
+.\backend\tests\api/test_settings.py: assert user.phone == "555-0000"
+.\backend\tests\api/test_settings.py: assert user.location == "San Francisco"
+.\backend\tests\api/test_settings.py: assert resp.status_code == 200
+.\backend\tests\api/test_settings.py: assert data["status"] == "success"
+.\backend\tests\api/test_settings.py: assert "highRisk" in data["data"]
+.\backend\tests\api/test_settings.py: assert resp.status_code == 200
+.\backend\tests\api/test_settings.py: assert resp.json["status"] == "success"
+.\backend\tests\api/test_settings.py: assert user.notification_preferences["highRisk"] is False
+.\backend\tests\api/test_telemetry.py: assert health_resp.status_code == 403
+.\backend\tests\api/test_telemetry.py: assert kpi_resp.status_code == 403
+.\backend\tests\api/test_telemetry.py: assert resp.status_code == 200
+.\backend\tests\api/test_telemetry.py: assert data["status"] == "unavailable"
+.\backend\tests\api/test_telemetry.py: assert data["is_synthetic"] is False
+.\backend\tests\api/test_telemetry.py: assert len(data["labels"]) == 0
+.\backend\tests\api/test_telemetry.py: assert len(data["legitimate"]) == 0
+.\backend\tests\api/test_telemetry.py: assert resp.status_code == 200
+.\backend\tests\api/test_telemetry.py: assert "labels" in data
+.\backend\tests\api/test_telemetry.py: assert "legitimate" in data
+.\backend\tests\api/test_telemetry.py: assert "fraudulent" in data
+.\backend\tests\api/test_telemetry.py: assert "flagged" in data
+.\backend\tests\api/test_telemetry.py: assert "hourly_volume" not in data
+.\backend\tests\api/test_telemetry.py: assert data["status"] == "available"
+.\backend\tests\api/test_telemetry.py: assert data["is_synthetic"] is False
+.\backend\tests\api/test_telemetry.py: assert len(data["labels"]) == 30
+.\backend\tests\api/test_telemetry.py: assert data["legitimate"][-1] >= 1
+.\backend\tests\api/test_telemetry.py: assert data["fraudulent"][-1] >= 1
+.\backend\tests\api/test_telemetry.py: assert resp.status_code == 200
+.\backend\tests\api/test_telemetry.py: assert data["fraud_rate"] == 50.0
+.\backend\tests\api/test_telemetry.py: assert data["transactions_today"] == 1
+.\backend\tests\api/test_telemetry.py: assert data["detection_accuracy"] is None
+.\backend\tests\api/test_telemetry.py: assert data["avg_decision_time_ms"] is None
+.\backend\tests\api/test_telemetry.py: assert data["active_users"] >= 1
+.\backend\tests\api/test_telemetry.py: assert "is_synthetic" not in data
+.\backend\tests\api/test_telemetry.py: assert resp.status_code == 200
+.\backend\tests\api/test_telemetry.py: assert data["database_status"] == "Online"
+.\backend\tests\api/test_telemetry.py: assert data["active_model_version"] is None
+.\backend\tests\api/test_telemetry.py: assert data["smtp_status"] is None
+.\backend\tests\api/test_telemetry.py: assert data["cpu_usage"] is None
+.\backend\tests\api/test_telemetry.py: assert "is_synthetic" not in data
+.\backend\tests\api/test_transactions.py: assert response.status_code == 200
+.\backend\tests\api/test_transactions.py: assert len(data) > 0
+.\backend\tests\api/test_transactions.py: assert sunday_point in data
+.\backend\tests\api/test_transactions.py: assert monday_point in data
+.\backend\tests\ml/test_inference.py: assert "scaler.pkl" in exc_info.value.message
+.\backend\tests\ml/test_inference.py: assert "extra_trees.pkl" in exc_info.value.message
+.\backend\tests\ml/test_inference.py: assert "mlp.keras" in exc_info.value.message
+.\backend\tests\ml/test_inference.py: assert "xgboost_meta.pkl" in exc_info.value.message
+.\backend\tests\ml/test_inference.py: assert "Corrupt artifact: scaler.pkl" in exc_info.value.message
+.\backend\tests\ml/test_inference.py: assert "Corrupt artifact: extra_trees.pkl" in exc_info.value.message
+.\backend\tests\ml/test_inference.py: assert "Corrupt artifact: xgboost_meta.pkl" in exc_info.value.message
+.\backend\tests\ml/test_inference.py: assert "probability" in result
+.\backend\tests\ml/test_inference.py: assert "risk_level" in result
+.\backend\tests\ml/test_inference.py: assert "suggested_action" in result
+.\backend\tests\ml/test_inference.py: assert "base_models" in result
+.\backend\tests\ml/test_inference.py: assert "extra_trees" in result["base_models"]
+.\backend\tests\ml/test_inference.py: assert "mlp" in result["base_models"]
+.\backend\tests\ml/test_inference.py: assert "shap_values" in result
+.\backend\tests\ml/test_inference.py: assert "feature_mode" in result
+.\backend\tests\ml/test_inference.py: assert isinstance(result["probability"], float)
+.\backend\tests\ml/test_inference.py: assert 0.0 <= result["probability"] <= 1.0
+.\backend\tests\ml/test_inference.py: assert result["risk_level"] in {"Low Risk", "Review Required", "High Risk"}
+.\backend\tests\ml/test_inference.py: assert result["suggested_action"] in {"approve", "flag", "decline"}
+.\backend\tests\ml/test_inference.py: assert exc_info.value.status_code == 422
+.\backend\tests\ml/test_inference.py: assert "Feature mismatch" in exc_info.value.message
+.\backend\tests\ml/test_inference.py: assert exc_info.value.status_code == 422
+.\backend\tests\ml/test_inference.py: assert "Feature mismatch" in exc_info.value.message
+.\backend\tests\ml/test_inference.py: assert exc_info.value.status_code == 500
+.\backend\tests\ml/test_inference.py: assert "Invalid probability" in exc_info.value.message
+.\backend\tests\ml/test_inference.py: assert base_val == 0.2
+.\backend\tests\ml/test_inference.py: assert len(shap_vals) == 30
+.\backend\tests\ml/test_inference.py: assert abs(sum_shap - 0.5) < 1e-6
+.\backend\tests\ml/test_inference.py: assert len(results) == n
+.\backend\tests\ml/test_inference.py: assert "Probability" in r
+.\backend\tests\ml/test_inference.py: assert "Risk" in r
+.\backend\tests\ml/test_inference.py: assert "Action" in r
+.\backend\tests\ml/test_smote.py: assert len(X_res) > len(X_train)
+.\backend\tests\ml/test_smote.py: # SMOTE balances the classes
+.\backend\tests\ml/test_smote.py: assert y_res.value_counts()[0] == y_res.value_counts()[1]
+.\docs/ARCHITECTURE.md: Proxy --> Assets[Static Asset Delivery]
+.\docs/DEMO_SCRIPTS.md: "This is the Command Center. The React frontend is streaming live Server-Sent Events from a Flask Python backend. Under the hood, I'm orchestrating Nginx, Redis, Celery, and MySQL via Docker Compose. The telemetry you see here updates asynchronously without blocking the UI thread."
+.\docs/DEMO_SCRIPTS.md: "To detect fraud on a heavily imbalanced dataset (99.8% legitimate), I engineered a Stacking Meta-Ensemble. I combined XGBoost, Extra Trees, and a Deep Neural Net, balanced the classes using SMOTE, and calibrated the output probabilities using Isotonic Regression."
+.\docs/DEMO_SCRIPTS.md: "Handling a massive CSV batch upload of 10,000 transactions would normally crash a synchronous web server. I solved this by separating concerns. The Flask API simply validates the payload and drops it onto a Redis message broker. A background Celery worker consumes the queue, processes the predictions, and dispatches SMTP emails independently. This guarantees our API latency remains under 100 milliseconds."
+.\docs/DEPLOYMENT.md: - **Multi-stage Builds**: The React frontend uses a multi-stage `Dockerfile` to build the static assets via Node, and then serves them via a lightweight NGINX Alpine image, drastically reducing the final image size.
+.\docs/DEPLOYMENT.md: - **Environment Variables**: No secrets are baked into the images. They are passed via `.env` files to the containers at runtime.
+.\docs/MLOPS_GUIDE.md: If left unaddressed, models will trivially predict "Legitimate" 100% of the time and achieve 99.8% accuracy while failing entirely at their actual job.
+.\docs/MLOPS_GUIDE.md: ## 3. Probability Calibration (Isotonic Regression)
+.\docs/MLOPS_GUIDE.md: **Our Solution**: We apply **Isotonic Regression** on top of the ensemble. This non-parametric calibration forces the predicted probabilities to strictly map to true empirical likelihoods.
+.\docs/MLOPS_GUIDE.md: ## 4. SHAP and LIME (Explainability)
+.\docs/MLOPS_GUIDE.md: - **LIME (Local Interpretable Model-agnostic Explanations)**: Generates a local surrogate model around the specific transaction to prove *why* the complex ensemble made its decision.
+.\docs/ML_PIPELINE.md: Data[Preprocessed Transaction] --> ET[Extra Trees Classifier]
+.\docs/ML_PIPELINE.md: Data --> RF[MLP]
+.\docs/PROJECT_OVERVIEW.md: In 2023, global credit card fraud losses exceeded $33 billion. Financial institutions face a two-fold problem:
+.\docs/PROJECT_OVERVIEW.md: 1. **The Imbalance Problem**: Fraudulent transactions make up less than 0.17% of all credit card swipes. Traditional Machine Learning models struggle to learn the minority class, resulting in high False Negative rates (missed fraud) or high False Positive rates (blocking legitimate customers).
+.\docs/PROJECT_STATUS.md: - The inference pipeline processes real requests and returns genuine predictions, probabilities, and SHAP explanations.
+.\docs\academic/model_documentation.md: - **XGBoost (Extreme Gradient Boosting)**: Consumes the probability outputs of the Base Learners. XGBoost was heavily tuned via Grid Search, prioritizing the `F1-Macro` metric to penalize False Negatives (missed fraud) heavily.
+.\docs\audit_and_release/enterprise_audit.md: - **Weaknesses**: Currently lacks an Flask Backend (like Kong or AWS Flask Backend) for advanced traffic routing outside of the Nginx reverse proxy.
+.\docs\audit_and_release/enterprise_audit.md: - **Weaknesses**: Lacks Multi-Factor Authentication (MFA) for the 'Administrator' role.
+.\docs\audit_and_release/enterprise_audit.md: - **Weaknesses**: A single monolithic MySQL instance may become a bottleneck at >10,000 TPS.
+.\docs\audit_and_release/enterprise_audit.md: - **Weaknesses**: The React Three Fiber 3D meshes (`ModelGalaxy`, `TrustRing`) heavily utilize the client's GPU.
+.\docs\audit_and_release/enterprise_audit.md: - **Recommendation**: Implement a dynamic resolution scaler for the 3D assets to degrade gracefully on low-end mobile devices.
+.\docs\audit_and_release/enterprise_audit.md: - **Weaknesses**: SMOTE can be computationally expensive during large-scale retraining.
+.\docs\audit_and_release/enterprise_audit.md: - **Weaknesses**: Lacks localized internationalization (i18n) for non-English financial markets.
+.\docs\audit_and_release/evaluations.md: **Weaknesses / Threats to Validity**:
+.\docs\audit_and_release/interview_guide.md: **A:** "I decoupled the heavy Machine Learning inference from the standard web traffic. While the Flask API processes the immediate REST request, any intensive background calculation—like retraining the model or computing SHAP dependency plots—is offloaded to a Celery worker queue backed by Redis. This ensures the main API thread remains unblocked and highly responsive."
+.\docs\audit_and_release/release_notes.md: FraudShield AI v1.0.0 marks the official transition from development to a academic portfolio platform. This release encompasses the full Hybrid ML Ensemble, the complete React 19 / WebGL frontend, and the rigorous GRC / MLOps telemetry dashboards.
+.\docs\audit_and_release/release_notes.md: - **SHAP Explainability Studio**: Visualizes the exact algorithmic reasoning behind fraud classifications using interactive Waterfall charts.
+.\docs\audit_and_release/release_notes.md: - [x] TypeScript strict-mode compilation passed with 0 errors.
+.\docs\audit_and_release/release_notes.md: - The 3D WebGL assets may cause slight frame drops on low-end mobile hardware without dedicated GPUs.
+.\docs\framework/00_PROJECT_CONSTITUTION.md: Dataset ↓ Validation ↓ Cleaning ↓ EDA ↓ Feature Engineering ↓ Feature Selection ↓ Train/Test Split ↓ SMOTE (Training Only) ↓ Cross Validation ↓ Hyperparameter Tuning ↓ Model Training ↓ Evaluation ↓ SHAP ↓ LIME ↓ Model Registry ↓ Deployment ↓ Inference
+.\docs\framework/00_PROJECT_CONSTITUTION.md: `src/` -> `app/`, `components/`, `features/`, `hooks/`, `layouts/`, `pages/`, `services/`, `lib/`, `types/`, `utils/`, `styles/`, `assets/`
+.\docs\framework/00_PROJECT_CONSTITUTION.md: ❌ God classes
+.\docs\framework/00_PROJECT_CONSTITUTION.md: Every button must have: Hover state, Focus state, Pressed state, Disabled state, Loading state, Success state (when applicable).
+.\docs\framework/00_PROJECT_CONSTITUTION.md: **Required assets:** Primary logo, Compact logo, Monochrome logo, Favicon, Social preview image, GitHub banner, Presentation assets, Brand guide.
+.\docs\framework/00_PROJECT_CONSTITUTION.md: ✓ passes design review
+.\docs\framework/00_PROJECT_CONSTITUTION.md: `src/` -> `app/`, `assets/`, `components/`, `features/`, `hooks/`, `layouts/`, `lib/`, `pages/`, `providers/`, `routes/`, `services/`, `stores/`, `styles/`, `types/`, `utils/`
+.\docs\framework/00_PROJECT_CONSTITUTION.md: The AI does not make final decisions on edge cases; it provides risk probabilities and SHAP/LIME explanations to empower the human Fraud Analyst.
+.\docs\framework/01_PROJECT_BRAIN.md: - **Explanation (SHAP/LIME):** The artifact generated alongside an inference, explaining *why* the model assigned a specific score.
+.\docs\framework/02_MASTER_CONTROLLER.md: - [ ] 43_LIME.md
+.\docs\presentation/interview_cheat_sheet.md: **Answer:** "Financial transaction data is highly tabular and suffers from extreme class imbalance (99.8% normal vs 0.2% fraud). Deep learning models are notoriously data-hungry and prone to overfitting on minority classes in tabular datasets. XGBoost (Gradient Boosted Trees) is the industry standard for tabular data because of its high efficiency, resistance to extreme variance, and its seamless compatibility with KernelExplainer for rapid explainability."
+.\docs\presentation/portfolio_assets.md: # Portfolio Assets & Resume Descriptions
+.\docs\technical/admin_manual.md: - **Administrators**: Possess super-user capabilities. Only administrators can access the `MLOps Center`, `Security Center`, and `Audit Logs`. Only administrators can trigger a model retraining pipeline.
+.\frontend\src\components\3d/Hero3DScene.tsx: {/* Branding - Embossed Effect */}
+.\frontend\src\components\3d/LIMEScene.tsx: function LIMECore() {
+.\frontend\src\components\3d/LIMEScene.tsx: export function LIMEScene() {
+.\frontend\src\components\3d/LIMEScene.tsx: <LIMECore />
+.\frontend\src\components\charts/GlobalFraudHeatmap.tsx: pressed: { outline: 'none' },
+.\frontend\src\components\landing/ExplainabilityStory.tsx: import { LIMEScene } from '@/components/3d/LIMEScene';
+.\frontend\src\components\landing/ExplainabilityStory.tsx: <LIMEScene />
+.\frontend\src\components\landing/ExplainableAI.tsx: <span className="font-semibold text-primary">AI Conclusion:</span> The extreme distance between the billing address and the IP location (+0.45), combined with an unusually high transaction amount (+0.22), strongly indicates a compromised card, resulting in a <strong>98% Fraud Risk Score</strong>.
+.\frontend\src\components\landing/FAQ.tsx: answer:"The project implements enterprise-oriented security controls including JWT-based authentication, RBAC, secure password hashing, and security-focused application practices. It is an academic/portfolio project and is not independently SOC 2 certified."
+.\frontend\src\components\landing/FeaturesBentoGrid.tsx: import batchImg from '@/assets/illustrations/bento_batch.png';
+.\frontend\src\components\landing/FeaturesBentoGrid.tsx: import adminImg from '@/assets/illustrations/bento_admin.png';
+.\frontend\src\components\landing/PlatformPreview.tsx: import analystImg from '@/assets/illustrations/mockup_analyst.png';
+.\frontend\src\components\landing/PlatformPreview.tsx: import customerImg from '@/assets/illustrations/mockup_customer.png';
+.\frontend\src\components\landing/PlatformPreview.tsx: import adminImg from '@/assets/illustrations/mockup_admin.png';
+.\frontend\src\components\landing/ProblemSection.tsx: desc:"Global card fraud losses are projected to reach $38.5B by 2027, driven by sophisticated AI-generated synthetic identities."
+.\frontend\src\components\motion/NeuralLoader.tsx: <p className="text-xs text-slate-400">Assembling FraudShield AI Components</p>
+.\frontend\src\components\motion/Skeleton.tsx: const baseClasses = "bg-muted/40 relative overflow-hidden";
+.\frontend\src\components\motion/Skeleton.tsx: const shapeClasses = {
+.\frontend\src\components\motion/Skeleton.tsx: <div className={`${baseClasses} ${shapeClasses[shape]} ${className}`}>
+.\frontend\src\core\api\hooks/useOps.ts: // Custom Hook for Server-Sent Events (SSE)
+.\frontend\src\core\api\hooks/useOps.ts: console.error("SSE parse error", err);
+.\frontend\src\core\api\hooks/useOps.ts: console.warn("SSE Connection Error. Attempting to reconnect...", error);
+.\frontend\src\pages/AboutPage.tsx: Our team consists of veteran engineers and AI researchers from top tech companies who are obsessed with developer experience, security, and the future of work.
+.\frontend\src\pages/ExplainabilityStudio.tsx: import { generateExplanation, getReadableFeatureName, BusinessExplanation } from '@/utils/explainabilityGenerator';
+.\frontend\src\pages/ExplainabilityStudio.tsx: const riskScore = explanationData?.probability ?? predictionData?.data?.risk_assessment?.probability ?? 0;
+.\frontend\src\pages/ExplainabilityStudio.tsx: const baseModels = predictionData?.data?.risk_assessment?.base_models ?? null;
+.\frontend\src\pages/ExplainabilityStudio.tsx: const businessExplanation: BusinessExplanation | null = React.useMemo(() => {
+.\frontend\src\pages/ExplainabilityStudio.tsx: {explanationData?.risk_level ?? predictionData?.data?.risk_assessment?.risk_level ?? 'Risk Score'}
+.\frontend\src\pages/ExplainabilityStudio.tsx: Suggested: <span className="font-semibold">{predictionData?.data?.risk_assessment?.suggested_action ?? '—'}</span>
+.\frontend\src\pages/ExplainabilityStudio.tsx: ) : businessExplanation ? (
+.\frontend\src\pages/ExplainabilityStudio.tsx: <div className={`p-4 rounded-xl border ${businessExplanation.finalDecision === 'High Risk' ? 'bg-rose-50 border-rose-100' : businessExplanation.finalDecision === 'Elevated Risk' ? 'bg-amber-50 border-amber-100' : 'bg-emerald-50 border-emerald-100'}`}>
+.\frontend\src\pages/ExplainabilityStudio.tsx: <div className="font-semibold text-slate-900">{businessExplanation.finalDecision} ({businessExplanation.confidenceScore})</div>
+.\frontend\src\pages/ExplainabilityStudio.tsx: <div className="font-semibold text-slate-900">{businessExplanation.recommendedAction}</div>
+.\frontend\src\pages/ExplainabilityStudio.tsx: <span className="font-bold">Analyst Recommendation:</span> {businessExplanation.analystRecommendation}
+.\frontend\src\pages/ExplainabilityStudio.tsx: {businessExplanation.predictionSummary.map((bullet, idx) => (
+.\frontend\src\pages/ExplainabilityStudio.tsx: {businessExplanation.topPositiveFactors.map((f, i) => <li key={i}>• {f}</li>)}
+.\frontend\src\pages/ExplainabilityStudio.tsx: {businessExplanation.topNegativeFactors.length > 0 ? businessExplanation.topNegativeFactors.map((f, i) => <li key={i}>• {f}</li>) : <li>None</li>}
+.\frontend\src\pages/ExplainabilityStudio.tsx: {businessExplanation && (
+.\frontend\src\pages/FraudAnalystWorkspace.tsx: description="Full ledger of ML-processed transactions. Flag, approve, or review flagged items."
+.\frontend\src\pages/LandingPage.tsx: {/* ASSEMBLED ENTERPRISE SECTIONS */}
+.\frontend\src\tests\hooks/usePredict.test.tsx: risk_assessment: {
+.\frontend\src\tests\hooks/usePredict.test.tsx: risk_assessment: {
+.\frontend\src\tests\hooks/usePredict.test.tsx: const ra = result.current.data?.data?.risk_assessment;
+.\frontend\src\tests\hooks/usePredict.test.tsx: const ra = result.current.data?.data?.risk_assessment;
+.\frontend\src\utils/cn.ts: * Utility helper to safely join tailwind classes together, merging modifiers.
+.\frontend\src\utils/explainabilityGenerator.ts: export interface BusinessExplanation {
+.\frontend\src\utils/explainabilityGenerator.ts: ): BusinessExplanation {

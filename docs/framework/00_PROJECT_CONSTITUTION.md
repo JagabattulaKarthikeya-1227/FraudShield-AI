@@ -259,7 +259,7 @@ No business logic shall exist inside UI components.
 The ML system shall exist as an independent service.
 
 **Pipeline:**
-Dataset ↓ Validation ↓ Cleaning ↓ EDA ↓ Feature Engineering ↓ Feature Selection ↓ Train/Test Split ↓ SMOTE (Training Only) ↓ Cross Validation ↓ Hyperparameter Tuning ↓ Model Training ↓ Evaluation ↓ SHAP ↓ LIME ↓ Model Registry ↓ Deployment ↓ Inference
+Dataset ↓ Validation ↓ Cleaning ↓ EDA ↓ Feature Engineering ↓ Feature Selection ↓ Train/Test Split ↓ SMOTE (Training Only) ↓ Cross Validation ↓ Hyperparameter Tuning ↓ Model Training ↓ Evaluation ↓ SHAP ↓ Model Registry ↓ Deployment ↓ Inference
 
 Training code shall never be mixed with inference code.
 
@@ -896,7 +896,7 @@ Avoid circular dependencies by maintaining strict layered architecture (Controll
 - **Zero Padding is Strictly Forbidden:** Inference pipelines must never arbitrarily pad missing features with zeros to satisfy tensor dimensions. 
 - **Model Truth:** The deployment must utilize the exact scaler and models trained during the research phase.
 **6.2 Human-in-the-loop (HITL)**
-The AI does not make final decisions on edge cases; it provides risk probabilities and SHAP/LIME explanations to empower the human Fraud Analyst.
+The AI does not make final decisions on edge cases; it provides risk probabilities and SHAP explanations to empower the human Fraud Analyst.
 
 ## PART 7: Security, Performance & Quality Constitution
 **7.1 Security Baseline**

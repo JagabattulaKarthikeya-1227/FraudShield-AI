@@ -7,7 +7,7 @@ FraudShield AI operates on a hybrid architecture bridging traditional real-time 
 ### 1. The Core Entities
 - **Transaction:** The atomic unit of work. Includes metadata (Time, Amount) and encrypted PII.
 - **Inference Engine:** The ML pipeline that receives a transaction and returns a `risk_score` (0.0 to 1.0).
-- **Explanation (SHAP/LIME):** The artifact generated alongside an inference, explaining *why* the model assigned a specific score.
+- **Explanation (SHAP):** The artifact generated alongside an inference, explaining *why* the model assigned a specific score.
 - **Analyst:** The human-in-the-loop (HITL) who reviews flagged transactions.
 
 ### 2. The Data Flow

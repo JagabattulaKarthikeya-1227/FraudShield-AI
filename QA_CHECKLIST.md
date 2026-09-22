@@ -27,8 +27,7 @@ This checklist tracks the final audit of Version 1.0 (Phase 15).
 
 ## 4. Documentation & Portfolio Audit
 - [x] **Root Files**: `README.md` and `CONTRIBUTING.md` are pristine and formatted beautifully with badges and Markdown.
-- [x] **Technical Documentation**: `docs/ARCHITECTURE.md`, `docs/ML_PIPELINE.md`, and `docs/SECURITY.md` contain accurate Mermaid diagrams.
-- [x] **Recruiter / Interview Assets**: The Recruiter Showcase Drawer is integrated into the Topbar, and the `docs/career` files provide excellent STAR-method interview prep.
+- - [x] **Recruiter / Interview Assets**: The Recruiter Showcase Drawer is integrated into the Topbar, and the `docs/career` files provide excellent STAR-method interview prep.
 
 ## Overall Status: `PASSED`
 FraudShield AI v1.0 is currently in active development for deployment, open-source publication, and portfolio demonstration.

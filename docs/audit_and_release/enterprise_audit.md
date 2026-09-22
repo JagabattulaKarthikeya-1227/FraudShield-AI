@@ -4,7 +4,7 @@ This report evaluates the structural integrity, security, and scalability of the
 
 ## 1. Architecture Audit
 - **Strengths**: The system adheres to Clean Architecture principles. The hard decoupling between the React 19 Frontend and the Flask Flask Backend allows for independent horizontal scaling. Celery/Redis effectively offloads blocking tasks.
-- **Weaknesses**: Currently lacks an Flask Backend (like Kong or AWS Flask Backend) for advanced traffic routing outside of the Nginx reverse proxy.
+- **Weaknesses**: Currently lacks a dedicated API Gateway (like Kong or AWS API Gateway) for advanced traffic routing outside of the Nginx reverse proxy.
 - **Verdict**: Highly robust for mid-to-large tier transactional throughput.
 
 ## 2. Security Audit
@@ -25,7 +25,7 @@ This report evaluates the structural integrity, security, and scalability of the
 ## 5. AI / ML Pipeline Audit
 - **Strengths**: The Hybrid Stacked Ensemble (ExtraTrees + DNN -> XGBoost) is highly resistant to variance. SMOTE completely mitigates the 99.8% class imbalance. The SHAP integration provides feature attributions. The Shadow Deployment architecture is designed to monitor Concept Drift.
 - **Weaknesses**: SMOTE can be computationally expensive during large-scale retraining.
-- **Verdict**: A state-of-the-art implementation that successfully balances predictive power with regulatory transparency.
+- **Verdict**: A solid implementation that successfully balances predictive power with model transparency.
 
 ## 6. UX Audit
 - **Strengths**: Adheres to a premium, editorial design system utilizing deep contrasts and glassmorphism. Navigation is intuitive across the three distinct user personas (Customer, Analyst, Admin).

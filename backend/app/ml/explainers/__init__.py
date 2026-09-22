@@ -3,7 +3,7 @@ from typing import Dict, Any
 
 
 class BaseExplainer(abc.ABC):
-    """Abstract base class representing XAI models (SHAP or LIME)."""
+    """Abstract base class representing XAI models."""
 
     @abc.abstractmethod
     def explain(self, model, instance, feature_names) -> Dict[str, Any]:

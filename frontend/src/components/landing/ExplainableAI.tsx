@@ -89,8 +89,8 @@ export function ExplainableAI() {
 
  <div className="space-y-5">
  {[
- { label:"IP Location Distance", value: 85, color:"bg-zinc-900", impact:"+0.45" },
- { label:"Transaction Amount", value: 65, color:"bg-zinc-700", impact:"+0.22" },
+ { label:"IP Location Distance", value: 85, color:"bg-zinc-900", impact:"High positive contribution" },
+ { label:"Transaction Amount", value: 65, color:"bg-zinc-700", impact:"Moderate positive contribution" },
  { label:"Time of Day", value: 40, color:"bg-zinc-500", impact:"+0.12" },
  { label:"Device Fingerprint", value: 20, color:"bg-zinc-300", impact:"-0.08" },
  { label:"Account Age", value: 15, color:"bg-zinc-200", impact:"-0.05" },
@@ -122,7 +122,7 @@ export function ExplainableAI() {
  <div className="mt-8 pt-6 border-t border-zinc-200 flex gap-3">
  <Fingerprint className="w-4 h-4 text-zinc-500 shrink-0 mt-0.5" />
  <p className="text-xs text-zinc-600 leading-relaxed">
- <span className="font-semibold text-primary">AI Conclusion:</span> The extreme distance between the billing address and the IP location (+0.45), combined with an unusually high transaction amount (+0.22), strongly indicates a compromised card, resulting in a <strong>98% Fraud Risk Score</strong>.
+ <span className="font-semibold text-primary">Illustrative SHAP visualization showing how feature attributions can be presented to analysts.</span>
  </p>
  </div>
  </motion.div>
