@@ -28,7 +28,7 @@ export function ExplainabilityStory() {
 
  <div className="flex gap-4 mb-12">
  <div className="flex-1 p-6 rounded-2xl bg-success/10 border border-success/20">
- <h4 className="text-success font-semibold text-xl mb-1">99.9%</h4>
+ <h4 className="text-success font-semibold text-xl mb-1">Fully</h4>
  <p className="text-xs text-success/80 uppercase tracking-widest font-medium">Explainable Decisions</p>
  </div>
  <div className="flex-1 p-6 rounded-2xl bg-accent/10 border border-accent/20">

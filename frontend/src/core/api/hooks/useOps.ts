@@ -32,6 +32,36 @@ export const useMLOpsRegistry = () => {
   });
 };
 
+export const useModelRegistry = () => {
+  return useQuery({
+    queryKey: ['ml_registry'],
+    queryFn: async () => {
+      const { data } = await apiClient.get('/ml/registry');
+      return data.data;
+    },
+  });
+};
+
+export const useExperiments = () => {
+  return useQuery({
+    queryKey: ['ml_experiments'],
+    queryFn: async () => {
+      const { data } = await apiClient.get('/ml/experiments');
+      return data.data;
+    },
+  });
+};
+
+export const useDrift = () => {
+  return useQuery({
+    queryKey: ['ml_drift'],
+    queryFn: async () => {
+      const { data } = await apiClient.get('/ml/drift');
+      return data.data;
+    },
+  });
+};
+
 // Custom Hook for Server-Sent Events (SSE)
 export const useEventSource = (url: string) => {
   const [lastEvent, setLastEvent] = useState<unknown>(null);

@@ -4,38 +4,22 @@ import echarts from '@/lib/echarts';
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Database, GitCompare, Activity } from "lucide-react";
 import { Button } from '@/components/ui/button';
+import { useModelRegistry } from "@/core/api/hooks/useOps";
 
 export const ModelRegistry = () => {
+  const { data, isLoading } = useModelRegistry();
+  const models = data?.registry || [];
+  const activeModel = models.find((m: any) => m.status === 'Production' || m.status === 'Champion') || models[0];
 
-  const rocOptions = {
-    tooltip: { trigger: 'axis' },
-    legend: { data: ['Ensemble v4', 'Random Guess'], textStyle: { color: '#64748b' } },
-    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-    xAxis: { type: 'value', name: 'False Positive Rate', nameLocation: 'middle', nameGap: 25, axisLabel: { color: '#64748b' }, splitLine: { show: false } },
-    yAxis: { type: 'value', name: 'True Positive Rate', nameLocation: 'middle', nameGap: 35, axisLabel: { color: '#64748b' }, splitLine: { lineStyle: { type: 'dashed', color: '#f1f5f9' } } },
-    series: [
-      {
-        name: 'Ensemble v4',
-        type: 'line',
-        smooth: true,
-        lineStyle: { width: 3, color: '#0f766e' },
-        showSymbol: false,
-        data: [[0, 0], [0.05, 0.8], [0.1, 0.9], [0.2, 0.95], [0.5, 0.98], [1, 1]]
-      },
-      {
-        name: 'Random Guess',
-        type: 'line',
-        lineStyle: { type: 'dashed', color: '#cbd5e1' },
-        showSymbol: false,
-        data: [[0, 0], [1, 1]]
-      }
-    ]
-  };
+  // Derive metrics or fallback to unavailable
+  const f1Val = activeModel?.f1_score != null ? (activeModel.f1_score * 100).toFixed(2) + "%" : "Unavailable";
+  const prAucVal = activeModel?.pr_auc != null ? activeModel.pr_auc.toFixed(4) : "Unavailable";
+  const accVal = f1Val; // Approximate accuracy with F1 since real accuracy isn't calculated
+  const precisionVal = "Unavailable"; // Detailed breakdown not in this endpoint
+  const recallVal = "Unavailable";
 
-  const matrixData = [
-    [9999, 1],
-    [0, 1000]
-  ];
+  const rocOptions = null;
+  const matrixData = null;
 
   return (
     <div className="space-y-6 pb-12 w-full animate-in fade-in duration-500">
@@ -53,10 +37,10 @@ export const ModelRegistry = () => {
       {/* Top Metrics Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: "Accuracy", val: "99.99%", color: "emerald" },
-          { label: "Precision", val: "99.98%", color: "emerald" },
-          { label: "Recall", val: "100.00%", color: "emerald" },
-          { label: "F1 Score", val: "99.99%", color: "emerald" },
+          { label: "Accuracy (F1)", val: accVal, color: "emerald" },
+          { label: "Precision", val: precisionVal, color: "slate" },
+          { label: "Recall", val: recallVal, color: "slate" },
+          { label: "F1 Score", val: f1Val, color: "emerald" },
         ].map((m, i) => (
           <div key={i} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
             <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">{m.label}</div>
@@ -68,47 +52,15 @@ export const ModelRegistry = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* ROC Curve */}
-        <div className="bg-white p-6 rounded-[1.25rem] border border-slate-200 shadow-sm">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-base font-semibold text-slate-900">ROC Curve</h3>
-            <span className="text-xs font-bold bg-emerald-50 text-emerald-600 px-2 py-1 rounded-md">AUC: 0.9999</span>
-          </div>
-          <div className="h-[300px]">
-            <ReactEChartsCore echarts={echarts} option={rocOptions} style={{ height: '100%', width: '100%' }} />
-          </div>
+        <div className="bg-white p-6 rounded-[1.25rem] border border-slate-200 shadow-sm flex flex-col justify-center items-center h-[380px]">
+          <h3 className="text-base font-semibold text-slate-900 mb-2 self-start w-full">ROC Curve</h3>
+          <div className="text-sm text-slate-500 font-medium my-auto">Data Unavailable</div>
         </div>
 
         {/* Confusion Matrix */}
-        <div className="bg-white p-6 rounded-[1.25rem] border border-slate-200 shadow-sm">
-          <h3 className="text-base font-semibold text-slate-900 mb-6">Confusion Matrix</h3>
-          
-          <div className="flex items-center justify-center h-[300px]">
-            <div className="grid grid-cols-3 gap-2 text-center w-full max-w-sm">
-              <div className="col-span-1"></div>
-              <div className="col-span-1 text-xs font-semibold text-slate-500 mb-2">Predicted Safe</div>
-              <div className="col-span-1 text-xs font-semibold text-slate-500 mb-2">Predicted Fraud</div>
-              
-              <div className="col-span-1 flex items-center justify-end pr-4 text-xs font-semibold text-slate-500">Actual Safe</div>
-              <div className="col-span-1 bg-emerald-50 border border-emerald-100 rounded-lg p-4 flex flex-col items-center justify-center">
-                <span className="text-2xl font-bold text-emerald-700">{matrixData[0][0]}</span>
-                <span className="text-[10px] text-emerald-600 uppercase mt-1">True Negative</span>
-              </div>
-              <div className="col-span-1 bg-rose-50 border border-rose-100 rounded-lg p-4 flex flex-col items-center justify-center">
-                <span className="text-2xl font-bold text-rose-700">{matrixData[0][1]}</span>
-                <span className="text-[10px] text-rose-600 uppercase mt-1">False Positive</span>
-              </div>
-
-              <div className="col-span-1 flex items-center justify-end pr-4 text-xs font-semibold text-slate-500">Actual Fraud</div>
-              <div className="col-span-1 bg-amber-50 border border-amber-100 rounded-lg p-4 flex flex-col items-center justify-center">
-                <span className="text-2xl font-bold text-amber-700">{matrixData[1][0]}</span>
-                <span className="text-[10px] text-amber-600 uppercase mt-1">False Negative</span>
-              </div>
-              <div className="col-span-1 bg-emerald-50 border border-emerald-100 rounded-lg p-4 flex flex-col items-center justify-center">
-                <span className="text-2xl font-bold text-emerald-700">{matrixData[1][1]}</span>
-                <span className="text-[10px] text-emerald-600 uppercase mt-1">True Positive</span>
-              </div>
-            </div>
-          </div>
+        <div className="bg-white p-6 rounded-[1.25rem] border border-slate-200 shadow-sm flex flex-col justify-center items-center h-[380px]">
+          <h3 className="text-base font-semibold text-slate-900 mb-2 self-start w-full">Confusion Matrix</h3>
+          <div className="text-sm text-slate-500 font-medium my-auto">Data Unavailable</div>
         </div>
 
       </div>
@@ -130,20 +82,31 @@ export const ModelRegistry = () => {
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-slate-100">
-              <tr className="hover:bg-slate-50 transition-colors">
-                <td className="p-4 font-mono text-slate-900">v4.2.1-prod</td>
-                <td className="p-4 text-slate-600">Hybrid Ensemble (XGB+LGBM)</td>
-                <td className="p-4 text-slate-600">2 days ago</td>
-                <td className="p-4 text-slate-600">42ms</td>
-                <td className="p-4"><span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-md">Primary</span></td>
-              </tr>
-              <tr className="hover:bg-slate-50 transition-colors">
-                <td className="p-4 font-mono text-slate-900">v4.3.0-rc1</td>
-                <td className="p-4 text-slate-600">Neural Network (Transformer)</td>
-                <td className="p-4 text-slate-600">5 hours ago</td>
-                <td className="p-4 text-slate-600">115ms</td>
-                <td className="p-4"><span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-md">Challenger</span></td>
-              </tr>
+              {isLoading ? (
+                <tr><td colSpan={5} className="p-4 text-center text-slate-500">Loading registry...</td></tr>
+              ) : models.length === 0 ? (
+                <tr><td colSpan={5} className="p-4 text-center text-slate-500">No models in registry.</td></tr>
+              ) : (
+                models.map((m: any, idx: number) => (
+                  <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                    <td className="p-4 font-mono text-slate-900">{m.id.replace('mdl_', '')}</td>
+                    <td className="p-4 text-slate-600">{m.name}</td>
+                    <td className="p-4 text-slate-600">
+                      {m.training_date === "Historical" ? "Historical" : new Date(m.training_date).toLocaleDateString()}
+                    </td>
+                    <td className="p-4 text-slate-600">{m.latency_ms != null ? `${m.latency_ms}ms` : 'Not Measured'}</td>
+                    <td className="p-4">
+                      <span className={`px-2 py-1 text-xs font-bold rounded-md ${
+                        (m.status === 'Production' || m.status === 'Champion')
+                          ? 'bg-emerald-100 text-emerald-700'
+                          : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        {m.status} {m.is_demo ? "(Demo)" : ""}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

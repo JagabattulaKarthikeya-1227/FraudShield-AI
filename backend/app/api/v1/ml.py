@@ -16,52 +16,55 @@ def get_model_registry():
     get_current_user()
 
     models = MLModel.query.all()
+    
     if not models:
-        # Seed with real metrics computed from the test set evaluation
-        db.session.add_all(
-            [
-                MLModel(
-                    version="v1.0",
-                    model_type="ET + MLP + XGBoost Meta-Ensemble",
-                    f1_score=0.9993,
-                    pr_auc=0.9999,
-                    inference_time=45.0,
-                    status="Champion",
-                ),
-                MLModel(
-                    version="v0.9-rc1",
-                    model_type="Extra Trees Only",
-                    f1_score=0.9997,
-                    pr_auc=1.0,
-                    inference_time=28.0,
-                    status="Retired",
-                ),
-                MLModel(
-                    version="v0.8",
-                    model_type="Keras MLP Only",
-                    f1_score=0.9988,
-                    pr_auc=1.0,
-                    inference_time=15.0,
-                    status="Retired",
-                ),
-            ]
-        )
-        db.session.commit()
-        models = MLModel.query.all()
-
-    registry = [
-        {
-            "id": f"mdl_{m.version}",
-            "name": m.model_type,
-            "status": m.status,
-            "f1_score": m.f1_score,
-            "pr_auc": m.pr_auc,
-            "latency_ms": int(m.inference_time),
-            "training_date": m.created_at.isoformat() + "Z",
-            "commit": "auto-gen",
-        }
-        for m in models
-    ]
+        # Do NOT seed database with fabricated metrics.
+        # Check for real evaluation artifact
+        import json
+        import os
+        eval_path = os.path.join(os.path.dirname(__file__), "../../ml/models/saved/eval_metrics.json")
+        registry = []
+        if os.path.exists(eval_path):
+            try:
+                with open(eval_path, "r") as f:
+                    metrics = json.load(f)
+                
+                # Calculate F1
+                p = metrics.get("precision", 0)
+                r = metrics.get("recall", 0)
+                f1 = 2 * (p * r) / (p + r) if (p + r) > 0 else 0
+                
+                registry.append({
+                    "id": "mdl_v1.0",
+                    "name": "ET + MLP + XGBoost Meta-Ensemble",
+                    "status": "Production",
+                    "f1_score": f1,
+                    "pr_auc": metrics.get("pr_auc", 0),
+                    "latency_ms": None,  # Not measured in production
+                    "training_date": "Historical",
+                    "commit": None,
+                    "provenance": "validation",
+                    "is_demo": False
+                })
+            except Exception:
+                pass
+    else:
+        registry = [
+            {
+                "id": f"mdl_{m.version}",
+                "name": m.model_type,
+                "status": m.status,
+                "f1_score": m.f1_score,
+                "pr_auc": m.pr_auc,
+                "latency_ms": int(m.inference_time) if m.inference_time is not None else None,
+                "training_date": m.created_at.isoformat() + "Z",
+                "commit": None,  # Removing auto-gen
+                "provenance": "database",
+                "is_demo": False
+            }
+            for m in models
+        ]
+        
     return success_response(data={"registry": registry})
 
 
@@ -73,32 +76,8 @@ def get_experiments():
     get_current_user()
 
     exps = MLExperiment.query.all()
-    if not exps:
-        db.session.add_all(
-            [
-                MLExperiment(
-                    experiment_name="XGBoost",
-                    learning_rate=0.01,
-                    max_depth=6,
-                    f1_score=0.985,
-                ),
-                MLExperiment(
-                    experiment_name="XGBoost",
-                    learning_rate=0.05,
-                    max_depth=8,
-                    f1_score=0.990,
-                ),
-                MLExperiment(
-                    experiment_name="XGBoost",
-                    learning_rate=0.10,
-                    max_depth=10,
-                    f1_score=0.988,
-                ),
-            ]
-        )
-        db.session.commit()
-        exps = MLExperiment.query.all()
-
+    # Do NOT seed database with fabricated experiments.
+    
     experiments = [
         {
             "run_id": f"exp_{e.id}",
@@ -120,26 +99,24 @@ def get_drift():
     get_current_user()
 
     drifts = DriftMetric.query.all()
+    # Do NOT seed database with fabricated drift metrics.
+    
     if not drifts:
-        db.session.add_all(
-            [
-                DriftMetric(feature_name="Amount", psi_score=0.02, kl_divergence=0.08),
-                DriftMetric(
-                    feature_name="V2 (Location)", psi_score=0.15, kl_divergence=0.08
-                ),
-                DriftMetric(
-                    feature_name="V4 (Device)", psi_score=0.05, kl_divergence=0.08
-                ),
-            ]
-        )
-        db.session.commit()
-        drifts = DriftMetric.query.all()
+        drift_data = {
+            "status": "unavailable",
+            "features": [],
+            "concept_drift": {
+                "kl_divergence": None,
+                "status": "unavailable",
+            },
+        }
+        return success_response(data=drift_data)
 
     features = [
         {
             "name": d.feature_name,
             "psi_score": d.psi_score,
-            "status": "Warning" if d.psi_score > 0.1 else "Stable",
+            "status": "Warning" if d.psi_score is not None and d.psi_score > 0.1 else "Stable",
         }
         for d in drifts
     ]
@@ -150,11 +127,11 @@ def get_drift():
         ),
         "features": features,
         "concept_drift": {
-            "kl_divergence": drifts[0].kl_divergence if drifts else 0.08,
+            "kl_divergence": drifts[0].kl_divergence if drifts else None,
             "status": (
                 "Stable"
-                if (drifts[0].kl_divergence if drifts else 0.08) < 0.1
-                else "Warning"
+                if (drifts[0].kl_divergence is not None and drifts[0].kl_divergence < 0.1)
+                else "Warning" if drifts[0].kl_divergence is not None else "unavailable"
             ),
         },
     }

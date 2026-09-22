@@ -134,8 +134,7 @@ export function EnterpriseHero() {
             <motion.div variants={containerVariants} className="grid grid-cols-3 gap-6 pt-8 border-t border-border/50">
               <motion.div variants={itemVariants} className="flex flex-col gap-1.5 group cursor-default">
                 <div className="font-bold text-foreground text-xl flex items-center gap-2 group-hover:text-primary transition-colors">
-                  <ShieldCheck className="w-5 h-5 text-primary" /> 
-                  <AnimatedCounter value={99.99} formatter={(v) => v.toFixed(2) + "%"} delay={0.5} />
+                  <ShieldCheck className="w-5 h-5 text-primary" /> Advanced
                 </div>
                 <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Threat Detection</div>
               </motion.div>

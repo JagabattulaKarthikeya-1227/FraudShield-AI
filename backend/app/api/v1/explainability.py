@@ -115,43 +115,69 @@ def get_global_insights():
 @jwt_required()
 def get_model_comparison():
     """
-    Returns real ensemble architecture metrics computed on the held-out
-    test set (20 000 samples, 50/50 SMOTE-balanced split from training data).
-    Note: high scores reflect the balanced dataset; real-world fraud rate ~0.17%.
+    Returns real ensemble architecture metrics computed on the validation set.
     """
+    import json
+    import os
+    eval_path = os.path.join(os.path.dirname(__file__), "../../ml/models/saved/eval_metrics.json")
+    
+    xgb_f1 = None
+    xgb_pr_auc = None
+    xgb_precision = None
+    xgb_recall = None
+    xgb_roc_auc = None
+    
+    if os.path.exists(eval_path):
+        try:
+            with open(eval_path, "r") as f:
+                metrics = json.load(f)
+            xgb_precision = metrics.get("precision")
+            xgb_recall = metrics.get("recall")
+            xgb_pr_auc = metrics.get("pr_auc")
+            xgb_roc_auc = metrics.get("roc_auc")
+            if xgb_precision is not None and xgb_recall is not None:
+                xgb_f1 = 2 * (xgb_precision * xgb_recall) / (xgb_precision + xgb_recall) if (xgb_precision + xgb_recall) > 0 else 0
+        except Exception:
+            pass
+
     return success_response(
         data={
             "models": [
                 {
                     "name": "Logistic Regression (Baseline)",
-                    "precision": 0.72,
-                    "recall": 0.65,
-                    "f1": 0.68,
-                    "roc_auc": 0.85,
+                    "precision": None,
+                    "recall": None,
+                    "f1": None,
+                    "roc_auc": None,
+                    "status": "historical",
                 },
                 {
                     "name": "Extra Trees (Base 1)",
-                    "precision": 0.9993,
-                    "recall": 1.0,
-                    "f1": 0.9997,
-                    "roc_auc": 1.0,
+                    "precision": None,
+                    "recall": None,
+                    "f1": None,
+                    "roc_auc": None,
+                    "status": "historical",
                 },
                 {
                     "name": "Keras MLP (Base 2)",
-                    "precision": 0.9976,
-                    "recall": 1.0,
-                    "f1": 0.9988,
-                    "roc_auc": 1.0,
+                    "precision": None,
+                    "recall": None,
+                    "f1": None,
+                    "roc_auc": None,
+                    "status": "historical",
                 },
                 {
                     "name": "XGBoost Meta-Learner (Active)",
-                    "precision": 0.9989,
-                    "recall": 0.9997,
-                    "f1": 0.9993,
-                    "roc_auc": 1.0,
+                    "precision": xgb_precision,
+                    "recall": xgb_recall,
+                    "f1": xgb_f1,
+                    "roc_auc": xgb_roc_auc,
+                    "pr_auc": xgb_pr_auc,
+                    "status": "verified",
+                    "provenance": "validation",
                 },
             ],
-            "eval_note": "Metrics on SMOTE-balanced held-out test set (50/50). "
-            "Real-world PR-AUC for XGBoost meta-learner: 0.9999.",
+            "eval_note": "Metrics for active model from validation evaluation artifacts.",
         }
     )

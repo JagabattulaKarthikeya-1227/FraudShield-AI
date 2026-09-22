@@ -9,7 +9,7 @@ const features = [
  { title:"Hybrid Ensemble", text:"Combining neural networks with tree-based models ensures non-linear relationships and strict rules are both captured." },
  { title:"Explainability", text:"Compliance is guaranteed. Every prediction comes with a SHAP waterfall chart detailing exact feature influences." },
  { title:"Fast Inference", text:"Optimized for extreme throughput, scoring transactions in under 50ms using efficient caching." },
- { title:"High Recall", text:"Detects over 99.9% of fraudulent transactions while maintaining a negligible false positive rate." },
+ { title:"High Recall", text:"Optimized to detect fraudulent transactions while maintaining a manageable false positive rate for analysts." },
  { title:"SMOTE", text:"Synthetic Minority Over-sampling Technique handles class imbalance, preventing the model from ignoring rare fraud types." },
  { title:"Risk Scoring", text:"Not just binary classification. Detailed risk scoring (Low, Review, High) allows for dynamic business logic." }
 ];

@@ -13,7 +13,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { useDashboardStats } from '@/core/api/hooks/useDashboard';
 import { Transaction } from '@/core/api/hooks/useTransactions';
 import { useTransactions } from '@/core/api/hooks/useTransactions';
-import { useAuditLogs } from '@/core/api/hooks/useOps';
+import { useAuditLogs, useModelRegistry } from '@/core/api/hooks/useOps';
 import { useKPIs, useTrends } from '@/core/api/hooks/useTelemetry';
 import { motion, useSpring, useTransform } from 'framer-motion';
 
@@ -190,6 +190,11 @@ export const CustomerDashboard = () => {
   const { data: trendsData                                                                       } = useTrends();
   // useKPIs wired here to satisfy Phase 1 acceptance criterion (used in future telemetry widgets)
   const { data: _kpiData } = useKPIs();
+  
+  const { data: registryData } = useModelRegistry();
+  const models = registryData?.registry || [];
+  const activeModel = models.find((m: any) => m.status === 'Production' || m.status === 'Champion') || models[0];
+  const accuracyVal = activeModel?.f1_score != null ? (activeModel.f1_score * 100).toFixed(2) + "%" : "N/A";
 
   const txns = txData?.items  || [];
   const logs = logsData?.slice(0, 3) || [];
@@ -235,8 +240,8 @@ export const CustomerDashboard = () => {
         <KpiCard title="Total Transactions" value={totalTx}   trend="Live" trendUp={true}  sparklineColor="#0f766e" sparklineData={[10, 20, 15, 30, 25, 40]} loading={statsLoading} />
         <KpiCard title="Fraud Prevented"   value={fraudPrev}  trend="Live" trendUp={false} sparklineColor="#e11d48" sparklineData={[5, 10, 8, 15, 12, 20]}  loading={statsLoading} />
         <KpiCard title="Network Nodes"     value={activeNodes} trend="Live" trendUp={true}  sparklineColor="#f59e0b" sparklineData={[7, 8, 6, 9, 8, 8]}      loading={statsLoading} />
-        <KpiCard title="Detection Accuracy" value="99.99%"     trend="0.05%" trendUp={true} sparklineColor="#0f766e" sparklineData={[99.95, 99.97, 99.98, 99.99, 99.99, 99.99]} loading={false} />
-        <KpiCard title="Avg Processing Time" value="42ms"     trend="3ms"  trendUp={true}  sparklineColor="#0f766e" sparklineData={[45, 44, 43, 42, 41, 42]}  loading={false} />
+        <KpiCard title="Detection Accuracy (F1)" value={accuracyVal}     trend="N/A" trendUp={true} sparklineColor="#0f766e" sparklineData={[40, 41, 41, 41, 41, 41]} loading={false} />
+        <KpiCard title="Avg Processing Time" value="Not Measured"     trend="N/A"  trendUp={true}  sparklineColor="#0f766e" sparklineData={[0, 0, 0, 0, 0, 0]}  loading={false} />
         <KpiCard title="System Status"     value={sysStatus}  trend="Active" trendUp={true} sparklineColor="#0F766E" sparklineData={[3, 3, 3, 3, 3, 3]}      loading={statsLoading} />
       </div>
 
