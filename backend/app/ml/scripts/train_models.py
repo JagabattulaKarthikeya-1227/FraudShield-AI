@@ -108,14 +108,27 @@ def main():
         "precision": float(precision_score(y_val, y_val_pred)),
         "recall": float(recall_score(y_val, y_val_pred))
     }
+    
+    # Calculate F1
+    p = metrics["precision"]
+    r = metrics["recall"]
+    metrics["f1"] = 2 * (p * r) / (p + r) if (p + r) > 0 else 0.0
 
     print("\nValidation Metrics:")
     for k, v in metrics.items():
         print(f"  {k}: {v:.4f}")
 
+    eval_artifact = {
+        "evaluation_type": "validation",
+        "model": "ET + MLP + XGBoost Meta-Ensemble",
+        "dataset": "creditcard.csv",
+        "split": "validation (20% stratify)",
+        "metrics": metrics
+    }
+
     metrics_path = os.path.join(models_dir, "eval_metrics.json")
     with open(metrics_path, "w") as f:
-        json.dump(metrics, f, indent=2)
+        json.dump(eval_artifact, f, indent=2)
     print(f"\nSaved evaluation metrics to {metrics_path}")
 
     print("\nAll models trained and saved successfully!")

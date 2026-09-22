@@ -53,8 +53,8 @@ const sparklineOptions = (color: string, data: number[]) => ({
 /** Build a line chart config from real trend data (falling back gracefully). */
 const buildTrendOptions = (trends: { hour: string; volume: number; errors: number }[] | null) => {
   const hours   = trends ? trends.map(t => t.hour)   : ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'];
-  const volumes = trends ? trends.map(t => t.volume) : [1200, 800, 3200, 4500, 3800, 2100];
-  const errors  = trends ? trends.map(t => t.errors) : [12, 8, 45, 90, 60, 25];
+  const volumes = trends ? trends.map(t => t.volume) : [0, 0, 0, 0, 0, 0];
+  const errors  = trends ? trends.map(t => t.errors) : [0, 0, 0, 0, 0, 0];
 
   return {
     tooltip: { trigger: 'axis' },
@@ -209,7 +209,7 @@ export const CustomerDashboard = () => {
     // Fallback so the chart always renders even when DB is empty
     return (low + medium + high + critical) > 0
       ? { low, medium, high, critical }
-      : { low: 8500, medium: 1200, high: 250, critical: 50 };
+      : { low: 0, medium: 0, high: 0, critical: 0 };
   }, [txData]);
 
   // ── Derive trend data for the line chart ─────────────────────────────────

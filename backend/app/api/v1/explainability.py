@@ -127,16 +127,32 @@ def get_model_comparison():
     xgb_recall = None
     xgb_roc_auc = None
     
+    xgb_provenance = "unavailable"
+    xgb_status = "unavailable"
+    eval_note = "No verified evaluation artifact is available."
+    
     if os.path.exists(eval_path):
         try:
             with open(eval_path, "r") as f:
-                metrics = json.load(f)
+                eval_data = json.load(f)
+            
+            metrics = eval_data.get("metrics", eval_data)
+            if isinstance(eval_data, dict) and "evaluation_type" in eval_data:
+                xgb_provenance = eval_data["evaluation_type"]
+            else:
+                xgb_provenance = "unavailable"
+                
             xgb_precision = metrics.get("precision")
             xgb_recall = metrics.get("recall")
             xgb_pr_auc = metrics.get("pr_auc")
             xgb_roc_auc = metrics.get("roc_auc")
-            if xgb_precision is not None and xgb_recall is not None:
+            
+            xgb_f1 = metrics.get("f1")
+            if xgb_f1 is None and xgb_precision is not None and xgb_recall is not None:
                 xgb_f1 = 2 * (xgb_precision * xgb_recall) / (xgb_precision + xgb_recall) if (xgb_precision + xgb_recall) > 0 else 0
+                
+            xgb_status = "verified" if xgb_provenance != "unavailable" else "available"
+            eval_note = f"Metrics for active model from {xgb_provenance} evaluation artifacts."
         except Exception:
             pass
 
@@ -174,10 +190,10 @@ def get_model_comparison():
                     "f1": xgb_f1,
                     "roc_auc": xgb_roc_auc,
                     "pr_auc": xgb_pr_auc,
-                    "status": "verified",
-                    "provenance": "validation",
+                    "status": xgb_status,
+                    "provenance": xgb_provenance,
                 },
             ],
-            "eval_note": "Metrics for active model from validation evaluation artifacts.",
+            "eval_note": eval_note,
         }
     )

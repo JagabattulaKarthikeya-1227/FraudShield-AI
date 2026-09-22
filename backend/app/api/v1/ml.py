@@ -27,27 +27,34 @@ def get_model_registry():
         if os.path.exists(eval_path):
             try:
                 with open(eval_path, "r") as f:
-                    metrics = json.load(f)
+                    eval_data = json.load(f)
                 
-                # Calculate F1
-                p = metrics.get("precision", 0)
-                r = metrics.get("recall", 0)
-                f1 = 2 * (p * r) / (p + r) if (p + r) > 0 else 0
+                metrics = eval_data.get("metrics", eval_data)
+                provenance = eval_data.get("evaluation_type", "unavailable") if isinstance(eval_data, dict) and "evaluation_type" in eval_data else "unavailable"
+                
+                f1 = metrics.get("f1", 0)
+                if not f1:
+                    p = metrics.get("precision", 0)
+                    r = metrics.get("recall", 0)
+                    f1 = 2 * (p * r) / (p + r) if (p + r) > 0 else 0
                 
                 registry.append({
                     "id": "mdl_v1.0",
                     "name": "ET + MLP + XGBoost Meta-Ensemble",
-                    "status": "Production",
+                    "status": "Available",
                     "f1_score": f1,
                     "pr_auc": metrics.get("pr_auc", 0),
-                    "latency_ms": None,  # Not measured in production
+                    "latency_ms": None,
                     "training_date": "Historical",
                     "commit": None,
-                    "provenance": "validation",
+                    "provenance": provenance,
                     "is_demo": False
                 })
             except Exception:
                 pass
+        
+        if not registry:
+            return success_response(data={"status": "unavailable", "reason": "No verified evaluation artifact is available.", "registry": []})
     else:
         registry = [
             {
