@@ -5,6 +5,7 @@ from app.core.exceptions import AppError
 from app.models.transaction import Transaction, TransactionStatus
 from app.models.user import User
 import datetime
+from app.models.session import Session
 from app.middleware.auth import require_role
 
 telemetry_bp = Blueprint("telemetry", __name__)
@@ -16,6 +17,9 @@ telemetry_bp = Blueprint("telemetry", __name__)
 def get_kpis():
     user = get_current_user()
 
+    today_start = datetime.datetime.now(datetime.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    tx_today = Transaction.query.filter(Transaction.transaction_date >= today_start).count()
+    
     total_tx = Transaction.query.count()
     total_fraud = Transaction.query.filter_by(status=TransactionStatus.DECLINED).count()
     total_queue = Transaction.query.filter_by(status=TransactionStatus.FLAGGED).count()
@@ -25,16 +29,20 @@ def get_kpis():
         if total_tx > 0
         else None
     )
+    
+    active_users = Session.query.filter(
+        Session.expires_at > datetime.datetime.now(datetime.timezone.utc),
+        Session.is_revoked == False
+    ).with_entities(Session.user_id).distinct().count()
 
     return success_response(
         data={
-            "transactions_today": total_tx,
+            "transactions_today": tx_today,
             "fraud_rate": fraud_rate,
             "detection_accuracy": None,
             "review_queue": total_queue,
             "avg_decision_time_ms": None,
-            "active_users": User.query.count(),
-            "is_synthetic": total_tx == 0,
+            "active_users": active_users,
         }
     )
 
@@ -98,6 +106,14 @@ def get_trends():
 @require_role(["Administrator"])
 def get_system_health():
     user = get_current_user()
+    
+    # Check DB status
+    from app.database.core import db
+    try:
+        db.session.execute(db.text("SELECT 1"))
+        db_status = "Online"
+    except Exception:
+        db_status = "Offline"
 
     return success_response(
         data={
@@ -105,9 +121,8 @@ def get_system_health():
             "memory_usage": None,
             "api_latency_ms": None,
             "backend_status": "Online",
-            "database_status": "Online",
-            "smtp_status": "Idle",
-            "active_model_version": "v1.4.2-hybrid",
-            "is_synthetic": True,
+            "database_status": db_status,
+            "smtp_status": None,
+            "active_model_version": None,
         }
     )
