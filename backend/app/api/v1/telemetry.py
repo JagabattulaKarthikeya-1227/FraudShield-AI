@@ -21,19 +21,21 @@ def get_kpis():
     total_fraud = Transaction.query.filter_by(status=TransactionStatus.DECLINED).count()
     total_queue = Transaction.query.filter_by(status=TransactionStatus.FLAGGED).count()
 
-    # Calculate actual fraud rate from live DB transactions (calibrated to ~0.20% baseline in production)
-    fraud_rate = (total_fraud / total_tx * 100) if total_tx > 0 else 0.20
+    fraud_rate = (
+        round((total_fraud / total_tx) * 100, 2)
+        if total_tx > 0
+        else None
+    )
 
     return success_response(
         data={
             "transactions_today": total_tx,
-            "fraud_rate": round(fraud_rate, 2),
-            "detection_accuracy": 99.99,
+            "fraud_rate": fraud_rate,
+            "detection_accuracy": None,
             "review_queue": total_queue,
-            # avg_decision_time_ms is simulated; no real latency tracking yet
-            "avg_decision_time_ms": random.randint(45, 60),
+            "avg_decision_time_ms": None,
             "active_users": User.query.count(),
-            "is_synthetic": total_tx == 0,  # Only fully synthetic when no real transactions exist
+            "is_synthetic": total_tx == 0,
         }
     )
 
@@ -70,16 +72,15 @@ def get_trends():
 def get_system_health():
     user = get_current_user()
 
-    # Simulate realistic server telemetry metrics
     return success_response(
         data={
-            "cpu_usage": random.randint(30, 45),
-            "memory_usage": random.randint(50, 70),
-            "api_latency_ms": random.randint(20, 80),
+            "cpu_usage": None,
+            "memory_usage": None,
+            "api_latency_ms": None,
             "backend_status": "Online",
             "database_status": "Online",
             "smtp_status": "Idle",
             "active_model_version": "v1.4.2-hybrid",
-            "is_synthetic": True,  # Resource metrics are simulated; integrate psutil/prometheus for real values
+            "is_synthetic": True,
         }
     )
