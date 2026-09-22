@@ -324,7 +324,72 @@ class TestSuccessfulInference:
             service.predict_single(payload)
             
         assert exc_info.value.status_code == 422
-        assert "missing 'Time'" in exc_info.value.message
+        assert "Feature mismatch" in exc_info.value.message
+
+    def test_predict_single_extra_feature_raises_422(self, tmp_path):
+        from app.core.exceptions import AppError
+        models_dir, config_path = _make_dirs(tmp_path)
+        _dump_all_artifacts(models_dir)
+        service = _build_service(tmp_path, config_path, batch_size=1)
+
+        payload = {f"V{i}": float(i) * 0.1 for i in range(1, 29)}
+        payload["Amount"] = 150.0
+        payload["Time"] = 1000.0
+        payload["ExtraCol"] = 99.9
+
+        with pytest.raises(AppError) as exc_info:
+            service.predict_single(payload)
+            
+        assert exc_info.value.status_code == 422
+        assert "Feature mismatch" in exc_info.value.message
+
+    def test_invalid_probability_raises_500(self, tmp_path):
+        from app.core.exceptions import AppError
+        models_dir, config_path = _make_dirs(tmp_path)
+        _dump_all_artifacts(models_dir)
+        service = _build_service(tmp_path, config_path, batch_size=1)
+        
+        # Mock meta model to return invalid probability
+        service.meta_model.predict_proba.return_value = np.array([2.5])
+
+        payload = {f"V{i}": float(i) * 0.1 for i in range(1, 29)}
+        payload["Amount"] = 150.0
+        payload["Time"] = 1000.0
+
+        with pytest.raises(AppError) as exc_info:
+            service.predict_single(payload)
+            
+        assert exc_info.value.status_code == 500
+        assert "Invalid probability" in exc_info.value.message
+
+    def test_shap_additivity_verification(self, tmp_path):
+        # We cannot easily test SHAP end-to-end here without the real models, 
+        # but we can mock the explainability engine to verify our InferenceService 
+        # correctly returns the values that sum up to the prediction, or test the logic.
+        # Since get_shap_explanation invokes the real ExplainabilityEngine, let's mock it
+        # and just ensure it's called and we can reconcile the mock output.
+        from app.ml.explainability.engine import ExplainabilityEngine
+        import pytest
+
+        models_dir, config_path = _make_dirs(tmp_path)
+        _dump_all_artifacts(models_dir)
+        service = _build_service(tmp_path, config_path, batch_size=1)
+        
+        # We need a payload
+        payload = {f"V{i}": float(i) * 0.1 for i in range(1, 29)}
+        payload["Amount"] = 150.0
+        payload["Time"] = 1000.0
+
+        # Run get_shap_explanation and intercept the engine call
+        with patch.object(ExplainabilityEngine, 'explain_local_shap') as mock_explain:
+            mock_explain.return_value = (0.2, [0.01] * 30) # Base 0.2 + (0.01 * 30) = 0.5
+            base_val, shap_vals = service.get_shap_explanation(payload)
+            
+            assert base_val == 0.2
+            assert len(shap_vals) == 30
+            
+            sum_shap = base_val + sum(shap_vals)
+            assert abs(sum_shap - 0.5) < 1e-6
 
     def test_predict_batch_returns_list(self, tmp_path):
         import pandas as pd

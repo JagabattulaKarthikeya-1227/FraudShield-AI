@@ -9,7 +9,7 @@ const stages = [
  { name:"Data Preprocessing", desc:"Scaling & SMOTE balancing applied", color:"bg-muted" },
  { name:"Base Learners", desc:"Extra Trees & Multilayer Perceptron", color:"bg-primary text-primary-foreground" },
  { name:"Meta-Learner", desc:"XGBoost interprets base probabilities", color:"bg-accent text-accent-foreground" },
- { name:"Explainability Layer", desc:"SHAP & LIME extract feature importance", color:"bg-success text-success-foreground" },
+ { name:"Explainability Layer", desc:"SHAP extracts feature importance", color:"bg-success text-success-foreground" },
  { name:"Risk Decision", desc:"Final confident classification", color:"bg-primary text-primary-foreground" }
 ];
 

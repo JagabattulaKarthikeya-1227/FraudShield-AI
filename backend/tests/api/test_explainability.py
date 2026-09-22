@@ -40,6 +40,7 @@ def test_explainability_real_shap_values(client, admin_token, monkeypatch):
     mock_shap_features[1] = 0.5  # Feature V1
     mock_shap_features[28] = 0.2 # Feature Amount
     mock_engine.get_shap_explanation.return_value = (0.15, mock_shap_features)
+    mock_engine._determine_risk.return_value = ("High Risk", "decline")
     
     monkeypatch.setattr('app.api.v1.predict.get_inference_service', lambda: mock_engine)
 
@@ -124,3 +125,26 @@ def test_explainability_missing_shap_returns_503(client, admin_token, monkeypatc
     assert not err_data["success"]
     assert err_data["error"]["code"] == "MODEL_NOT_READY"
     assert "SHAP explainer is unavailable" in err_data["error"]["message"]
+
+def test_explainability_missing_prediction_returns_404(client, admin_token, monkeypatch):
+    from app.database.core import db
+    from app.models.transaction import Transaction, TransactionStatus
+    from datetime import datetime, timezone
+    
+    tx = Transaction(
+        user_id="c7bc4e62-62a6-4e8e-a6d7-fdcb83a48fc3",
+        merchant="No Prediction",
+        category="Test",
+        amount=10.0,
+        status=TransactionStatus.PENDING,
+        transaction_date=datetime.now(timezone.utc),
+    )
+    db.session.add(tx)
+    db.session.commit()
+    
+    exp_resp = client.get(f'/api/v1/explainability/transaction/{tx.id}', headers={"Authorization": f"Bearer {admin_token}"})
+    assert exp_resp.status_code == 404
+    
+    err_data = json.loads(exp_resp.data)
+    assert not err_data["success"]
+    assert "Prediction/explanation unavailable" in err_data["error"]["message"]

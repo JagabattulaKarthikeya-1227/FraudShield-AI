@@ -1,3 +1,11 @@
+"""
+HISTORICAL / EXPERIMENTAL IMPLEMENTATION
+This module represents a historical LightGBM implementation that was not wired into 
+the production API routes. It is preserved for reference.
+The active production runtime uses the Extra Trees + MLP + XGBoost Meta-Ensemble 
+located in `app.ml.inference.predict`.
+"""
+
 import os
 import json
 import joblib
@@ -6,6 +14,10 @@ from typing import Dict, Any
 
 
 class FraudDetectionModel:
+    """
+    EXPERIMENTAL: Do not use in production. 
+    Use `InferenceService` from `app.ml.inference.predict` instead.
+    """
     _instance = None
 
     def __new__(cls, *args, **kwargs):

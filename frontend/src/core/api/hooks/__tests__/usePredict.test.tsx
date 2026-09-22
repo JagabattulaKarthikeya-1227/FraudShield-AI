@@ -32,7 +32,7 @@ describe('usePredict hook', () => {
     });
 
     expect(result.current.data).toEqual(mockResponse.data);
-    expect(apiClient.post).toHaveBeenCalledWith('/predict/single', {
+    expect(apiClient.post).toHaveBeenCalledWith('/fraud/predict', {
       Amount: 100,
       Merchant: 'Test',
       Category: 'Retail',

@@ -96,7 +96,7 @@ export function AIInferenceAnimation() {
               Every prediction is explainable.
             </motion.h2>
             <div className="flex gap-4 mt-6">
-              {['SHAP Explainability', 'Ensemble Learning', 'Real-Time Risk Analysis'].map((tag, i) => (
+              {['SHAP Explainability', 'Hybrid Ensemble', 'Real-Time Risk Analysis'].map((tag, i) => (
                 <motion.span 
                   key={i}
                   initial={{ opacity: 0, scale: 0.8 }}

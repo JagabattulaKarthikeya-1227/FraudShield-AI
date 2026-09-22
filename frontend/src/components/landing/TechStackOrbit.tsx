@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 const techOrbit = [
 "React","Framer Motion","TailwindCSS","Lucide",
 "Flask","TensorFlow","XGBoost","Scikit-Learn",
-"SHAP","LIME","SQLite","Imbalanced-Learn"
+"SHAP","SQLite","Imbalanced-Learn"
 ];
 
 export function TechStackOrbit() {

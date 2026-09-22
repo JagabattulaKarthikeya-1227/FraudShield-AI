@@ -38,13 +38,13 @@ export function ExplainableAI() {
  transition={{ delay: 0.2 }}
  className="text-lg text-zinc-500 mb-10 leading-relaxed"
  >
- Black-box models are a liability in regulated industries. FraudShield AI integrates SHAP and LIME to provide human-readable explanations for every single decision, satisfying compliance requirements instantly.
+ Black-box models are a liability in regulated industries. FraudShield AI integrates SHAP to provide human-readable explanations for every single decision, satisfying compliance requirements instantly.
  </motion.p>
 
  <div className="space-y-6">
  {[
  { title:"SHAP Values", desc:"Understand exactly how much each feature contributed to the final risk score globally and locally." },
- { title:"LIME Explanations", desc:"Generate intuitive, localized approximations for complex neural network decisions." },
+ { title:"Risk Explanations", desc:"Generate intuitive approximations for complex neural network decisions." },
  { title:"Regulatory Compliance", desc:"Automated rationale reports ready for auditors and internal review boards." }
  ].map((item, idx) => (
  <motion.div 

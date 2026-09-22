@@ -32,7 +32,7 @@ export const AICopilotPanel: React.FC = () => {
 
   const getQuickPrompts = () => {
     if (activeRole === 'Customer') return ['Explain my trust score', 'Is my account secure?', 'Summarize recent activity'];
-    if (activeRole === 'Analyst') return ['Explain SHAP values', 'Generate investigation report', 'Summarize local LIME', 'What is the risk threshold?'];
+    if (activeRole === 'Analyst') return ['Explain SHAP values', 'Generate investigation report', 'Summarize prediction details', 'What is the risk threshold?'];
     return ['System health check', 'Generate audit summary', 'Show model drift', 'Database latency'];
   };
 

@@ -12,7 +12,7 @@ import batchImg from '@/assets/illustrations/bento_batch.png';
 import adminImg from '@/assets/illustrations/bento_admin.png';
 
 const bentoItems = [
- { title:"Explainability", span:"md:col-span-2 md:row-span-2", bg:"bg-white/60", content:"SHAP and LIME native integration.", scene: null, image: null },
+ { title:"Explainability", span:"md:col-span-2 md:row-span-2", bg:"bg-white/60", content:"SHAP native integration.", scene: null, image: null },
  { title:"Batch Prediction", span:"md:col-span-1 md:row-span-1", bg:"bg-primary text-primary-foreground relative overflow-hidden", content:"Process millions of rows instantly.", scene: null, image: batchImg },
  { title:"Admin Portal", span:"md:col-span-1 md:row-span-1", bg:"bg-white/40 relative overflow-hidden", content:"Manage system configurations.", scene: null, image: adminImg },
  { title:"Fraud Network", span:"md:col-span-1 md:row-span-2", bg:"bg-accent/10 p-0 overflow-hidden relative", content:"Advanced topology mapping.", scene: <NeuralNetwork3D />, image: null },

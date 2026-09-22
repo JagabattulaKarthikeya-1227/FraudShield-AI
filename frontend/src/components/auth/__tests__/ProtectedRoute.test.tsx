@@ -15,7 +15,11 @@ describe('ProtectedRoute', () => {
   });
 
   it('redirects to /login when not authenticated', () => {
-    (useAuthStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
+    (useAuthStore as unknown as ReturnType<typeof vi.fn>).mockImplementation((selector: any) => selector({
+      isAuthenticated: false,
+      isInitializing: false,
+      user: null
+    }));
 
     const { getByText } = render(
       <MemoryRouter initialEntries={['/protected']}>
@@ -32,7 +36,11 @@ describe('ProtectedRoute', () => {
   });
 
   it('renders Outlet when authenticated', () => {
-    (useAuthStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (useAuthStore as unknown as ReturnType<typeof vi.fn>).mockImplementation((selector: any) => selector({
+      isAuthenticated: true,
+      isInitializing: false,
+      user: null
+    }));
 
     const { getByText } = render(
       <MemoryRouter initialEntries={['/protected']}>

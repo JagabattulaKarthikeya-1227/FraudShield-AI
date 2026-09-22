@@ -19,24 +19,24 @@ def get_transaction_explanation(tx_id):
     if not tx:
         raise AppError("Transaction not found", 404)
 
-    probability = float(tx.prediction.risk_score) if tx.prediction else 0.05
-    is_high_risk = probability > 0.75
-    is_medium_risk = 0.15 < probability <= 0.75
+    if not tx.prediction:
+        raise AppError("Prediction/explanation unavailable", 404)
+
+    probability = float(tx.prediction.risk_score)
+    from app.api.v1.predict import get_inference_service
+    engine = get_inference_service()
+    risk_level, _ = engine._determine_risk(probability)
+    is_high_risk = risk_level == "High Risk"
+    is_medium_risk = risk_level == "Review Required"
 
     # Customer View: plain-English NLP explanation only
     if user.role.value == "Customer":
         if is_high_risk:
-            msg = (
-                "This transaction was flagged because the amount and transaction "
-                "velocity significantly deviated from your established spending history."
-            )
+            msg = "This transaction was flagged by the risk engine due to its evaluated characteristics and amount."
         elif is_medium_risk:
-            msg = (
-                "This transaction requires minor review due to an unusual merchant "
-                "category, but overall fraud probability is moderate."
-            )
+            msg = "This transaction requires minor review by the risk engine, though overall fraud probability is moderate."
         else:
-            msg = "This transaction perfectly aligns with your historical legitimate spending patterns."
+            msg = "This transaction was evaluated as low risk based on its characteristics."
 
         return success_response(
             data={"explanation_type": "nlp", "summary": msg, "probability": probability}
@@ -62,17 +62,8 @@ def get_transaction_explanation(tx_id):
         data={
             "explanation_type": "technical",
             "probability": probability,
-            "risk_level": (
-                "High Risk"
-                if is_high_risk
-                else ("Review Required" if is_medium_risk else "Low Risk")
-            ),
+            "risk_level": risk_level,
             "shap_summary": {"base_value": base_value, "features": shap_features},
-            "model_contributions": {
-                "extra_trees": 0.0,
-                "mlp_neural_net": 0.0,
-                "xgboost_meta": 0.0,
-            },
         }
     )
 
@@ -105,15 +96,17 @@ def get_global_insights():
 
     return success_response(
         data={
+            "is_demo_mode": True,
             "fraud_rate": fraud_rate,
             "feature_importance": [
-                {"feature": "V17 (Location)", "importance": 0.28},
-                {"feature": "V14 (Velocity)", "importance": 0.24},
-                {"feature": "V12 (History)", "importance": 0.19},
-                {"feature": "Amount", "importance": 0.15},
-                {"feature": "V10 (Time)", "importance": 0.08},
-                {"feature": "V3 (Merchant)", "importance": 0.06},
+                {"feature": "V17 (Demonstration Baseline)", "importance": 0.28},
+                {"feature": "V14 (Demonstration Baseline)", "importance": 0.24},
+                {"feature": "V12 (Demonstration Baseline)", "importance": 0.19},
+                {"feature": "Amount (Demonstration Baseline)", "importance": 0.15},
+                {"feature": "V10 (Demonstration Baseline)", "importance": 0.08},
+                {"feature": "V3 (Demonstration Baseline)", "importance": 0.06},
             ],
+            "note": "Global explainability is currently in demo mode with static baselines."
         }
     )
 

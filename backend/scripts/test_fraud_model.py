@@ -1,3 +1,9 @@
+"""
+HISTORICAL / EXPERIMENTAL TEST SCRIPT
+This script tests the historical LightGBM `FraudDetectionModel` which is not 
+used in the production API routes. It is preserved for reference.
+"""
+
 import sys
 import os
 import pandas as pd

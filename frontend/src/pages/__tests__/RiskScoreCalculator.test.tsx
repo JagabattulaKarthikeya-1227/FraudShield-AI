@@ -34,16 +34,13 @@ describe('RiskScoreCalculator Form Validation', () => {
       </QueryClientProvider>
     );
 
-    const amountInput = screen.getByLabelText(/Transaction Amount/i);
-    const merchantInput = screen.getByLabelText(/Merchant Name/i);
-    fireEvent.change(amountInput, { target: { value: '' } });
-    fireEvent.change(merchantInput, { target: { value: '' } });
+    const txInput = screen.getByLabelText(/Transaction ID \(Index\)/i);
+    fireEvent.change(txInput, { target: { value: '' } });
 
     const submitBtn = screen.getByRole('button', { name: /Run Fraud Detection/i });
     fireEvent.click(submitBtn);
 
-    expect(await screen.findByText(/Enter a valid amount/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Merchant is required/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Enter a valid numeric ID/i)).toBeInTheDocument();
   });
 
   it('allows valid submission', async () => {
@@ -55,18 +52,15 @@ describe('RiskScoreCalculator Form Validation', () => {
       </QueryClientProvider>
     );
 
-    const amountInput = screen.getByLabelText(/Transaction Amount/i);
-    const merchantInput = screen.getByLabelText(/Merchant Name/i);
+    const txInput = screen.getByLabelText(/Transaction ID \(Index\)/i);
 
-    fireEvent.change(amountInput, { target: { value: '150.00' } });
-    fireEvent.change(merchantInput, { target: { value: 'Test Merchant' } });
+    fireEvent.change(txInput, { target: { value: '10492' } });
 
     const submitBtn = screen.getByRole('button', { name: /Run Fraud Detection/i });
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
-      expect(screen.queryByText('Enter a valid amount')).not.toBeInTheDocument();
-      expect(screen.queryByText('Merchant is required')).not.toBeInTheDocument();
+      expect(screen.queryByText('Enter a valid numeric ID')).not.toBeInTheDocument();
     });
   });
 });

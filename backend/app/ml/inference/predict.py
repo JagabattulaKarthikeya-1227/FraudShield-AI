@@ -126,7 +126,7 @@ class InferenceService:
                 f"Risk threshold config unreadable: {e}"
             ) from e
 
-        self.active_record = {"version_id": "v1.0.0"}
+        self.active_record = {"version_id": "v1.0.0-ensemble"}
         self.models_dir = models_dir
 
         logger.info("[InferenceService] All model artifacts loaded and validated.")
@@ -223,13 +223,19 @@ class InferenceService:
         from app.core.exceptions import AppError
 
         features = np.zeros((1, len(CANONICAL_FEATURES)))
+        
+        # Exact feature set validation
+        if set(transaction_dict.keys()) != set(CANONICAL_FEATURES):
+            raise AppError("Feature mismatch: expected exactly CANONICAL_FEATURES", 422)
+            
         for i, name in enumerate(CANONICAL_FEATURES):
-            if name not in transaction_dict:
-                raise AppError(f"Incomplete feature vector: missing '{name}'", 422)
             try:
-                features[0, i] = float(transaction_dict[name])
+                val = float(transaction_dict[name])
+                if not np.isfinite(val):
+                    raise AppError(f"Feature '{name}' must be finite.", 422)
+                features[0, i] = val
             except (ValueError, TypeError):
-                raise AppError(f"Invalid value for feature '{name}'", 422)
+                raise AppError(f"Invalid numeric value for feature '{name}'", 422)
 
         # Scale
         X_scaled = self.scaler.transform(features)
@@ -245,6 +251,9 @@ class InferenceService:
         # Apply calibration if available
         if self.calibrator is not None:
             final_prob = float(self.calibrator.predict_proba(X_meta)[0])
+
+        if not (0.0 <= final_prob <= 1.0) or not np.isfinite(final_prob):
+            raise AppError("Invalid probability calculated by the ensemble.", 500)
 
         risk_level, action = self._determine_risk(final_prob)
 
@@ -297,8 +306,14 @@ class InferenceService:
             probs = np.array(probs).flatten()
             return np.vstack([1 - probs, probs]).T
 
-        # Use the scaler's mean as the background instance (1 sample)
-        # scaler.mean_ is the mean of the training data before scaling
+        # BACKGROUND DATA STRATEGY:
+        # We use the scaler's mean as a deterministic single-point baseline:
+        # `scaler.mean_.reshape(1, -1)`
+        # This is a technically valid, fast one-point baseline for KernelExplainer.
+        # It represents the mathematical average of the training data features.
+        # While a larger background dataset (e.g., 100 k-means centroids) would provide
+        # a broader population baseline, this single-point approach prioritizes 
+        # real-time inference latency and reproducibility over global representativeness.
         background_data = self.scaler.mean_.reshape(1, -1)
 
         engine = ExplainabilityEngine(
@@ -327,11 +342,16 @@ class InferenceService:
             return []
 
         features = np.zeros((n, len(CANONICAL_FEATURES)))
+        
+        if set(df.columns) != set(CANONICAL_FEATURES):
+            raise AppError("Batch features do not exactly match CANONICAL_FEATURES", 422)
+
         for i, name in enumerate(CANONICAL_FEATURES):
-            if name not in df.columns:
-                raise AppError(f"Incomplete batch feature vector: missing '{name}' column", 422)
             try:
-                features[:, i] = df[name].astype(float).to_numpy()
+                col_data = df[name].astype(float).to_numpy()
+                if not np.isfinite(col_data).all():
+                    raise AppError(f"Feature '{name}' contains non-finite values (NaN/Inf).", 422)
+                features[:, i] = col_data
             except (ValueError, TypeError):
                 raise AppError(f"Invalid values in feature column '{name}'", 422)
 
@@ -355,6 +375,8 @@ class InferenceService:
         results = []
         for i in range(n):
             prob = float(final_probs[i])
+            if not (0.0 <= prob <= 1.0) or not np.isfinite(prob):
+                raise AppError("Invalid probability calculated by the ensemble.", 500)
             risk_level, action = self._determine_risk(prob)
             results.append({
                 "Amount": float(amounts[i]),

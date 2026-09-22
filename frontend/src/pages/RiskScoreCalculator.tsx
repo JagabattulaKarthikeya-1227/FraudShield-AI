@@ -53,7 +53,7 @@ export const RiskScoreCalculator = () => {
   const onSubmit = (data: CalcFields) => {
     // We send only the transaction index to the backend.
     // The backend securely loads the confidential V1-V28 features directly from the database/CSV
-    // and runs the actual Hugging Face LightGBM model. 
+    // and runs the actual ET+MLP+XGBoost Hybrid Ensemble. 
     predict(
       { transaction_index: data.transaction_index ?? 0 },
       {
@@ -82,7 +82,7 @@ export const RiskScoreCalculator = () => {
                 <span className="text-xs font-bold uppercase tracking-widest text-white/80">Live AI Inference</span>
               </div>
               <h1 className="text-2xl font-bold leading-tight mb-1">Risk Score Calculator</h1>
-              <p className="text-sm text-white/70">Historical Transaction Lookup (Powered by LightGBM Fraud Classifier)</p>
+              <p className="text-sm text-white/70">Historical Transaction Lookup (Powered by Hybrid Ensemble Fraud Classifier)</p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-5">
@@ -217,7 +217,7 @@ export const RiskScoreCalculator = () => {
                       <ul className="space-y-2 text-sm text-slate-600">
                         <li className="flex items-start gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                          The LightGBM Fraud Classifier evaluated all 29 encrypted transaction characteristics securely on the backend.
+                          The Hybrid Ensemble Fraud Classifier evaluated all 29 encrypted transaction characteristics securely on the backend.
                         </li>
                         <li className="flex items-start gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />

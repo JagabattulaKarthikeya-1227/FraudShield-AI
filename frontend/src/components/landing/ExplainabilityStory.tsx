@@ -20,7 +20,7 @@ export function ExplainabilityStory() {
  Never Trust a <br /> Black Box Again.
  </h2>
  <p className="text-lg text-muted-foreground leading-relaxed mb-6">
- FraudShield AI integrates <strong className="text-primary font-semibold">SHAP</strong> and <strong className="text-primary font-semibold">LIME</strong> at the core of its architecture. Every single prediction is accompanied by a mathematical breakdown of why the decision was made.
+ FraudShield AI integrates <strong className="text-primary font-semibold">SHAP</strong> at the core of its architecture. Every single prediction is accompanied by a mathematical breakdown of why the decision was made.
  </p>
  <p className="text-lg text-muted-foreground leading-relaxed mb-8">
  Compliance teams no longer have to guess. They can see exactly how transaction amounts, timing, and anonymized features pushed the model towards a fraud classification.
@@ -53,7 +53,7 @@ export function ExplainabilityStory() {
  </div>
 
  <div className="w-full bg-white/40 border border-border/60 rounded-[32px] p-6 shadow-[0_8px_40px_rgba(0,0,0,0.03)] backdrop-blur-md">
- <h4 className="text-sm font-semibold text-primary mb-4">LIME Local Neighborhood (Transaction Level)</h4>
+ <h4 className="text-sm font-semibold text-primary mb-4">Local Neighborhood Visualization</h4>
  <LIMEScene />
  </div>
  </motion.div>
