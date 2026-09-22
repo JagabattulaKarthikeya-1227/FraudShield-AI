@@ -4,7 +4,7 @@
 This is to certify that this project report entitled "FraudShield AI" is the bona fide work of the engineering team, submitted in partial fulfillment of the requirements for the degree of Bachelor of Engineering / Technology.
 
 **Abstract**  
-The rapid digitization of financial services has precipitated an unprecedented rise in sophisticated transaction fraud. Traditional rule-based systems suffer from high false-positive rates and lack the agility to adapt to novel fraud typologies. This project proposes *FraudShield AI*, an enterprise-grade hybrid machine learning architecture that integrates a Champion vs. Challenger MLOps pipeline. The proposed system leverages a Stacked Ensemble model (XGBoost, Random Forest, Deep Neural Networks) enhanced with Synthetic Minority Over-sampling Technique (SMOTE) to combat severe class imbalance. Crucially, the platform integrates SHAP (SHapley Additive exPlanations) to provide cryptographic-level explainability, allowing human fraud analysts to interpret algorithmic decisions and comply with stringent regulatory frameworks (e.g., GDPR, ISO 27001). The system achieves a 99.2% PR-AUC score while maintaining sub-50ms inference latency.
+The rapid digitization of financial services has precipitated an unprecedented rise in sophisticated transaction fraud. Traditional rule-based systems suffer from high false-positive rates and lack the agility to adapt to novel fraud typologies. This project proposes *FraudShield AI*, an enterprise-grade hybrid machine learning architecture that integrates model registry tracking (with designs for a Champion vs. Challenger pipeline). The proposed system leverages a Stacked Ensemble model (Extra Trees, MLP, and XGBoost) enhanced with Synthetic Minority Over-sampling Technique (SMOTE) to combat severe class imbalance. Crucially, the platform integrates SHAP (SHapley Additive exPlanations) to provide SHAP-based feature attribution, allowing human fraud analysts to interpret algorithmic decisions and comply with stringent regulatory frameworks (e.g., GDPR, ISO 27001). The system is engineered to maximize PR-AUC while maintaining low inference latency.
 
 ---
 
@@ -32,14 +32,14 @@ Existing literature heavily focuses on raw accuracy using Deep Learning, often n
 | Adaptability | Low | High | Very High (Continuous Eval) |
 | False Positive Rate | High | Medium | Low |
 | Explainability | Transparent | Opaque | Transparent (SHAP) |
-| Architecture | Monolithic | Microservices | Cloud-Native / Dockerized |
+| Architecture | Monolithic | Modular Monolith | Cloud-Native / Dockerized |
 
 ---
 
 ## Chapter 3: System Analysis
 
 ### 3.1 Proposed System
-FraudShield AI is designed around a Clean Architecture paradigm. The frontend utilizes React 19 and WebGL (React Three Fiber) for advanced spatial data visualization. The backend relies on a Flask/Python 3.12 microservice topology, utilizing Redis for rate-limiting and Celery for asynchronous background ML retraining.
+FraudShield AI is designed around a Clean Architecture paradigm. The frontend utilizes React 19 and WebGL (React Three Fiber) for advanced spatial data visualization. The backend relies on a Flask/Python 3.12 modular backend architecture, utilizing Redis for rate-limiting and Celery for asynchronous background ML retraining.
 
 ---
 

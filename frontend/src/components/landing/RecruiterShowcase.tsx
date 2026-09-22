@@ -72,10 +72,10 @@ export const RecruiterShowcase: React.FC<{ isOpen: boolean; onClose: () => void 
  <p className="text-sm text-primary-foreground">
  <strong>Stacking Ensemble Strategy:</strong>
  <br />
- We process 10M+ rows of high-cardinality synthetic data. To handle the massive class imbalance (0.1% positive class), we apply SMOTE strictly on the training set to prevent data leakage.
+ We process synthetic transaction data. To handle the massive class imbalance (0.1% positive class), we apply SMOTE strictly on the training set to prevent data leakage.
  </p>
  <p className="text-sm text-primary-foreground">
- The ensemble utilizes Extra Trees, Random Forest, and MLP base learners, with a Logistic Regression Meta-Learner making the final prediction. We optimize for <strong>PR-AUC</strong> rather than ROC-AUC due to the severe imbalance.
+ The ensemble utilizes Extra Trees and MLP base learners, with an XGBoost Meta-Learner making the final prediction. We optimize for <strong>PR-AUC</strong> rather than ROC-AUC due to the severe imbalance.
  </p>
  </div>
  </section>

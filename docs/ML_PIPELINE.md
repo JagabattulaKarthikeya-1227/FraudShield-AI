@@ -18,10 +18,10 @@ Instead of relying on a single algorithm, we use a **Stacking Classifier**.
 ```mermaid
 graph TD
     Data[Preprocessed Transaction] --> ET[Extra Trees Classifier]
-    Data --> RF[Random Forest]
+    Data --> RF[MLP]
     Data --> MLP[Multilayer Perceptron]
     
-    ET --> |Prediction| Meta[Logistic Regression Meta-Learner]
+    ET --> |Prediction| Meta[XGBoost Meta-Learner]
     RF --> |Prediction| Meta
     MLP --> |Prediction| Meta
     
@@ -29,9 +29,9 @@ graph TD
 ```
 
 1. **Extra Trees**: Highly randomized, excellent for reducing variance.
-2. **Random Forest**: Strong baseline tabular data performer.
+2. **MLP**: Strong baseline tabular data performer.
 3. **Multilayer Perceptron (MLP)**: Captures complex non-linear relationships that tree-based models might miss.
-4. **Logistic Regression (Meta)**: Learns which base model to trust in specific scenarios.
+4. **XGBoost (Meta)**: Learns which base model to trust in specific scenarios.
 
 ### Why optimize for PR-AUC?
 Traditional ROC-AUC is misleading on imbalanced datasets because a model can achieve a high score simply by guessing the majority class correctly. We explicitly optimize for **Precision-Recall Area Under Curve (PR-AUC)**, prioritizing the accurate identification of the minority class (fraud).

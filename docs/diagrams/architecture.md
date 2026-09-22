@@ -8,7 +8,7 @@ This document contains high-fidelity Mermaid.js diagrams representing the intern
 graph TD
     Client[Web Client - React 19]
     Nginx[Nginx Reverse Proxy]
-    API[Flask API Gateway]
+    API[Flask Flask Backend]
     Auth[JWT Auth Service]
     ML[ML Inference Engine]
     Celery[Celery Task Queue]

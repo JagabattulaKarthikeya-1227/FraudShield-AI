@@ -14,7 +14,7 @@ No single algorithm captures all nuances of fraud:
 - **XGBoost**: Gradient boosted trees provide unparalleled accuracy for non-linear relationships.
 - **Keras MLP (Neural Net)**: Deep learning catches complex, hidden interactions between features.
 
-**Our Solution**: The outputs of these three base learners are fed into a Logistic Regression Meta-Classifier (Stacking). The meta-classifier learns *which* base model to trust under *which* conditions.
+**Our Solution**: The outputs of these three base learners are fed into a XGBoost Meta-Classifier (Stacking). The meta-classifier learns *which* base model to trust under *which* conditions.
 
 ## 3. Probability Calibration (Isotonic Regression)
 Tree-based models (like XGBoost) often produce uncalibrated probabilities (e.g., they might output 0.8, but empirically only 60% of those transactions are fraud).

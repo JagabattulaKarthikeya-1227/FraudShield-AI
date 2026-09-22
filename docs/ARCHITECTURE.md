@@ -1,6 +1,6 @@
 # Architecture
 
-FraudShield AI utilizes a modern, decoupled microservices architecture designed to simulate an enterprise DevSecOps environment.
+FraudShield AI utilizes a modern, decoupled modular backend architecture designed to simulate an enterprise DevSecOps environment.
 
 ## High-Level System Architecture
 
@@ -13,7 +13,7 @@ graph TD
     end
     
     subgraph Gateway Layer
-        Proxy -->|/api| Gateway[API Gateway - Flask]
+        Proxy -->|/api| Gateway[Flask Backend]
     end
     
     subgraph Core Services

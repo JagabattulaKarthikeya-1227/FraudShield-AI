@@ -153,7 +153,7 @@ def get_model_comparison():
         data={
             "models": [
                 {
-                    "name": "Logistic Regression (Baseline)",
+                    "name": "XGBoost (Baseline)",
                     "precision": None,
                     "recall": None,
                     "f1": None,

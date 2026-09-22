@@ -428,7 +428,7 @@ const AboutTab = () => {
                         <span className="font-bold text-slate-600 flex items-center text-sm"><CheckCircle className="w-3.5 h-3.5 text-green-500 mr-1.5"/> Connected</span>
                     </div>
                     <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-                        <span className="text-slate-500 text-sm font-medium">API Gateway</span>
+                        <span className="text-slate-500 text-sm font-medium">Flask Backend</span>
                         <span className="font-bold text-slate-600 flex items-center text-sm"><CheckCircle className="w-3.5 h-3.5 text-green-500 mr-1.5"/> Operational</span>
                     </div>
                     <div className="flex justify-between items-center border-b border-slate-100 pb-3">

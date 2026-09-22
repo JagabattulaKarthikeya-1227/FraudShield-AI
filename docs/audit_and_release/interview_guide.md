@@ -11,10 +11,10 @@ Use this guide to prepare for technical interviews (Software Engineering, Machin
 
 ## Section 2: Machine Learning & Explainability
 **Q: Why didn't you just use a Deep Neural Network?**
-**A:** "Neural Networks are incredibly powerful for unstructured data (vision, audio), but they frequently underperform on highly tabular datasets compared to Gradient Boosted Trees (like XGBoost). Furthermore, Neural Nets are strict black boxes. In finance, blocking a transaction without an explanation is a regulatory violation. XGBoost, paired with TreeSHAP, allowed me to achieve a 99.2% PR-AUC while providing mathematically precise explanations for every single decision."
+**A:** "Neural Networks are incredibly powerful for unstructured data (vision, audio), but they frequently underperform on highly tabular datasets compared to Gradient Boosted Trees (like XGBoost). Furthermore, Neural Nets are strict black boxes. In finance, blocking a transaction without an explanation is a regulatory violation. XGBoost, paired with KernelExplainer, allowed me to optimize PR-AUC while providing local feature attribution explanations for every single decision."
 
 **Q: What is Concept Drift, and how does your system handle it?**
-**A:** "Concept drift occurs when the statistical properties of the target variable change over time (e.g., fraudsters invent a new technique). FraudShield AI monitors Kullback-Leibler (KL) Divergence between the training data and live inferences. When a spike is detected, the system trains a 'Challenger' model in a Shadow Deployment. The Challenger evaluates live traffic asynchronously without affecting users. Once it proves it can handle the new drift better than the 'Champion', an Admin promotes it."
+**A:** "Concept drift occurs when the statistical properties of the target variable change over time (e.g., fraudsters invent a new technique). FraudShield AI's architecture is designed to monitor Kullback-Leibler (KL) Divergence between training data and live inferences. (Note: Shadow deployment and automated drift retraining are designed but not fully operational). An Admin can promote verified models to Champion status via the Model Registry."
 
 ## Section 3: Frontend & UX
 **Q: Why React 19 over Angular, and why Zustand over Redux?**

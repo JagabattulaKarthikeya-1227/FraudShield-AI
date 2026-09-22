@@ -31,7 +31,7 @@ This document provides structured narration for presenting the project in variou
 
 **[The Machine Learning Engine: 4 mins]**
 - Discuss the data pipeline: EDA, outlier capping, and SMOTE for minority oversampling.
-- Explain the Hybrid Meta-Ensemble: How stacking Random Forests with XGBoost penalizes false negatives.
+- Explain the Hybrid Meta-Ensemble: How stacking MLPs with XGBoost penalizes false negatives.
 - Transition into the MLOps suite: Model Registry, Drift Detection, and Shadow Deployments (Champion vs. Challenger).
 
 **[Live Demonstration: 3 mins]**

@@ -18,7 +18,7 @@ To maximize detection of complex, non-linear fraud typologies while minimizing f
 - **XGBoost (Extreme Gradient Boosting)**: Consumes the probability outputs of the Base Learners. XGBoost was heavily tuned via Grid Search, prioritizing the `F1-Macro` metric to penalize False Negatives (missed fraud) heavily.
 
 ## 3. Explainability: SHAP Integration
-Black-box AI is unacceptable in heavily regulated financial environments (e.g., GDPR Article 22). FraudShield AI utilizes **TreeSHAP** (SHapley Additive exPlanations).
+Black-box AI is unacceptable in heavily regulated financial environments (e.g., GDPR Article 22). FraudShield AI utilizes **KernelExplainer** (SHapley Additive exPlanations).
 - **Function**: Calculates the exact marginal contribution of every single feature (e.g., `Amount`, `V4`) to the final prediction probability.
 - **Output**: Generates a JSON payload consumed by the Frontend to render interactive Waterfall charts, visually explaining *why* a transaction was flagged, satisfying the legal "Right to Explanation."
 
@@ -30,5 +30,5 @@ The system is continuously evaluated against a hold-out test set.
 - **PR-AUC**: 0.992 (Precision-Recall Area Under Curve is the primary metric due to extreme class imbalance; standard ROC-AUC is misleading in this context).
 
 ## 5. Limitations & Future Improvements
-- **Limitation**: TreeSHAP computation introduces a minor latency overhead (~15ms) compared to raw inference.
+- **Limitation**: KernelExplainer computation introduces a minor latency overhead (~15ms) compared to raw inference.
 - **Future Scope**: Implementing a specialized Graph Neural Network (GNN) to detect coordinated "fraud rings" across multiple connected accounts.

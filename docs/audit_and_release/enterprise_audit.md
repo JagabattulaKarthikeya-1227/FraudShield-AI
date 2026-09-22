@@ -3,8 +3,8 @@
 This report evaluates the structural integrity, security, and scalability of the FraudShield AI platform as if prepared by a Principal Engineering team.
 
 ## 1. Architecture Audit
-- **Strengths**: The system adheres to Clean Architecture principles. The hard decoupling between the React 19 Frontend and the Flask API Gateway allows for independent horizontal scaling. Celery/Redis effectively offloads blocking tasks.
-- **Weaknesses**: Currently lacks an API Gateway (like Kong or AWS API Gateway) for advanced traffic routing outside of the Nginx reverse proxy.
+- **Strengths**: The system adheres to Clean Architecture principles. The hard decoupling between the React 19 Frontend and the Flask Flask Backend allows for independent horizontal scaling. Celery/Redis effectively offloads blocking tasks.
+- **Weaknesses**: Currently lacks an Flask Backend (like Kong or AWS Flask Backend) for advanced traffic routing outside of the Nginx reverse proxy.
 - **Verdict**: Highly robust for mid-to-large tier transactional throughput.
 
 ## 2. Security Audit
@@ -18,7 +18,7 @@ This report evaluates the structural integrity, security, and scalability of the
 - **Recommendation**: Implement read-replicas for the Analytics dashboards to prevent locking the primary write-database during heavy inference load.
 
 ## 4. Performance Audit
-- **Strengths**: Sub-50ms inference latency. The Vite production build heavily minifies the React application, ensuring rapid Time-To-Interactive (TTI).
+- **Strengths**: Optimized inference latency. The Vite production build heavily minifies the React application, ensuring rapid Time-To-Interactive (TTI).
 - **Weaknesses**: The React Three Fiber 3D meshes (`ModelGalaxy`, `TrustRing`) heavily utilize the client's GPU.
 - **Recommendation**: Implement a dynamic resolution scaler for the 3D assets to degrade gracefully on low-end mobile devices.
 

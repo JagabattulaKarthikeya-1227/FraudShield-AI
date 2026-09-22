@@ -46,4 +46,4 @@ Please refer to the `README.md` for standard local setup. Ensure that:
 Because this project demonstrates enterprise security (SOC 2, OWASP):
 - **Never commit secrets**.
 - Always use the `AcademicTooltip` component when adding new UI features to explain the enterprise/academic reasoning behind the feature.
-- Maintain the strict separation of concerns between the API Gateway and the Inference Engine.
+- Maintain the strict separation of concerns between the Flask Backend and the Inference Engine.

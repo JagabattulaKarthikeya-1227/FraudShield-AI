@@ -37,7 +37,7 @@ Unlike typical Jupyter Notebook data science projects, FraudShield AI wraps the 
 
 ## ✨ Key Features
 
-1. **Stacking Ensemble Engine**: Achieves optimal PR-AUC on imbalanced data by stacking Extra Trees, Random Forest, and a Multilayer Perceptron, utilizing Logistic Regression as the Meta-Learner.
+1. **Stacking Ensemble Engine**: Achieves optimal PR-AUC on imbalanced data by stacking Extra Trees, a Multilayer Perceptron, utilizing XGBoost as the Meta-Learner.
 2. **Explainable AI (SHAP)**: Financial models cannot be "black boxes". We utilize KernelSHAP to provide exact, legally defensible feature importance for every blocked transaction.
 3. **Enterprise AI Copilot**: A context-aware LLM interface that explains the complex SHAP values to non-technical fraud analysts in plain English.
 4. **DevSecOps & Governance**: Features a live Security Operations Center (SOC) dashboard, OWASP Top 10 defenses (HttpOnly cookies, Argon2id), and an immutable Audit Log.
@@ -51,7 +51,7 @@ Unlike typical Jupyter Notebook data science projects, FraudShield AI wraps the 
 graph TD
     Client[Web Client - React/Vite] -->|HTTPS| Proxy[NGINX Reverse Proxy]
     Proxy --> Frontend[Static Assets]
-    Proxy -->|/api| Gateway[API Gateway - Flask]
+    Proxy -->|/api| Gateway[Flask Backend]
     Gateway --> Auth[Auth Service - JWT/Argon2id]
     Gateway --> Inference[ML Inference Service]
     Gateway --> Explain[XAI Engine - SHAP]

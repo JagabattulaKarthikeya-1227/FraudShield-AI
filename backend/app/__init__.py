@@ -89,7 +89,7 @@ def create_app(config_name=None):
     def health_check():
         return jsonify({"status": "healthy", "version": "1.0.0"})
 
-    # 5. Pre-warm ML Inference Engine in background thread so first user request is instant (<50ms)
+    # 5. Pre-warm ML Inference Engine in background thread so first user request is responsive
     import threading
 
     def _warmup_ml(app_instance):

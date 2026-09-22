@@ -8,7 +8,7 @@
 **Strengths**:
 - **Methodological Rigor**: The application of a Meta-Ensemble to penalize False Negatives (F1-Macro optimization) is highly appropriate for fraud typologies.
 - **Novelty in Transparency**: Integrating SHAP directly into the operational UI bridges a critical gap between academic ML metrics and real-world banking compliance (GDPR Article 22).
-- **Reproducibility**: The containerized microservice topology ensures the research can be replicated flawlessly.
+- **Reproducibility**: The containerized modular backend architecture ensures the research can be replicated flawlessly.
 
 **Weaknesses / Threats to Validity**:
 - The reliance on SMOTE for oversampling assumes the synthetic vectors accurately represent true, out-of-distribution fraudulent attacks. Future work should evaluate Generative Adversarial Networks (GANs) for minority synthesis.
@@ -31,7 +31,7 @@
 
 | Category | Score (0-10) | Justification |
 | :--- | :---: | :--- |
-| **Architecture** | **9.5** | Clean separation of concerns. Scalable API Gateway. |
+| **Architecture** | **9.5** | Clean separation of concerns. Scalable Flask Backend. |
 | **UI / UX** | **10.0** | Premium, Bloomberg/Stripe-tier interface with stunning 3D WebGL meshes. |
 | **Backend** | **9.0** | Robust Flask/SQLAlchemy implementation. Excellent use of background workers. |
 | **Frontend** | **9.5** | Vite, Zustand, and React Query provide a modern, highly responsive client. |

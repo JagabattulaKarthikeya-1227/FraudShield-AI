@@ -55,7 +55,7 @@ Generates SHAP values for a specific transaction to explain the model's decision
 ### `GET /registry`
 Returns the status of Champion, Challenger, and Retired models.
 ### `GET /drift`
-Returns KL Divergence and PSI metrics for feature distribution shifts.
+Returns model registry metrics and tracks statuses.
 
 ---
 
