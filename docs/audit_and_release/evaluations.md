@@ -2,7 +2,7 @@
 
 ## 1. IEEE Reviewer Simulation
 
-**Paper Title**: FraudShield AI: An Enterprise-Grade Explainable Machine Learning Platform for Financial Anomaly Detection
+**Paper Title**: FraudShield AI: A Comprehensive Explainable Machine Learning Platform for Financial Anomaly Detection
 **Reviewer Recommendation**: **Accept (Strong)**
 
 **Strengths**:
@@ -38,5 +38,5 @@
 | **Machine Learning** | **9.5** | Sophisticated Meta-Ensemble. High PR-AUC on extremely imbalanced data. |
 | **Explainability** | **10.0** | Best-in-class SHAP integration replacing black-box opacity with visual transparency. |
 | **Security** | **9.0** | Strict JWT RBAC, OWASP compliance mapping, and immutable Audit Logging. |
-| **DevOps** | **8.5** | Clean Docker Compose orchestration. Production-ready CI/CD workflows. |
+| **DevOps** | **8.5** | Clean Docker Compose orchestration. Configured CI/CD workflows. |
 | **Overall Quality** | **9.4** | An exceptionally engineered, portfolio-defining capstone project. |

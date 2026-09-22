@@ -19,8 +19,8 @@ To maximize detection of complex, non-linear fraud typologies while minimizing f
 
 ## 3. Explainability: SHAP Integration
 FraudShield AI utilizes **KernelExplainer** (SHapley Additive exPlanations) to provide feature attributions.
-- **Function**: Calculates the exact marginal contribution of every single feature (e.g., `Amount`, `V4`) to the final prediction probability.
-- **Output**: Generates a JSON payload consumed by the Frontend to render interactive Waterfall charts, visually explaining *why* a transaction was flagged, satisfying the legal "Right to Explanation."
+- **Function**: Calculates local feature attributions of every single feature (e.g., `Amount`, `V4`) to the final prediction probability.
+- **Output**: Generates a JSON payload consumed by the Frontend to render interactive Waterfall charts, visually explaining *why* a transaction was flagged.
 
 ## 4. Evaluation Metrics
 The system is continuously evaluated against a hold-out test set.
@@ -30,5 +30,5 @@ The system is continuously evaluated against a hold-out test set.
 - **PR-AUC**: Target maximization for imbalanced data (Precision-Recall Area Under Curve is the primary metric due to extreme class imbalance; standard ROC-AUC is misleading in this context).
 
 ## 5. Limitations & Future Improvements
-- **Limitation**: KernelExplainer computation introduces a minor latency overhead (~15ms) compared to raw inference.
+- **Limitation**: KernelExplainer computation introduces a latency overhead compared to raw inference.
 - **Future Scope**: Implementing a specialized Graph Neural Network (GNN) to detect coordinated "fraud rings" across multiple connected accounts.

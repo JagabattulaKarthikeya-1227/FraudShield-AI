@@ -4,12 +4,12 @@
 **Version**: 1.0.0 (Production Stable)
 
 ## Executive Summary
-FraudShield AI v1.0.0 marks the official transition from development to a production-ready enterprise platform. This release encompasses the full Hybrid ML Ensemble, the complete React 19 / WebGL frontend, and the rigorous GRC / MLOps telemetry dashboards.
+FraudShield AI v1.0.0 marks the official transition from development to a academic portfolio platform. This release encompasses the full Hybrid ML Ensemble, the complete React 19 / WebGL frontend, and the rigorous GRC / MLOps telemetry dashboards.
 
 ## What's Included (Core Features)
 - **Real-Time Inference Engine**: Evaluates 30-dimensional financial vectors.
 - **SHAP Explainability Studio**: Visualizes the exact algorithmic reasoning behind fraud classifications using interactive Waterfall charts.
-- **MLOps Shadow Deployment**: Full Model Registry for model status tracking.
+- **MLOps Model Registry**: Full Model Registry for model status tracking.
 - **Enterprise GRC Dashboards**: Security Center, Incident Management, Privacy Center, and Responsible AI compliance trackers.
 - **3D Spatial Analytics**: Custom React Three Fiber WebGL meshes (`TrustRing`, `ModelGalaxy`) for premium data visualization.
 

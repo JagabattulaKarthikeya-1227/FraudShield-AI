@@ -25,7 +25,7 @@ Use these scripts for Hackathons, Academic Presentations, or Job Interviews. Kee
 "We use SHAP (SHapley Additive exPlanations) to provide local feature attribution explanations, allowing us to interpret the model's decisions."
 
 **[4:00 - Conclusion]**
-"FraudShield AI isn't just a model in a Jupyter Notebook. It's a secure, cloud-native, production-ready AI platform."
+"FraudShield AI isn't just a model in a Jupyter Notebook. It's an application demonstrating enterprise AI platform principles."
 
 ---
 

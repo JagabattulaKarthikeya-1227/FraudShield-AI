@@ -1,6 +1,6 @@
 # Contributing to FraudShield AI
 
-Thank you for your interest in contributing to FraudShield AI! This document provides guidelines for contributing to this enterprise-grade demonstration platform.
+Thank you for your interest in contributing to FraudShield AI! This document provides guidelines for contributing to this academic demonstration platform.
 
 ## Code of Conduct
 
@@ -9,7 +9,7 @@ By participating in this project, you are expected to uphold a welcoming, inclus
 ## Branching Strategy
 
 We follow a simplified GitFlow workflow:
-- `main`: Production-ready code.
+- `main`: Stable branch.
 - `develop`: Integration branch for new features.
 - `feature/<name>`: For new features (e.g., `feature/dashboard-polish`).
 - `bugfix/<name>`: For resolving bugs.

@@ -28,7 +28,7 @@ The project is NOT intended to be a simple college assignment. It is intended to
 
 ## 2. PROJECT VISION
 
-FraudShield AI aims to become a complete enterprise-grade demonstration of modern fraud detection systems.
+FraudShield AI aims to become a comprehensive academic demonstration of modern fraud detection systems.
 
 Every component should communicate:
 Trust, Security, Reliability, Performance, Transparency, Professionalism, Maintainability, Scalability, Explainability.
@@ -390,7 +390,7 @@ Architecture is complete only if:
 ✔ ML pipeline isolated
 ✔ Reusable components
 ✔ Testable modules
-✔ Production-ready folder structure
+✔ Structured backend folder structure
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 END OF PART 2

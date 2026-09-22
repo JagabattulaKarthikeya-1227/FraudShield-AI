@@ -6,7 +6,7 @@
   <h3>Explainable Hybrid Ensemble Framework for Intelligent Credit Card Fraud Detection</h3>
   
   <p>
-    <b>A Production-Grade Demonstration of Enterprise Machine Learning & DevSecOps.</b>
+    <b>An academic and portfolio demonstration of full-stack machine learning and DevSecOps concepts.</b>
   </p>
   
   <p>
@@ -25,7 +25,7 @@
 
 **FraudShield AI** is a comprehensive, full-stack portfolio project demonstrating the end-to-end lifecycle of an enterprise Machine Learning product. It solves the complex problem of **Credit Card Fraud Detection** in highly imbalanced datasets (0.1% positive class) by utilizing a Stacking Ensemble architecture (Extra Trees + MLP + XGBoost Meta-Learner).
 
-Unlike typical Jupyter Notebook data science projects, FraudShield AI wraps the predictive models in a **production-ready DevSecOps ecosystem**, featuring:
+Unlike typical Jupyter Notebook data science projects, FraudShield AI wraps the predictive models in a **simulated DevSecOps ecosystem**, featuring:
 - A luxury React/Framer Motion frontend with 3D WebGL visualizations.
 - A Flask-based API layer simulating Gunicorn/NGINX deployments.
 - Explainable AI (XAI) via SHAP to support interpretability workflows.

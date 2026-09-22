@@ -213,13 +213,13 @@ export const LoginPage = () => {
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-primary-foreground/80 text-lg leading-relaxed max-w-sm"
               >
-                Protect every transaction with enterprise-grade AI fraud detection and real-time explainability.
+                Protect every transaction with advanced AI fraud detection and real-time explainability.
               </motion.p>
             </div>
 
             <div className="space-y-6">
               {[
-                { icon: ShieldCheck, title: 'Real-Time Fraud Detection', desc: 'Sub-millisecond processing' },
+                { icon: ShieldCheck, title: 'Real-Time Fraud Detection', desc: 'Low-latency fraud inference' },
                 { icon: BarChart2, title: 'Explainable AI Predictions', desc: 'SHAP value transparency' },
                 { icon: Lock, title: 'Enterprise Security', desc: 'Security-focused architecture' },
               ].map(({ icon: Icon, title, desc }, idx) => (

@@ -17,7 +17,7 @@ const faqs = [
  },
  {
  question:"Is my codebase secure?",
- answer:"Yes. Agents operate in sandboxed environments with zero-trust policies. We are SOC2 Type II certified. You can deploy FraudShield AI on-premise or use VPC peering for enterprise security."
+ answer:"The project implements enterprise-oriented security controls including JWT-based authentication, RBAC, secure password hashing, and security-focused application practices. It is an academic/portfolio project and is not independently SOC 2 certified."
  },
  {
  question:"Can I extend the SDK with custom tools?",

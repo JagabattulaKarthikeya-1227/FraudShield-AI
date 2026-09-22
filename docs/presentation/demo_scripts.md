@@ -8,7 +8,7 @@ This document provides structured narration for presenting the project in variou
 "Good morning. Did you know that global transaction fraud is projected to cost the industry $40 billion by 2027? Current systems are black-boxes—they block legitimate customers and frustrate analysts. We built FraudShield AI to fix this."
 
 **[Slide 2: The Solution]**
-"FraudShield AI is an enterprise-grade, cloud-native fraud detection platform. We didn't just build a model; we built an entire MLOps ecosystem. Our hybrid XGBoost ensemble detects anomalies in under 50 milliseconds with 99% precision."
+"FraudShield AI demonstrates a fraud detection platform. We built a foundation for an MLOps ecosystem. Our hybrid XGBoost ensemble is designed for low-latency inference."
 
 **[Slide 3: The Secret Weapon - Explainability]**
 "But accuracy isn't enough. Regulators require transparency. We integrated SHAP explainability directly into a stunning React Three Fiber 3D interface. Analysts no longer guess *why* the AI flagged a transaction; the AI visually proves it to them."
@@ -36,12 +36,12 @@ This document provides structured narration for presenting the project in variou
 
 **[Live Demonstration: 3 mins]**
 - Log in as 'Administrator'.
-- Route to the **Fraud Intelligence Center**. Show the real-time throughput metrics.
+- Route to the **Fraud Intelligence Center**. Show the transaction metrics.
 - Route to the **Explainability Studio**. Select a flagged transaction and demonstrate how the SHAP waterfall chart breaks down the exact algorithmic logic.
 - Route to the **3D MLOps Center**. Show the 'Model Galaxy' and 'Experiment Orbit' WebGL meshes.
 
 **[Conclusion & Q&A: 2 mins]**
-- Summarize achievements: High PR-AUC, low latency, and regulatory compliance.
+- Summarize achievements: Model interpretability and security controls.
 - Open the floor to the evaluation panel.
 
 ---
@@ -61,8 +61,8 @@ This document provides structured narration for presenting the project in variou
 
 **Scene 3 [0:45 - 1:15]**:
 *Visual*: Navigating the MLOps Center, showing the Model Registry Dashboard and the 3D Model Galaxy.
-*Voiceover*: "It features a complete MLOps lifecycle, including shadow deployments, data drift monitoring, and a full Model Registry to ensure production models remain perfectly calibrated."
+*Voiceover*: "It features a Model Registry and configured infrastructure that form the foundation for future shadow evaluation and automated drift workflows."
 
 **Scene 4 [1:15 - 2:00]**:
 *Visual*: Showing the Security Center and Audit Ledger. Fade out to the GitHub repository URL.
-*Voiceover*: "Secured via strict JWT authentication, RBAC, and rate-limiting, FraudShield AI is production-ready. Check out the source code and documentation on GitHub."
+*Voiceover*: "Secured via strict JWT authentication, RBAC, and rate-limiting, FraudShield AI is designed with relevant security considerations. Check out the source code and documentation on GitHub."

@@ -45,7 +45,7 @@ export const RecruiterShowcase: React.FC<{ isOpen: boolean; onClose: () => void 
  </div>
  <h3 className="text-xl font-bold tracking-tight text-slate-900">FraudShield AI Enterprise</h3>
  <p className="text-sm text-slate-600 leading-relaxed">
- A production-grade demonstration of full-stack engineering, machine learning, and enterprise UX design. This platform solves the complex issue of credit card fraud detection using an Explainable Hybrid Ensemble Framework.
+ An academic and portfolio demonstration of full-stack engineering, machine learning, and enterprise UX design. This platform solves the complex issue of credit card fraud detection using an Explainable Hybrid Ensemble Framework.
  </p>
  </section>
 

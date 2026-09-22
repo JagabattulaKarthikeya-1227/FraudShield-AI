@@ -1,23 +1,23 @@
-# FraudShield AI: An Enterprise-Grade Explainable Machine Learning Platform for Financial Anomaly Detection
+# FraudShield AI: A Comprehensive Explainable Machine Learning Platform for Financial Anomaly Detection
 
 **Certificate Page**  
 This is to certify that this project report entitled "FraudShield AI" is the bona fide work of the engineering team, submitted in partial fulfillment of the requirements for the degree of Bachelor of Engineering / Technology.
 
 **Abstract**  
-The rapid digitization of financial services has precipitated an unprecedented rise in sophisticated transaction fraud. Traditional rule-based systems suffer from high false-positive rates and lack the agility to adapt to novel fraud typologies. This project proposes *FraudShield AI*, an enterprise-grade hybrid machine learning architecture that integrates model registry tracking (with designs for a Champion vs. Challenger pipeline). The proposed system leverages a Stacked Ensemble model (Extra Trees, MLP, and XGBoost) enhanced with Synthetic Minority Over-sampling Technique (SMOTE) to combat severe class imbalance. Crucially, the platform integrates SHAP (SHapley Additive exPlanations) to provide SHAP-based feature attribution, allowing analysts to interpret algorithmic decisions. The system is engineered to maximize PR-AUC while maintaining low inference latency.
+The rapid digitization of financial services has precipitated an unprecedented rise in sophisticated transaction fraud. Traditional rule-based systems suffer from high false-positive rates and lack the agility to adapt to novel fraud typologies. This project proposes *FraudShield AI*, a hybrid machine learning architecture that integrates model registry tracking (with designs for a Champion vs. Challenger pipeline). The proposed system leverages a Stacked Ensemble model (Extra Trees, MLP, and XGBoost) enhanced with Synthetic Minority Over-sampling Technique (SMOTE) to combat severe class imbalance. Crucially, the platform integrates SHAP (SHapley Additive exPlanations) to provide SHAP-based feature attribution, allowing analysts to interpret algorithmic decisions. The system is engineered to maximize PR-AUC while maintaining low inference latency.
 
 ---
 
 ## Chapter 1: Introduction
 
 ### 1.1 Problem Statement
-Modern financial institutions process millions of transactions per second. Fraudulent transactions constitute a minuscule fraction (<0.1%) of this volume, creating a severe class imbalance problem. Black-box neural networks achieve high accuracy but fail to provide the "Right to Explanation" demanded by international privacy laws.
+Modern financial institutions process millions of transactions per second. Fraudulent transactions constitute a minuscule fraction (<0.1%) of this volume, creating a severe class imbalance problem. Black-box neural networks achieve high accuracy but can lack interpretability.
 
 ### 1.2 Objectives
 1. Develop a high-throughput transaction inference engine.
 2. Implement a Hybrid Ensemble model robust against data drift.
 3. Construct an Explainability Studio utilizing SHAP values.
-4. Establish a full CI/CD MLOps lifecycle supporting shadow deployments.
+4. Configure infrastructure for future MLOps lifecycles.
 
 ---
 
@@ -32,7 +32,7 @@ Existing literature heavily focuses on raw accuracy using Deep Learning, often n
 | Adaptability | Low | High | Very High (Continuous Eval) |
 | False Positive Rate | High | Medium | Low |
 | Explainability | Transparent | Opaque | Transparent (SHAP) |
-| Architecture | Monolithic | Modular Monolith | Cloud-Native / Dockerized |
+| Architecture | Monolithic | Modular Monolith | Containerized |
 
 ---
 
@@ -68,11 +68,11 @@ A fully featured Governance, Risk, and Compliance (GRC) module continually maps 
 - **ROC-AUC**: 0.998
 - **PR-AUC**: Target maximization for imbalanced data
 - **Recall**: 95.4%
-- **Inference Latency**: 42ms
+- **Inference Latency**: Designed for low-latency inference
 - **Throughput**: Designed for high throughput
 
 ### 6.2 Discussion
-The integration of SHAP completely eliminated the "black-box" dilemma, allowing Analysts to approve or reject borderline transactions in under 10 seconds. The shadow deployment framework proved invaluable in capturing silent feature drift without affecting live customer traffic.
+The integration of SHAP completely eliminated the "black-box" dilemma, allowing Analysts to approve or reject borderline transactions in efficiently. The shadow deployment design provides a foundation for capturing silent feature drift.
 
 ---
 

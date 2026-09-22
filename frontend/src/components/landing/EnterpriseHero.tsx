@@ -140,9 +140,9 @@ export function EnterpriseHero() {
               </motion.div>
               <motion.div variants={itemVariants} className="flex flex-col gap-1.5 group cursor-default">
                 <div className="font-bold text-foreground text-xl flex items-center gap-2 group-hover:text-primary transition-colors">
-                  <Lock className="w-5 h-5 text-primary" /> SOC2
+                  <Lock className="w-5 h-5 text-primary" /> Security Principles
                 </div>
-                <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Certified Secure</div>
+                <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Enterprise Design</div>
               </motion.div>
               <motion.div variants={itemVariants} className="flex flex-col gap-1.5 group cursor-default">
                 <div className="font-bold text-foreground text-xl flex items-center gap-2 group-hover:text-primary transition-colors">

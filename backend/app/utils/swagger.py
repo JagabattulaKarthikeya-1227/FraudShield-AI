@@ -22,7 +22,7 @@ def setup_swagger(app):
         "swagger": "2.0",
         "info": {
             "title": "FraudShield AI API Documentation",
-            "description": "Production-ready API for explainable credit card fraud detection system.",
+            "description": "API for explainable credit card fraud detection system.",
             "contact": {
                 "responsibleOrganization": "FraudShield AI",
                 "responsibleDeveloper": "Principal Software Architect",

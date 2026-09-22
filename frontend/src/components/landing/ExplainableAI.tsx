@@ -45,7 +45,7 @@ export function ExplainableAI() {
  {[
  { title:"SHAP Values", desc:"Understand exactly how much each feature contributed to the final risk score globally and locally." },
  { title:"Risk Explanations", desc:"Generate intuitive approximations for complex neural network decisions." },
- { title:"Regulatory Compliance", desc:"Automated rationale reports ready for auditors and internal review boards." }
+ { title:"Interpretability", desc:"SHAP provides local feature attributions that help analysts interpret model predictions." }
  ].map((item, idx) => (
  <motion.div 
  key={idx}

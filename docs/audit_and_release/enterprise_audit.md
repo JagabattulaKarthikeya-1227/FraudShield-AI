@@ -23,7 +23,7 @@ This report evaluates the structural integrity, security, and scalability of the
 - **Recommendation**: Implement a dynamic resolution scaler for the 3D assets to degrade gracefully on low-end mobile devices.
 
 ## 5. AI / ML Pipeline Audit
-- **Strengths**: The Hybrid Stacked Ensemble (ExtraTrees + DNN -> XGBoost) is highly resistant to variance. SMOTE completely mitigates the 99.8% class imbalance. The SHAP integration mathematically guarantees explainability. The Shadow Deployment pipeline prevents Concept Drift.
+- **Strengths**: The Hybrid Stacked Ensemble (ExtraTrees + DNN -> XGBoost) is highly resistant to variance. SMOTE completely mitigates the 99.8% class imbalance. The SHAP integration provides feature attributions. The Shadow Deployment architecture is designed to monitor Concept Drift.
 - **Weaknesses**: SMOTE can be computationally expensive during large-scale retraining.
 - **Verdict**: A state-of-the-art implementation that successfully balances predictive power with regulatory transparency.
 
