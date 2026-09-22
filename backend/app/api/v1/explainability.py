@@ -85,28 +85,21 @@ def get_global_insights():
             .scalar()
             or 0
         )
-        total_count = db.session.query(db.func.count(Prediction.id)).scalar() or 1
-        fraud_rate = (
-            round(high_risk_count / max(total_count, 1), 4)
-            if total_count > 10
-            else 0.0020
-        )
+        total_count = db.session.query(db.func.count(Prediction.id)).scalar() or 0
+        if total_count > 10:
+            fraud_rate = round(high_risk_count / total_count, 4)
+        else:
+            fraud_rate = None
     except Exception:
-        fraud_rate = 0.0020  # Enterprise Kaggle dataset baseline (0.20%)
+        fraud_rate = None
 
     return success_response(
         data={
-            "is_demo_mode": True,
+            "status": "unavailable",
+            "is_demo_mode": False,
+            "feature_importance": [],
             "fraud_rate": fraud_rate,
-            "feature_importance": [
-                {"feature": "V17 (Demonstration Baseline)", "importance": 0.28},
-                {"feature": "V14 (Demonstration Baseline)", "importance": 0.24},
-                {"feature": "V12 (Demonstration Baseline)", "importance": 0.19},
-                {"feature": "Amount (Demonstration Baseline)", "importance": 0.15},
-                {"feature": "V10 (Demonstration Baseline)", "importance": 0.08},
-                {"feature": "V3 (Demonstration Baseline)", "importance": 0.06},
-            ],
-            "note": "Global explainability is currently in demo mode with static baselines."
+            "note": "Global explainability data is unavailable because no aggregated SHAP data is currently available."
         }
     )
 

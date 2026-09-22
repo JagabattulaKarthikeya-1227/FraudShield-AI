@@ -161,7 +161,11 @@ const KpiCard = React.memo(({ title, value, trend, trendUp, sparklineColor, spar
             </div>
           </div>
           <div className="h-10 w-full opacity-60 group-hover:opacity-100 transition-opacity">
-            <ReactEChartsCore echarts={echarts} option={sparklineOptions(sparklineColor, sparklineData)} style={{ height: '100%', width: '100%' }} />
+            {sparklineData && sparklineData.length > 0 ? (
+              <ReactEChartsCore echarts={echarts} option={sparklineOptions(sparklineColor, sparklineData)} style={{ height: '100%', width: '100%' }} />
+            ) : (
+              <div className="flex items-center text-xs text-slate-400 h-full">No telemetry data available</div>
+            )}
           </div>
         </>
       )}
@@ -237,12 +241,12 @@ export const CustomerDashboard = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-        <KpiCard title="Total Transactions" value={totalTx}   trend="Live" trendUp={true}  sparklineColor="#0f766e" sparklineData={[10, 20, 15, 30, 25, 40]} loading={statsLoading} />
-        <KpiCard title="Fraud Prevented"   value={fraudPrev}  trend="Live" trendUp={false} sparklineColor="#e11d48" sparklineData={[5, 10, 8, 15, 12, 20]}  loading={statsLoading} />
-        <KpiCard title="Network Nodes"     value={activeNodes} trend="Live" trendUp={true}  sparklineColor="#f59e0b" sparklineData={[7, 8, 6, 9, 8, 8]}      loading={statsLoading} />
-        <KpiCard title="F1 Score" value={accuracyVal}     trend="N/A" trendUp={true} sparklineColor="#0f766e" sparklineData={[40, 41, 41, 41, 41, 41]} loading={false} />
-        <KpiCard title="Avg Processing Time" value="Not Measured"     trend="N/A"  trendUp={true}  sparklineColor="#0f766e" sparklineData={[0, 0, 0, 0, 0, 0]}  loading={false} />
-        <KpiCard title="System Status"     value={sysStatus}  trend="Active" trendUp={true} sparklineColor="#0F766E" sparklineData={[3, 3, 3, 3, 3, 3]}      loading={statsLoading} />
+        <KpiCard title="Total Transactions" value={totalTx}   trend="Live" trendUp={true}  sparklineColor="#0f766e" sparklineData={[]} loading={statsLoading} />
+        <KpiCard title="Fraud Prevented"   value={fraudPrev}  trend="Live" trendUp={false} sparklineColor="#e11d48" sparklineData={[]}  loading={statsLoading} />
+        <KpiCard title="Network Nodes"     value={activeNodes} trend="Live" trendUp={true}  sparklineColor="#f59e0b" sparklineData={[]}      loading={statsLoading} />
+        <KpiCard title="F1 Score" value={accuracyVal}     trend="N/A" trendUp={true} sparklineColor="#0f766e" sparklineData={[]} loading={false} />
+        <KpiCard title="Avg Processing Time" value="Not Measured"     trend="N/A"  trendUp={true}  sparklineColor="#0f766e" sparklineData={[]}  loading={false} />
+        <KpiCard title="System Status"     value={sysStatus}  trend="Active" trendUp={true} sparklineColor="#0F766E" sparklineData={[]}      loading={statsLoading} />
       </div>
 
       {/* Row 2: Live Stream & Alerts */}
@@ -440,7 +444,7 @@ export const CustomerDashboard = () => {
             </div>
             <div className="flex gap-3 items-start">
               <div className="mt-0.5 p-1.5 rounded-full bg-emerald-50 text-emerald-600"><Activity className="w-3.5 h-3.5" /></div>
-              <p className="text-sm text-slate-600 leading-relaxed">V14 (Velocity) and V17 (Location) are the highest SHAP contributors to fraud decisions.</p>
+              <p className="text-sm text-slate-600 leading-relaxed">The model explanation highlights the anonymized features that contributed most to this prediction.</p>
             </div>
           </div>
         </div>

@@ -146,10 +146,9 @@ export function EnterpriseHero() {
               </motion.div>
               <motion.div variants={itemVariants} className="flex flex-col gap-1.5 group cursor-default">
                 <div className="font-bold text-foreground text-xl flex items-center gap-2 group-hover:text-primary transition-colors">
-                  <CreditCard className="w-5 h-5 text-primary" /> 
-                  &lt;<AnimatedCounter value={50} formatter={(v) => v + "ms"} delay={0.7} />
+                  <CreditCard className="w-5 h-5 text-primary" /> Fast
                 </div>
-                <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Processing Time</div>
+                <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">Transaction Evaluation</div>
               </motion.div>
             </motion.div>
           </motion.div>
