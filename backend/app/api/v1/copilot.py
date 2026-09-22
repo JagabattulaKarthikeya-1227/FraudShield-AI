@@ -8,6 +8,8 @@ from app.middleware.auth import require_role
 from app.models.transaction import Transaction, TransactionStatus
 from app.models.grc import SecurityIncident
 import datetime
+import yaml
+from pathlib import Path
 
 copilot_bp = Blueprint("copilot", __name__)
 
@@ -67,7 +69,25 @@ def summarize_case(tx_id):
     summary = f"AI Summary for {tx_id}: Transaction Amount: {tx.amount} {tx.currency}. Merchant: {tx.merchant}. Status: {tx.status.value}."
     
     if tx.prediction and tx.prediction.risk_score is not None:
-        summary += f" Risk Level: {tx.prediction.risk_level} ({round(tx.prediction.risk_score * 100, 2)}%)."
+        score = tx.prediction.risk_score
+        risk_level = None
+        try:
+            config_path = Path(__file__).resolve().parent.parent.parent / "ml" / "config" / "risk_thresholds.yaml"
+            with open(config_path, "r") as f:
+                thresholds = yaml.safe_load(f)["thresholds"]
+            if score < thresholds["low_risk"]["max_probability"]:
+                risk_level = "Low Risk"
+            elif score < thresholds["review_required"]["max_probability"]:
+                risk_level = "Review Required"
+            else:
+                risk_level = "High Risk"
+        except Exception:
+            pass
+
+        if risk_level:
+            summary += f" Risk Level: {risk_level} ({round(score * 100, 2)}%)."
+        else:
+            summary += f" Risk Score: {round(score * 100, 2)}% (Categorical risk label is unavailable)."
     else:
         summary += " Risk probability and detailed feature attribution are currently unavailable."
 
@@ -87,18 +107,25 @@ def generate_report():
     total_fraud = Transaction.query.filter_by(status=TransactionStatus.DECLINED).count()
     total_queue = Transaction.query.filter_by(status=TransactionStatus.FLAGGED).count()
     
-    fraud_rate = round((total_fraud / total_tx) * 100, 2) if total_tx > 0 else 0
-    criticals = SecurityIncident.query.filter_by(severity="Critical").count() if hasattr(SecurityIncident, "query") else 0
+    fraud_rate_str = f"{round((total_fraud / total_tx) * 100, 2)}%" if total_tx > 0 else "Unavailable"
+    
+    if hasattr(SecurityIncident, "query"):
+        criticals = SecurityIncident.query.filter(
+            SecurityIncident.severity == "Critical",
+            SecurityIncident.status.in_(["Open", "Investigating"])
+        ).count()
+    else:
+        criticals = 0
 
     markdown_report = f"""# Executive Fraud Report
 
 ## Transaction Overview
 - **Transactions Today**: {tx_today}
-- **Global Fraud Rate**: {fraud_rate}%
+- **Global Fraud Rate**: {fraud_rate_str}
 - **Review Queue**: {total_queue} flagged transactions awaiting review.
 
 ## Security Overview
-- **Critical Incidents**: {criticals} active critical security incidents.
+- **Active Critical Incidents**: {criticals} active critical security incidents.
 
 *Note: Model evaluation, latency, and false positive rates are currently unmeasured and unavailable.*
 """
