@@ -2,6 +2,7 @@ import pytest
 import json
 import datetime
 from app.models.transaction import Transaction, TransactionStatus
+from app.models.user import User
 from app.database.core import db
 
 def test_telemetry_role_access(client):
@@ -55,22 +56,38 @@ def test_telemetry_trends_empty_db(client):
 
 def test_telemetry_trends_real_data(client, app):
     # Setup admin token
+    client.post('/api/v1/auth/register', json={
+        "email": "admin_telemetry2@fraudshield.ai",
+        "password": "SecurePassword123!",
+        "first_name": "Admin",
+        "last_name": "User",
+        "role": "Administrator"
+    })
     auth_resp = client.post('/api/v1/auth/login', json={
-        "email": "admin_telemetry@fraudshield.ai",
+        "email": "admin_telemetry2@fraudshield.ai",
         "password": "SecurePassword123!"
     })
     token = json.loads(auth_resp.data)["data"]["access_token"]
 
     # Case 1 - real data
     with app.app_context():
+        # Get the admin user we just registered (or another user) to satisfy user_id constraint
+        admin_user = User.query.filter_by(email="admin_telemetry2@fraudshield.ai").first()
+        
         # Seed some data
         tx1 = Transaction(
+            user_id=admin_user.id,
+            category="Test Category 1",
+            currency="USD",
             merchant="Test Merchant 1",
             amount=100.0,
             status=TransactionStatus.APPROVED,
             transaction_date=datetime.datetime.now()
         )
         tx2 = Transaction(
+            user_id=admin_user.id,
+            category="Test Category 2",
+            currency="USD",
             merchant="Test Merchant 2",
             amount=200.0,
             status=TransactionStatus.DECLINED,
