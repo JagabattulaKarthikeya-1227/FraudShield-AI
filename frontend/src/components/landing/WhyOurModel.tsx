@@ -8,7 +8,7 @@ import { FadeIn } from '@/components/motion/FadeIn';
 const features = [
  { title:"Hybrid Ensemble", text:"Combining neural networks with tree-based models ensures non-linear relationships and strict rules are both captured." },
  { title:"Explainability", text:"Compliance is guaranteed. Every prediction comes with a SHAP waterfall chart detailing exact feature influences." },
- { title:"Fast Inference", text:"Optimized for extreme throughput, scoring transactions in under 50ms using efficient caching." },
+ { title:"Fast Inference", text:"Optimized for extreme throughput, scoring transactions quickly using efficient caching." },
  { title:"High Recall", text:"Optimized to detect fraudulent transactions while maintaining a manageable false positive rate for analysts." },
  { title:"SMOTE", text:"Synthetic Minority Over-sampling Technique handles class imbalance, preventing the model from ignoring rare fraud types." },
  { title:"Risk Scoring", text:"Not just binary classification. Detailed risk scoring (Low, Review, High) allows for dynamic business logic." }

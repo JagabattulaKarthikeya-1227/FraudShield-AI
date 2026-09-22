@@ -240,7 +240,7 @@ export const CustomerDashboard = () => {
         <KpiCard title="Total Transactions" value={totalTx}   trend="Live" trendUp={true}  sparklineColor="#0f766e" sparklineData={[10, 20, 15, 30, 25, 40]} loading={statsLoading} />
         <KpiCard title="Fraud Prevented"   value={fraudPrev}  trend="Live" trendUp={false} sparklineColor="#e11d48" sparklineData={[5, 10, 8, 15, 12, 20]}  loading={statsLoading} />
         <KpiCard title="Network Nodes"     value={activeNodes} trend="Live" trendUp={true}  sparklineColor="#f59e0b" sparklineData={[7, 8, 6, 9, 8, 8]}      loading={statsLoading} />
-        <KpiCard title="Detection Accuracy (F1)" value={accuracyVal}     trend="N/A" trendUp={true} sparklineColor="#0f766e" sparklineData={[40, 41, 41, 41, 41, 41]} loading={false} />
+        <KpiCard title="F1 Score" value={accuracyVal}     trend="N/A" trendUp={true} sparklineColor="#0f766e" sparklineData={[40, 41, 41, 41, 41, 41]} loading={false} />
         <KpiCard title="Avg Processing Time" value="Not Measured"     trend="N/A"  trendUp={true}  sparklineColor="#0f766e" sparklineData={[0, 0, 0, 0, 0, 0]}  loading={false} />
         <KpiCard title="System Status"     value={sysStatus}  trend="Active" trendUp={true} sparklineColor="#0F766E" sparklineData={[3, 3, 3, 3, 3, 3]}      loading={statsLoading} />
       </div>

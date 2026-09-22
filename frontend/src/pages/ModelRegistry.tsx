@@ -14,7 +14,7 @@ export const ModelRegistry = () => {
   // Derive metrics or fallback to unavailable
   const f1Val = activeModel?.f1_score != null ? (activeModel.f1_score * 100).toFixed(2) + "%" : "Unavailable";
   const prAucVal = activeModel?.pr_auc != null ? activeModel.pr_auc.toFixed(4) : "Unavailable";
-  const accVal = f1Val; // Approximate accuracy with F1 since real accuracy isn't calculated
+  const accVal = "Unavailable"; // Real accuracy isn't calculated in eval_metrics
   const precisionVal = "Unavailable"; // Detailed breakdown not in this endpoint
   const recallVal = "Unavailable";
 
@@ -37,7 +37,7 @@ export const ModelRegistry = () => {
       {/* Top Metrics Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: "Accuracy (F1)", val: accVal, color: "emerald" },
+          { label: "Accuracy", val: accVal, color: "emerald" },
           { label: "Precision", val: precisionVal, color: "slate" },
           { label: "Recall", val: recallVal, color: "slate" },
           { label: "F1 Score", val: f1Val, color: "emerald" },

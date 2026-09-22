@@ -10,7 +10,7 @@ const FEATURES = [
  },
  {
  title:"Real-Time Decisioning",
- description:"The FraudShield AI engine evaluates transactions in under 50ms, coordinating multiple neural networks for an immediate response.",
+ description:"The FraudShield AI engine evaluates transactions quickly, coordinating multiple neural networks for a rapid response.",
  icon: Cpu
  },
  {
