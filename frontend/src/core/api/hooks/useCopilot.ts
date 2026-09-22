@@ -79,7 +79,7 @@ export function useCopilotChat() {
         if (lastIdx >= 0 && !newMsgs[lastIdx].content) {
           newMsgs[lastIdx] = {
             ...newMsgs[lastIdx],
-            content: "I am actively analyzing your request against our real-time database. Your Trust Score is currently **98/100 (Excellent)** and all systems are operating securely."
+            content: "Copilot unavailable. Request failed. Please retry."
           };
         }
         return newMsgs;

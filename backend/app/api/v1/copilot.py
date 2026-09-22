@@ -5,6 +5,9 @@ from app.core.responses import success_response
 from app.core.exceptions import AppError
 from app.services.llm_service import get_llm_service
 from app.middleware.auth import require_role
+from app.models.transaction import Transaction, TransactionStatus
+from app.models.grc import SecurityIncident
+import datetime
 
 copilot_bp = Blueprint("copilot", __name__)
 
@@ -22,11 +25,24 @@ def chat_stream():
     if not query:
         raise AppError("Query cannot be empty", 400)
 
-    context_role = data.get("context", {}).get("role") or (
-        user.role.value if user and hasattr(user, "role") else "Customer"
-    )
+    context_role = user.role.value if user and hasattr(user, "role") else "Customer"
+    tx_id = data.get("context", {}).get("transactionId")
+    
+    verified_context = f"User role: {context_role}.\n"
+    if tx_id:
+        tx = Transaction.query.filter_by(id=tx_id).first()
+        if tx:
+            if context_role == "Customer" and tx.user_id != user.id:
+                tx = None
+        if tx:
+            verified_context += f"Transaction context: ID={tx.id}, Amount={tx.amount} {tx.currency}, Merchant={tx.merchant}, Status={tx.status.value}, Date={tx.transaction_date}.\n"
+        else:
+            verified_context += f"Transaction context: Transaction ID {tx_id} not found or inaccessible.\n"
+    
+    verified_context += f"User query: {query}"
+    
     llm = get_llm_service()
-    full_response = llm.generate_chat_response(query, context_role)
+    full_response = llm.generate_chat_response(verified_context, context_role)
 
     def generate():
         for token in llm.stream_tokens(full_response):
@@ -44,8 +60,16 @@ def chat_stream():
 @require_role(["Administrator", "Fraud Analyst"])
 def summarize_case(tx_id):
     user = get_current_user()
+    tx = Transaction.query.filter_by(id=tx_id).first()
+    if not tx:
+        raise AppError("Transaction not found", 404)
 
-    summary = f"AI Summary for {tx_id}: This transaction was classified as High Risk (89%). The SHAP TreeExplainer indicates that the primary driving factors were the transaction Amount and the V2 location vector deviating from historic baselines."
+    summary = f"AI Summary for {tx_id}: Transaction Amount: {tx.amount} {tx.currency}. Merchant: {tx.merchant}. Status: {tx.status.value}."
+    
+    if tx.prediction and tx.prediction.risk_score is not None:
+        summary += f" Risk Level: {tx.prediction.risk_level} ({round(tx.prediction.risk_score * 100, 2)}%)."
+    else:
+        summary += " Risk probability and detailed feature attribution are currently unavailable."
 
     return success_response(data={"summary": summary})
 
@@ -55,14 +79,27 @@ def summarize_case(tx_id):
 @require_role(["Administrator"])
 def generate_report():
     user = get_current_user()
+    
+    today_start = datetime.datetime.now(datetime.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    tx_today = Transaction.query.filter(Transaction.transaction_date >= today_start).count()
+    
+    total_tx = Transaction.query.count()
+    total_fraud = Transaction.query.filter_by(status=TransactionStatus.DECLINED).count()
+    total_queue = Transaction.query.filter_by(status=TransactionStatus.FLAGGED).count()
+    
+    fraud_rate = round((total_fraud / total_tx) * 100, 2) if total_tx > 0 else 0
+    criticals = SecurityIncident.query.filter_by(severity="Critical").count() if hasattr(SecurityIncident, "query") else 0
 
-    markdown_report = """# Executive Fraud Report
+    markdown_report = f"""# Executive Fraud Report
 
-## Velocity
-Fraud attempts have risen 12% week-over-week.
+## Transaction Overview
+- **Transactions Today**: {tx_today}
+- **Global Fraud Rate**: {fraud_rate}%
+- **Review Queue**: {total_queue} flagged transactions awaiting review.
 
-## Model Performance
-The Hybrid Meta-Ensemble correctly intercepted $452,000 in fraudulent attempts yesterday.
-False positive rates remain suppressed below 0.1% due to Isotonic Calibration.
+## Security Overview
+- **Critical Incidents**: {criticals} active critical security incidents.
+
+*Note: Model evaluation, latency, and false positive rates are currently unmeasured and unavailable.*
 """
     return success_response(data={"report": markdown_report})
