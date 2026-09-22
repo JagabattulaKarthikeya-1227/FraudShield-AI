@@ -29,7 +29,14 @@ def app():
     application = create_app("testing")
     with application.app_context():
         from flask_migrate import upgrade
-        upgrade()
+        import os
+        
+        backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        migrations_dir = os.path.join(backend_dir, "migrations")
+        if not os.path.isdir(migrations_dir):
+            raise RuntimeError(f"Test migration directory not found: {migrations_dir}")
+            
+        upgrade(directory=migrations_dir)
         yield application
         db.session.remove()
         db.drop_all()
