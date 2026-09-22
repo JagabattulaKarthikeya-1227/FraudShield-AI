@@ -31,7 +31,7 @@ graph TD
 1. **Extra Trees**: Highly randomized, excellent for reducing variance.
 2. **MLP**: Strong baseline tabular data performer.
 3. **Multilayer Perceptron (MLP)**: Captures complex non-linear relationships that tree-based models might miss.
-4. **XGBoost (Meta)**: Learns which base model to trust in specific scenarios.
+4. **XGBoost (Meta)**: Meta-learner that learns which base model to trust in specific scenarios.
 
 ### Why optimize for PR-AUC?
 Traditional ROC-AUC is misleading on imbalanced datasets because a model can achieve a high score simply by guessing the majority class correctly. We explicitly optimize for **Precision-Recall Area Under Curve (PR-AUC)**, prioritizing the accurate identification of the minority class (fraud).
@@ -39,6 +39,6 @@ Traditional ROC-AUC is misleading on imbalanced datasets because a model can ach
 ## 3. Explainable AI (XAI)
 
 In regulated financial environments, models cannot be black boxes.
-- We implement **KernelSHAP** to analyze the ensemble's decision.
+- We implement **SHAP** to analyze the ensemble's decision.
 - When a transaction is blocked, SHAP calculates the marginal contribution of each feature (`V14`, `Amount`, etc.).
 - This output is visualized in the Fraud Analyst Workspace and fed into our LLM Copilot to generate human-readable narratives.

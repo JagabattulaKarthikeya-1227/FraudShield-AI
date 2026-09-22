@@ -83,7 +83,7 @@ export const RecruiterShowcase: React.FC<{ isOpen: boolean; onClose: () => void 
  <section className="space-y-4">
  <h4 className="font-semibold text-sm flex items-center gap-2 uppercase tracking-wider text-slate-500"><LineChart className="w-4 h-4" /> Explainability & Copilot</h4>
  <p className="text-sm text-slate-600 leading-relaxed">
- Financial institutions cannot use"black box" models due to regulatory requirements. FraudShield implements KernelSHAP to provide exact, legally defensible feature importance (e.g.,"Why was this specific transaction blocked?").
+ Financial institutions cannot use"black box" models due to regulatory requirements. FraudShield implements SHAP to provide local feature importance (e.g.,"Why was this specific transaction blocked?").
  <br /><br />
  This is augmented by the <strong>Enterprise AI Copilot</strong>, a context-aware LLM interface that explains the SHAP values to non-technical fraud analysts.
  </p>
@@ -92,7 +92,7 @@ export const RecruiterShowcase: React.FC<{ isOpen: boolean; onClose: () => void 
  <section className="space-y-4">
  <h4 className="font-semibold text-sm flex items-center gap-2 uppercase tracking-wider text-slate-500"><Shield className="w-4 h-4" /> DevSecOps & Governance</h4>
  <p className="text-sm text-slate-600 leading-relaxed">
- The platform simulates an SOC 2 Type II compliant environment. It features an immutable Audit Log, a live Security SOC dashboard, OWASP Top 10 defenses (JWTs in HttpOnly cookies), and a Model Governance portal documenting fairness (Disparate Impact ratio).
+ The platform is designed with enterprise security considerations. It features an immutable Audit Log, a live Security SOC dashboard, OWASP Top 10 defenses (JWTs in HttpOnly cookies), and a Model Governance portal documenting fairness (Disparate Impact ratio).
  </p>
  </section>
 

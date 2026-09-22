@@ -221,7 +221,7 @@ export const LoginPage = () => {
               {[
                 { icon: ShieldCheck, title: 'Real-Time Fraud Detection', desc: 'Sub-millisecond processing' },
                 { icon: BarChart2, title: 'Explainable AI Predictions', desc: 'SHAP value transparency' },
-                { icon: Lock, title: 'Enterprise Security', desc: 'SOC 2-ready architecture' },
+                { icon: Lock, title: 'Enterprise Security', desc: 'Security-focused architecture' },
               ].map(({ icon: Icon, title, desc }, idx) => (
                 <motion.div 
                   key={title} 

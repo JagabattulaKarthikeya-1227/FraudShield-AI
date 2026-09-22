@@ -28,8 +28,8 @@
 Unlike typical Jupyter Notebook data science projects, FraudShield AI wraps the predictive models in a **production-ready DevSecOps ecosystem**, featuring:
 - A luxury React/Framer Motion frontend with 3D WebGL visualizations.
 - A Flask-based API layer simulating Gunicorn/NGINX deployments.
-- Explainable AI (XAI) via KernelSHAP to satisfy financial regulatory compliance.
-- A simulated SOC 2 Type II environment with RBAC, JWTs, and Audit Logging.
+- Explainable AI (XAI) via SHAP to support interpretability workflows.
+- A simulated enterprise environment with RBAC, JWTs, and Audit Logging.
 
 > **Note**: This is an academic/portfolio demonstration. The platform operates strictly on mathematically generated **Synthetic Data**. No real financial information, credit cards, or PII are used or stored.
 
@@ -38,7 +38,7 @@ Unlike typical Jupyter Notebook data science projects, FraudShield AI wraps the 
 ## ✨ Key Features
 
 1. **Stacking Ensemble Engine**: Achieves optimal PR-AUC on imbalanced data by stacking Extra Trees, a Multilayer Perceptron, utilizing XGBoost as the Meta-Learner.
-2. **Explainable AI (SHAP)**: Financial models cannot be "black boxes". We utilize KernelSHAP to provide exact, legally defensible feature importance for every blocked transaction.
+2. **Explainable AI (SHAP)**: Financial models cannot be "black boxes". We utilize SHAP (KernelExplainer) to provide local feature attributions for supported transactions.
 3. **Enterprise AI Copilot**: A context-aware LLM interface that explains the complex SHAP values to non-technical fraud analysts in plain English.
 4. **DevSecOps & Governance**: Features a live Security Operations Center (SOC) dashboard, OWASP Top 10 defenses (HttpOnly cookies, Argon2id), and an immutable Audit Log.
 5. **Premium Motion UI**: Cinematic route transitions, branded neural loading experiences, and interactive ECharts data visualization.

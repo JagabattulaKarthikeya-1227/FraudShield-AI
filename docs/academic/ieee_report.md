@@ -4,7 +4,7 @@
 This is to certify that this project report entitled "FraudShield AI" is the bona fide work of the engineering team, submitted in partial fulfillment of the requirements for the degree of Bachelor of Engineering / Technology.
 
 **Abstract**  
-The rapid digitization of financial services has precipitated an unprecedented rise in sophisticated transaction fraud. Traditional rule-based systems suffer from high false-positive rates and lack the agility to adapt to novel fraud typologies. This project proposes *FraudShield AI*, an enterprise-grade hybrid machine learning architecture that integrates model registry tracking (with designs for a Champion vs. Challenger pipeline). The proposed system leverages a Stacked Ensemble model (Extra Trees, MLP, and XGBoost) enhanced with Synthetic Minority Over-sampling Technique (SMOTE) to combat severe class imbalance. Crucially, the platform integrates SHAP (SHapley Additive exPlanations) to provide SHAP-based feature attribution, allowing human fraud analysts to interpret algorithmic decisions and comply with stringent regulatory frameworks (e.g., GDPR, ISO 27001). The system is engineered to maximize PR-AUC while maintaining low inference latency.
+The rapid digitization of financial services has precipitated an unprecedented rise in sophisticated transaction fraud. Traditional rule-based systems suffer from high false-positive rates and lack the agility to adapt to novel fraud typologies. This project proposes *FraudShield AI*, an enterprise-grade hybrid machine learning architecture that integrates model registry tracking (with designs for a Champion vs. Challenger pipeline). The proposed system leverages a Stacked Ensemble model (Extra Trees, MLP, and XGBoost) enhanced with Synthetic Minority Over-sampling Technique (SMOTE) to combat severe class imbalance. Crucially, the platform integrates SHAP (SHapley Additive exPlanations) to provide SHAP-based feature attribution, allowing analysts to interpret algorithmic decisions. The system is engineered to maximize PR-AUC while maintaining low inference latency.
 
 ---
 
@@ -58,7 +58,7 @@ The system employs a multi-tier architecture. Client requests are intercepted by
 The dataset is initially sanitized using an EDA Module. SMOTE generates synthetic minority instances. The Hybrid Ensemble cascades predictions from an ExtraTrees classifier into an XGBoost meta-learner, optimizing for the F1-Macro score to penalize false negatives.
 
 ### 5.2 MLOps & Governance
-A fully featured Governance, Risk, and Compliance (GRC) module continually maps system health against OWASP standards. The Model Registry tracks "Champion" models in production while evaluating "Challengers" in shadow mode to prevent production degradation due to Concept Drift.
+A fully featured Governance, Risk, and Compliance (GRC) module continually maps system health against OWASP standards. The architecture includes a Model Registry to track statuses and is designed for future shadow deployment and Concept Drift monitoring.
 
 ---
 
@@ -66,10 +66,10 @@ A fully featured Governance, Risk, and Compliance (GRC) module continually maps 
 
 ### 6.1 Performance Metrics
 - **ROC-AUC**: 0.998
-- **PR-AUC**: 0.992
+- **PR-AUC**: Target maximization for imbalanced data
 - **Recall**: 95.4%
 - **Inference Latency**: 42ms
-- **Throughput**: 1,200 TPS
+- **Throughput**: Designed for high throughput
 
 ### 6.2 Discussion
 The integration of SHAP completely eliminated the "black-box" dilemma, allowing Analysts to approve or reject borderline transactions in under 10 seconds. The shadow deployment framework proved invaluable in capturing silent feature drift without affecting live customer traffic.

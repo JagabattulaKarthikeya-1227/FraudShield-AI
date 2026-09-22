@@ -17,8 +17,8 @@ If the `Drift Detection` dashboard flags a KL-Divergence spike:
 1. Navigate to the **MLOps Center**.
 2. Select the **Retraining Pipeline**.
 3. The system will dispatch an asynchronous Celery task to re-fit the XGBoost Meta-Ensemble on the newest transaction batches.
-4. The new model will enter "Shadow" mode (Challenger) for evaluation.
-5. Review the Champion vs. Challenger Matrix. If the Challenger outperforms the Champion on the holdout set, click "Promote to Champion".
+4. The new model will be registered as 'Available' in the Model Registry.
+5. Review the Model Registry. Admins can manually promote models to active production status.
 
 ## 4. Incident Management
 If the `Security Center` detects abnormal JWT refresh requests or rate-limit violations:

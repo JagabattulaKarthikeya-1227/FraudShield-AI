@@ -22,7 +22,7 @@ Use these scripts for Hackathons, Academic Presentations, or Job Interviews. Kee
 
 **[3:00 - The Killer Feature (Explainability)]**
 *Action: Click into `DecisionLab`. Select a High-Risk transaction.*
-"But here is the killer feature. Regulators demand explanations for AI decisions. I integrated SHAP cooperative game theory to break down the exact mathematical contribution of every feature. As you can see on this Waterfall chart, we have cryptographic proof of *why* the AI declined this card."
+"We use SHAP (SHapley Additive exPlanations) to provide local feature attribution explanations, allowing us to interpret the model's decisions."
 
 **[4:00 - Conclusion]**
 "FraudShield AI isn't just a model in a Jupyter Notebook. It's a secure, cloud-native, production-ready AI platform."

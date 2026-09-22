@@ -39,5 +39,5 @@ erDiagram
 
 ## Security Constraints
 - **Passwords**: Stored exclusively as Argon2id hashes with random salts.
-- **Immutability**: The `AUDIT_LOGS` table is append-only. Hard deletes are prevented at the application level to ensure SOC 2 compliance.
+- **Immutability**: The `AUDIT_LOGS` table is append-only. Hard deletes are prevented at the application level to ensure security logging.
 - **PII**: No real credit card numbers or raw transaction data are stored in this database. This is strictly a configuration and governance database.

@@ -6,7 +6,7 @@ All notable changes to the FraudShield AI project will be documented in this fil
 
 ### Added
 - **Explainable Hybrid Ensemble**: Implemented the core ML pipeline utilizing Extra Trees, Multilayer Perceptron, and XGBoost Stacking, explicitly optimized for PR-AUC to handle severe class imbalance.
-- **KernelSHAP XAI**: Integrated Shapley Additive Explanations to mathematically calculate feature importance for blocked transactions, resolving the "Black Box" compliance issue.
+- **SHAP XAI**: Integrated feature attributions to provide local interpretability for blocked transactions.
 - **Enterprise AI Copilot**: Added an LLM-powered assistant to translate SHAP mathematical vectors into plain-English narratives for human Fraud Analysts.
 - **DevSecOps Architecture**: 
   - Created the `SystemHealth.tsx` SRE dashboard.

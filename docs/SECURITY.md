@@ -2,7 +2,7 @@
 
 *Last verified against commit: September 2026*
 
-FraudShield AI simulates a SOC 2 Type II compliant enterprise application. The security architecture is designed using a Zero-Trust methodology.
+FraudShield AI is designed with relevant enterprise security considerations. The security architecture is designed using a Zero-Trust methodology.
 
 ---
 

@@ -4,8 +4,8 @@ Use these quantified, highly technical descriptions when adding FraudShield AI t
 
 ## Resume Bullet Points (Software Engineering / AI Role)
 - **Engineered an Enterprise Fraud Detection Platform** using Flask, React 19, and XGBoost, capable of classifying financial transaction anomalies with optimized inference latency.
-- **Designed a Champion vs Challenger MLOps architecture**, utilizing Celery and Redis to continuously evaluate model drift and execute shadow deployments without disrupting production traffic.
-- **Integrated SHAP (SHapley Additive exPlanations)** into a React Three Fiber spatial dashboard, providing cryptographically transparent "Right to Explanation" workflows compliant with GDPR Article 22.
+- **Designed a Champion vs Challenger MLOps architecture**, utilizing Celery and Redis to continuously evaluate model drift and track model statuses.
+- **Integrated SHAP (SHapley Additive exPlanations)** into a React Three Fiber spatial dashboard, providing local feature attributions.
 - **Architected a modular backend architecture** secured by strict JWT Role-Based Access Control (RBAC), mapping system defenses directly against OWASP Top 10 vulnerabilities.
 
 ## LinkedIn Project Description

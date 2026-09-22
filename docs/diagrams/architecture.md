@@ -14,7 +14,7 @@ graph TD
     Celery[Celery Task Queue]
     Redis[Redis Cache / Broker]
     DB[(MySQL 8 Database)]
-    
+
     Client -->|HTTPS| Nginx
     Nginx --> API
     API <--> Auth
@@ -33,7 +33,7 @@ sequenceDiagram
     participant Frontend
     participant API
     participant DB
-    
+
     User->>Frontend: Enter Credentials
     Frontend->>API: POST /api/v1/auth/login
     API->>DB: Validate Hash (bcrypt)
@@ -44,19 +44,19 @@ sequenceDiagram
     Frontend-->>User: Redirect to Dashboard
 ```
 
-## 3. Champion vs Challenger MLOps Workflow
+## 3. Model Registry Architecture (Designed for Shadow Workflows)
 
 ```mermaid
 stateDiagram-v2
     [*] --> Ingest: Live Transaction
-    Ingest --> Champion: Route to Active Model
-    Ingest --> Challenger: Route to Shadow Model (Async)
-    
-    Champion --> Decision: Return Prediction to User
+    Ingest --> ActiveModel: Route to Active Model
+
+
+    ActiveModel --> Decision: Return Prediction to User
     Decision --> [*]
-    
-    Challenger --> Telemetry: Record Prediction
-    Telemetry --> DriftAnalyzer: Compare Champion vs Challenger
+
+
+    Telemetry --> DriftAnalyzer: (Designed for future drift comparison)
     DriftAnalyzer --> Registry: Update Metrics Matrix
 ```
 

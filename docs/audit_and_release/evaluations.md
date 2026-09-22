@@ -7,7 +7,7 @@
 
 **Strengths**:
 - **Methodological Rigor**: The application of a Meta-Ensemble to penalize False Negatives (F1-Macro optimization) is highly appropriate for fraud typologies.
-- **Novelty in Transparency**: Integrating SHAP directly into the operational UI bridges a critical gap between academic ML metrics and real-world banking compliance (GDPR Article 22).
+- **Novelty in Transparency**: Integrating SHAP directly into the operational UI bridges a critical gap between academic ML metrics and interpretability needs.
 - **Reproducibility**: The containerized modular backend architecture ensures the research can be replicated flawlessly.
 
 **Weaknesses / Threats to Validity**:

@@ -19,7 +19,7 @@ graph TD
     subgraph Core Services
         Gateway --> Auth[Auth Service]
         Gateway --> Inference[ML Inference Service]
-        Gateway --> Explain[XAI Engine - KernelSHAP]
+        Gateway --> Explain[XAI Engine - SHAP]
         Gateway --> Copilot[LLM Integration Service]
     end
     

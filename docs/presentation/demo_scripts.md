@@ -32,7 +32,7 @@ This document provides structured narration for presenting the project in variou
 **[The Machine Learning Engine: 4 mins]**
 - Discuss the data pipeline: EDA, outlier capping, and SMOTE for minority oversampling.
 - Explain the Hybrid Meta-Ensemble: How stacking MLPs with XGBoost penalizes false negatives.
-- Transition into the MLOps suite: Model Registry, Drift Detection, and Shadow Deployments (Champion vs. Challenger).
+- Transition into the MLOps suite: Model Registry and drift metrics design.
 
 **[Live Demonstration: 3 mins]**
 - Log in as 'Administrator'.
@@ -57,10 +57,10 @@ This document provides structured narration for presenting the project in variou
 
 **Scene 2 [0:15 - 0:45]**:
 *Visual*: Hovering over the SHAP Waterfall charts in the Explainability Studio.
-*Voiceover*: "Built with React and Flask, the platform moves beyond black-box AI by utilizing SHapley Additive exPlanations to provide cryptographically transparent reasoning for every blocked transaction."
+*Voiceover*: "Built with React and Flask, the platform moves beyond black-box AI by utilizing SHapley Additive exPlanations to provide SHAP-based feature attribution for every blocked transaction."
 
 **Scene 3 [0:45 - 1:15]**:
-*Visual*: Navigating the MLOps Center, showing the Champion vs Challenger Radar chart and the 3D Model Galaxy.
+*Visual*: Navigating the MLOps Center, showing the Model Registry Dashboard and the 3D Model Galaxy.
 *Voiceover*: "It features a complete MLOps lifecycle, including shadow deployments, data drift monitoring, and a full Model Registry to ensure production models remain perfectly calibrated."
 
 **Scene 4 [1:15 - 2:00]**:
