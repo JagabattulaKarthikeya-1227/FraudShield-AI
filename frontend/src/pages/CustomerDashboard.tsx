@@ -50,17 +50,13 @@ const sparklineOptions = (color: string, data: number[]) => ({
   series: [{ data, type: 'line', smooth: true, showSymbol: false, lineStyle: { color, width: 2 } }],
 });
 
-/** Build a line chart config from real trend data (falling back gracefully). */
-const buildTrendOptions = (trends: { hour: string; volume: number; errors: number }[] | null) => {
-  const hours   = trends ? trends.map(t => t.hour)   : ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'];
-  const volumes = trends ? trends.map(t => t.volume) : [0, 0, 0, 0, 0, 0];
-  const errors  = trends ? trends.map(t => t.errors) : [0, 0, 0, 0, 0, 0];
-
+/** Build a line chart config from real trend data. */
+const buildTrendOptions = (labels: string[], legitimate: number[], fraudulent: number[], flagged: number[]) => {
   return {
     tooltip: { trigger: 'axis' },
     grid: { left: '3%', right: '4%', bottom: '5%', top: '10%', containLabel: true },
     xAxis: {
-      type: 'category', boundaryGap: false, data: hours,
+      type: 'category', boundaryGap: false, data: labels,
       axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: '#64748b' }
     },
     yAxis: {
@@ -70,16 +66,21 @@ const buildTrendOptions = (trends: { hour: string; volume: number; errors: numbe
     },
     series: [
       {
-        name: 'Volume', type: 'line', smooth: true,
+        name: 'Legitimate', type: 'line', smooth: true,
         lineStyle: { width: 3, color: '#0f766e' }, showSymbol: false,
         areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
           colorStops: [{ offset: 0, color: 'rgba(15,118,110,0.2)' }, { offset: 1, color: 'rgba(15,118,110,0)' }] } },
-        data: volumes
+        data: legitimate
       },
       {
-        name: 'Errors', type: 'line', smooth: true,
+        name: 'Fraudulent', type: 'line', smooth: true,
         lineStyle: { width: 3, color: '#e11d48' }, showSymbol: false,
-        data: errors
+        data: fraudulent
+      },
+      {
+        name: 'Flagged', type: 'line', smooth: true,
+        lineStyle: { width: 3, color: '#f59e0b' }, showSymbol: false,
+        data: flagged
       },
     ],
   };
@@ -218,10 +219,10 @@ export const CustomerDashboard = () => {
 
   // ── Derive trend data for the line chart ─────────────────────────────────
   const trendChartOptions = React.useMemo(() => {
-    if (trendsData?.hourly_volume) {
-      return buildTrendOptions(trendsData.hourly_volume);
+    if (trendsData?.status === 'available' && trendsData.labels?.length > 0) {
+      return buildTrendOptions(trendsData.labels, trendsData.legitimate, trendsData.fraudulent, trendsData.flagged || []);
     }
-    return buildTrendOptions(null); // illustrative fallback
+    return null; // explicit unavailable state
   }, [trendsData]);
 
   // ── KPI values from real stats endpoint ──────────────────────────────────
@@ -407,7 +408,13 @@ export const CustomerDashboard = () => {
             )}
           </div>
           <div className="h-[220px]">
-            <ReactEChartsCore echarts={echarts} option={trendChartOptions} style={{ height: '100%', width: '100%' }} />
+            {trendChartOptions ? (
+              <ReactEChartsCore echarts={echarts} option={trendChartOptions} style={{ height: '100%', width: '100%' }} />
+            ) : (
+              <div className="h-full flex items-center justify-center">
+                <EmptyState title="No transaction telemetry available" description="No trends to show." icon={<Activity className="w-6 h-6" />} />
+              </div>
+            )}
           </div>
         </div>
 

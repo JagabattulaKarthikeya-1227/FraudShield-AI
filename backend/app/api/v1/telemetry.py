@@ -5,7 +5,6 @@ from app.core.exceptions import AppError
 from app.models.transaction import Transaction, TransactionStatus
 from app.models.user import User
 import datetime
-import random
 from app.middleware.auth import require_role
 
 telemetry_bp = Blueprint("telemetry", __name__)
@@ -46,22 +45,50 @@ def get_kpis():
 def get_trends():
     user = get_current_user()
 
-    # Generate realistic 30-day time-series data where fraud rate averages exactly 0.20% of volume
+    # Get transactions from the last 30 days
+    start_date = datetime.datetime.now() - datetime.timedelta(days=30)
+    transactions = Transaction.query.filter(Transaction.transaction_date >= start_date).all()
+
+    if not transactions:
+        return success_response(
+            data={
+                "status": "unavailable",
+                "labels": [],
+                "legitimate": [],
+                "fraudulent": [],
+                "flagged": [],
+                "is_synthetic": False,
+                "reason": "No transaction telemetry is available for the selected period."
+            }
+        )
+
     days = [
         (datetime.datetime.now() - datetime.timedelta(days=i)).strftime("%m-%d")
         for i in range(29, -1, -1)
     ]
-    legit_volume = [random.randint(5000, 8000) for _ in range(30)]
-    fraud_volume = [
-        max(1, int(v * random.uniform(0.0018, 0.0022))) for v in legit_volume
-    ]  # ~0.20%
+    
+    legit_counts = {day: 0 for day in days}
+    fraud_counts = {day: 0 for day in days}
+    flagged_counts = {day: 0 for day in days}
+    
+    for tx in transactions:
+        tx_day = tx.transaction_date.strftime("%m-%d")
+        if tx_day in legit_counts:
+            if tx.status == TransactionStatus.APPROVED:
+                legit_counts[tx_day] += 1
+            elif tx.status == TransactionStatus.DECLINED:
+                fraud_counts[tx_day] += 1
+            elif tx.status == TransactionStatus.FLAGGED:
+                flagged_counts[tx_day] += 1
 
     return success_response(
         data={
+            "status": "available",
             "labels": days,
-            "legitimate": legit_volume,
-            "fraudulent": fraud_volume,
-            "is_synthetic": True,  # Time-series trend data is currently illustrative; no real historical aggregation yet
+            "legitimate": [legit_counts[day] for day in days],
+            "fraudulent": [fraud_counts[day] for day in days],
+            "flagged": [flagged_counts[day] for day in days],
+            "is_synthetic": False,
         }
     )
 
