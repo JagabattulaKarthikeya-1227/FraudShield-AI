@@ -28,7 +28,7 @@ Authenticates a user and establishes a secure session.
   }
 }
 ```
-*Note: The API also sets an `HttpOnly, SameSite=Strict` cookie containing a long-lived refresh token. The returned `token` is a short-lived access token.*
+*Note: Both a short-lived `access_token` and a long-lived `refresh_token` are returned directly in the JSON response payload.*
 
 ## Core ML Endpoints
 

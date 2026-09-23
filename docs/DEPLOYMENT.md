@@ -16,11 +16,11 @@ The application is split into multiple services orchestrated by `docker-compose`
 
 ```mermaid
 graph TD
-    Client[Web Client] -->|Port 80/443| Nginx[NGINX Container]
-    Nginx -->|Port 5173| Frontend[Vite/React Container]
-    Nginx -->|Port 5000| Backend[Flask/Gunicorn Container]
+    Client[Web Client] -->|Port 80/443| Frontend[Frontend NGINX Container]
+    Frontend -->|Static Assets| Browser[(User Browser)]
+    Frontend -->|/api on Port 5000| Backend[Flask/Gunicorn Container]
     
-    Backend -->|Port 5432| DB[(Postgres Container)]
+    Backend -->|Port 3306| DB[(MySQL Container)]
     Backend -->|Port 6379| Redis[(Redis Container)]
 ```
 
@@ -38,7 +38,7 @@ docker-compose up --build -d
 ```
 
 This will spin up:
-- The Postgres Database.
+- The MySQL Database.
 - The Redis Cache.
 - The Flask API (with Gunicorn workers).
 - The React Frontend.

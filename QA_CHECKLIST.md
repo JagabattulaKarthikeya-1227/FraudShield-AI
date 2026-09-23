@@ -20,8 +20,8 @@ This checklist tracks the final audit of Version 1.0 (Phase 15).
 ## 3. Backend & Security Audit
 - [x] **Authentication Flow**: JWT token generation works as expected.
 - [x] **OWASP Compliance**: 
-  - Passwords are fundamentally hashed with Argon2id.
-  - XSS mitigation is enforced via HttpOnly/SameSite cookie usage.
+  - Passwords are fundamentally hashed with bcrypt.
+  - XSS mitigation is enforced via strict header-based JWT transport and short-lived access tokens.
 - [x] **Zero-Trust Secrets**: API Keys and Database URIs are not hardcoded.
 - [x] **Graceful Error Handling**: The 404 page is branded and guides users back to the safe dashboard.
 

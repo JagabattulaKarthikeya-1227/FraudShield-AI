@@ -12,16 +12,6 @@ import pytest
 import json
 from unittest.mock import patch, MagicMock
 
-# ---------------------------------------------------------------------------
-# Pre-patch: ensure `app.core.redis` can be imported without the real redis
-# package.  This must happen BEFORE conftest imports `create_app`.
-# ---------------------------------------------------------------------------
-_redis_mod_name = "app.core.redis"
-if _redis_mod_name not in sys.modules:
-    _fake_redis_mod = types.ModuleType(_redis_mod_name)
-    _fake_redis_mod.redis_client = None   # type: ignore[attr-defined]
-    sys.modules[_redis_mod_name] = _fake_redis_mod
-
 from app.core.exceptions import ModelNotReadyError
 
 

@@ -22,7 +22,7 @@ In a fintech environment, a predicted probability of 80% MUST mean an 80% empiri
 
 **Our Solution**: Probability calibration is supported as an optional inference stage when a compatible calibrator artifact is available.
 
-## 4. SHAP and LIME (Explainability)
+## 4. Explainability (SHAP)
 The primary business obstacle to AI adoption in banking is the "Black Box" problem. Explainability is crucial to interpret adverse actions (e.g., declining a transaction).
 
 - **SHAP (SHapley Additive exPlanations)**: Based on cooperative game theory, SHAP calculates local feature attributions of every single feature (V1-V28, Amount) to the final risk score.

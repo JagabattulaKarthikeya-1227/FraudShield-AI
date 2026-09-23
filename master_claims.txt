@@ -16,12 +16,12 @@
 .\backend\app\api\v1/predict.py: data={"transaction_id": tx.id, "risk_assessment": result},
 .\backend\app\api\v1/predict.py: message=f"Batch processed: {len(results)} transactions.",
 .\backend\app\api\v1/predict.py: return success_response(data={"state": task_result.state, "status": "Task is waiting to be processed or is currently running..."})
-.\backend\app\ml\documentation/generator.py: - Explainability (SHAP & LIME) is integrated to allow analysts to audit why a transaction was flagged, reducing opaque algorithmic bias.
-.\backend\app\ml\explainers/__init__.py: """Abstract base class representing XAI models (SHAP or LIME)."""
+.\backend\app\ml\documentation/generator.py: - Explainability (SHAP) is integrated to allow analysts to audit why a transaction was flagged, reducing opaque algorithmic bias.
+.\backend\app\ml\explainers/__init__.py: """Abstract base class representing XAI models (SHAP)."""
 .\backend\app\ml\training/mlp.py: loss="binary_crossentropy",
 .\backend\app\models/grc.py: last_assessed = db.Column(db.DateTime, default=datetime.utcnow)
 .\backend\app\models/mlops.py: psi_score = db.Column(db.Float)
-.\backend\app\services/llm_service.py: - Transaction risk analysis and SHAP/LIME explainability
+.\backend\app\services/llm_service.py: - Transaction risk analysis and SHAP explainability
 .\backend\app\services/llm_service.py: """Stream word-by-word for SSE."""
 .\backend\app\services/llm_service.py: """Simulates fast token-by-token streaming of an LLM via SSE (<0.1s total delay)."""
 .\backend\migrations\versions/83162e50a75b_initial_schema.py: sa.Column('last_assessed', sa.DateTime(), nullable=True),
@@ -270,7 +270,7 @@
 .\docs/MLOPS_GUIDE.md: ## 3. Probability Calibration (Isotonic Regression)
 .\docs/MLOPS_GUIDE.md: **Our Solution**: We apply **Isotonic Regression** on top of the ensemble. This non-parametric calibration forces the predicted probabilities to strictly map to true empirical likelihoods.
 .\docs/MLOPS_GUIDE.md: ## 4. SHAP and LIME (Explainability)
-.\docs/MLOPS_GUIDE.md: - **LIME (Local Interpretable Model-agnostic Explanations)**: Generates a local surrogate model around the specific transaction to prove *why* the complex ensemble made its decision.
+.\docs/MLOPS_GUIDE.md: - **LIME (Local Interpretable Model-agnostic Explanations)**: LIME is a potential future/alternative explainability method.
 .\docs/ML_PIPELINE.md: Data[Preprocessed Transaction] --> ET[Extra Trees Classifier]
 .\docs/ML_PIPELINE.md: Data --> RF[MLP]
 .\docs/PROJECT_OVERVIEW.md: In 2023, global credit card fraud losses exceeded $33 billion. Financial institutions face a two-fold problem:
@@ -290,16 +290,15 @@
 .\docs\audit_and_release/release_notes.md: - **SHAP Explainability Studio**: Visualizes the exact algorithmic reasoning behind fraud classifications using interactive Waterfall charts.
 .\docs\audit_and_release/release_notes.md: - [x] TypeScript strict-mode compilation passed with 0 errors.
 .\docs\audit_and_release/release_notes.md: - The 3D WebGL assets may cause slight frame drops on low-end mobile hardware without dedicated GPUs.
-.\docs\framework/00_PROJECT_CONSTITUTION.md: Dataset ↓ Validation ↓ Cleaning ↓ EDA ↓ Feature Engineering ↓ Feature Selection ↓ Train/Test Split ↓ SMOTE (Training Only) ↓ Cross Validation ↓ Hyperparameter Tuning ↓ Model Training ↓ Evaluation ↓ SHAP ↓ LIME ↓ Model Registry ↓ Deployment ↓ Inference
+.\docs\framework/00_PROJECT_CONSTITUTION.md: Dataset ↓ Validation ↓ Cleaning ↓ EDA ↓ Feature Engineering ↓ Feature Selection ↓ Train/Test Split ↓ SMOTE (Training Only) ↓ Cross Validation ↓ Hyperparameter Tuning ↓ Model Training ↓ Evaluation ↓ SHAP ↓ Model Registry ↓ Deployment ↓ Inference
 .\docs\framework/00_PROJECT_CONSTITUTION.md: `src/` -> `app/`, `components/`, `features/`, `hooks/`, `layouts/`, `pages/`, `services/`, `lib/`, `types/`, `utils/`, `styles/`, `assets/`
 .\docs\framework/00_PROJECT_CONSTITUTION.md: ❌ God classes
 .\docs\framework/00_PROJECT_CONSTITUTION.md: Every button must have: Hover state, Focus state, Pressed state, Disabled state, Loading state, Success state (when applicable).
 .\docs\framework/00_PROJECT_CONSTITUTION.md: **Required assets:** Primary logo, Compact logo, Monochrome logo, Favicon, Social preview image, GitHub banner, Presentation assets, Brand guide.
 .\docs\framework/00_PROJECT_CONSTITUTION.md: ✓ passes design review
 .\docs\framework/00_PROJECT_CONSTITUTION.md: `src/` -> `app/`, `assets/`, `components/`, `features/`, `hooks/`, `layouts/`, `lib/`, `pages/`, `providers/`, `routes/`, `services/`, `stores/`, `styles/`, `types/`, `utils/`
-.\docs\framework/00_PROJECT_CONSTITUTION.md: The AI does not make final decisions on edge cases; it provides risk probabilities and SHAP/LIME explanations to empower the human Fraud Analyst.
-.\docs\framework/01_PROJECT_BRAIN.md: - **Explanation (SHAP/LIME):** The artifact generated alongside an inference, explaining *why* the model assigned a specific score.
-.\docs\framework/02_MASTER_CONTROLLER.md: - [ ] 43_LIME.md
+.\docs\framework/00_PROJECT_CONSTITUTION.md: The AI does not make final decisions on edge cases; it provides risk probabilities and SHAP explanations to empower the human Fraud Analyst.
+.\docs\framework/01_PROJECT_BRAIN.md: - **Explanation (SHAP):** The artifact generated alongside an inference, explaining *why* the model assigned a specific score.
 .\docs\presentation/interview_cheat_sheet.md: **Answer:** "Financial transaction data is highly tabular and suffers from extreme class imbalance (99.8% normal vs 0.2% fraud). Deep learning models are notoriously data-hungry and prone to overfitting on minority classes in tabular datasets. XGBoost (Gradient Boosted Trees) is the industry standard for tabular data because of its high efficiency, resistance to extreme variance, and its seamless compatibility with KernelExplainer for rapid explainability."
 .\docs\presentation/portfolio_assets.md: # Portfolio Assets & Resume Descriptions
 .\docs\technical/admin_manual.md: - **Administrators**: Possess super-user capabilities. Only administrators can access the `MLOps Center`, `Security Center`, and `Audit Logs`. Only administrators can trigger a model retraining pipeline.

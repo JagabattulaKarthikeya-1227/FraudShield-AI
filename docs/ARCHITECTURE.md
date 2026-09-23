@@ -6,14 +6,14 @@ FraudShield AI utilizes a modern, decoupled modular backend architecture designe
 
 ```mermaid
 graph TD
-    Client[Web Client - React] -->|HTTPS / WAF| Proxy[NGINX Reverse Proxy]
+    Client[Web Client - React] -->|HTTPS / WAF| Frontend[Frontend NGINX Container]
     
     subgraph Frontend Layer
-        Proxy --> Assets[Static Asset Delivery]
+        Frontend -->|Static Assets| Browser[(User Browser)]
     end
     
     subgraph Gateway Layer
-        Proxy -->|/api| Gateway[Flask Backend]
+        Frontend -->|/api on Port 5000| Gateway[Flask Backend]
     end
     
     subgraph Core Services
@@ -24,14 +24,14 @@ graph TD
     end
     
     subgraph Data Layer
-        Auth --> Postgres[(PostgreSQL 15)]
+        Auth --> Postgres[(MySQL 8.0)]
         Inference --> Redis[(Redis Cache)]
         Explain --> Redis
     end
 ```
 
 ## Frontend Architecture
-- **Framework**: React 18 + Vite for lightning-fast HMR and optimized builds.
+- **Framework**: React 19 + Vite for lightning-fast HMR and optimized builds.
 - **Styling**: Tailwind CSS for utility-first styling, ensuring a consistent design system.
 - **Motion & 3D**: `framer-motion` for cinematic page transitions and micro-interactions. `@react-three/fiber` for rendering the complex WebGL globes and particles.
 - **State Management**: Context API for global states (Academic Mode, Theme) and React Query for server state caching and optimistic UI updates.
@@ -40,7 +40,7 @@ graph TD
 - **Framework**: Flask (Python) served via Gunicorn.
 - **Concurrency**: Gunicorn runs with asynchronous workers to handle long-running ML inference requests without blocking the event loop for auth requests.
 - **Security**: 
-  - JWTs are generated via `PyJWT` and signed with HS256.
+  - JWTs are generated via `Flask-JWT-Extended` and signed with HS256.
   - Refresh tokens are stored strictly in `HttpOnly, SameSite=Strict` cookies to prevent XSS exfiltration.
 
 ## Machine Learning Pipeline (Training Architecture)

@@ -39,8 +39,8 @@ Unlike typical Jupyter Notebook data science projects, FraudShield AI wraps the 
 
 1. **Stacking Ensemble Engine**: Achieves optimal PR-AUC on imbalanced data by stacking Extra Trees, a Multilayer Perceptron, utilizing XGBoost as the Meta-Learner.
 2. **Explainable AI (SHAP)**: Financial models cannot be "black boxes". We utilize SHAP (KernelExplainer) to provide local feature attributions for supported transactions.
-3. **Enterprise AI Copilot**: A context-aware LLM interface that explains the complex SHAP values to non-technical fraud analysts in plain English.
-4. **DevSecOps & Governance**: Features a live Security Operations Center (SOC) dashboard, OWASP Top 10 defenses (HttpOnly cookies, Argon2id), and an immutable Audit Log.
+3. **Enterprise AI Copilot**: A hybrid assistant for fraud analysts. The conversational Chat Assistant is a real Google Gemini 1.5 Flash LLM integration (with graceful fallbacks), while the Executive Reports and Transaction Summaries are deterministically generated via templates for guaranteed accuracy.
+4. **DevSecOps & Governance**: Features a live Security Operations Center (SOC) dashboard, OWASP Top 10 defenses (strict header-based JWTs, bcrypt), and an immutable Audit Log.
 5. **Premium Motion UI**: Cinematic route transitions, branded neural loading experiences, and interactive ECharts data visualization.
 
 ---
@@ -49,10 +49,10 @@ Unlike typical Jupyter Notebook data science projects, FraudShield AI wraps the 
 
 ```mermaid
 graph TD
-    Client[Web Client - React/Vite] -->|HTTPS| Proxy[NGINX Reverse Proxy]
-    Proxy --> Frontend[Static Assets]
-    Proxy -->|/api| Gateway[Flask Backend]
-    Gateway --> Auth[Auth Service - JWT/Argon2id]
+    Client[Web Client - React/Vite] -->|HTTPS| Frontend[Frontend NGINX Container]
+    Frontend -->|Static Assets| Browser[(User Browser)]
+    Frontend -->|/api on Port 5000| Gateway[Flask Backend]
+    Gateway --> Auth[Auth Service - JWT/bcrypt]
     Gateway --> Inference[ML Inference Service]
     Gateway --> Explain[XAI Engine - SHAP]
     

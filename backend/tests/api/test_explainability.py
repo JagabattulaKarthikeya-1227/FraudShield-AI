@@ -147,4 +147,4 @@ def test_explainability_missing_prediction_returns_404(client, admin_token, monk
     
     err_data = json.loads(exp_resp.data)
     assert not err_data["success"]
-    assert "Prediction/explanation unavailable" in err_data["error"]["message"]
+    assert "Prediction/explanation unavailable" in err_data["message"]

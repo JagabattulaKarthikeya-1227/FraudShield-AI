@@ -11,7 +11,7 @@ All notable changes to the FraudShield AI project will be documented in this fil
 - **DevSecOps Architecture**: 
   - Created the `SystemHealth.tsx` SRE dashboard.
   - Implemented immutable Audit Logging.
-  - Integrated custom JWT authentication utilizing Argon2id hashing and HttpOnly cookies for OWASP compliance.
+  - Integrated custom JWT authentication utilizing bcrypt hashing and strict header-based transport for OWASP compliance.
 - **Premium Frontend UX**:
   - Engineered a custom React Three Fiber 3D globe visualization.
   - Built cinematic page transitions utilizing Framer Motion (`AnimatePresence`).

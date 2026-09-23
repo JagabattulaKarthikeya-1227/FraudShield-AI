@@ -66,7 +66,7 @@ def summarize_case(tx_id):
     if not tx:
         raise AppError("Transaction not found", 404)
 
-    summary = f"AI Summary for {tx_id}: Transaction Amount: {tx.amount} {tx.currency}. Merchant: {tx.merchant}. Status: {tx.status.value}."
+    summary = f"Transaction Summary for {tx_id}: Transaction Amount: {tx.amount} {tx.currency}. Merchant: {tx.merchant}. Status: {tx.status.value}."
     
     if tx.prediction and tx.prediction.risk_score is not None:
         score = tx.prediction.risk_score

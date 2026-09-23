@@ -107,6 +107,7 @@ def _build_service(tmp_path, config_path, batch_size=1):
             pickle.load(f)
         scaler = MagicMock()
         scaler.n_features_in_ = 30
+        scaler.mean_ = np.zeros(30)
         scaler.transform = MagicMock(side_effect=lambda X: X)
         service.scaler = scaler
     except Exception as e:
