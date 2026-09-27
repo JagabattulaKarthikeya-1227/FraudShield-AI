@@ -30,6 +30,8 @@ services:
       - REDIS_URL=redis://redis_cache:6379/0
       - SECRET_KEY=${SECRET_KEY}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.8-flash}
     depends_on:
       mysql_db:
         condition: service_healthy
