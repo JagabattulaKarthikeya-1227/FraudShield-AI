@@ -2,9 +2,8 @@ import { useReducedMotion } from '@/utils/useReducedMotion';
 import { VisibleCanvas } from '@/components/3d/VisibleCanvas';
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { RoundedBox, Float, ContactShadows, Text } from '@react-three/drei';
+import { RoundedBox, Float, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
-import interFontUrl from '@fontsource/inter/files/inter-latin-400-normal.woff2?url';
 
 function Card() {
   const group = useRef<THREE.Group>(null);
@@ -42,18 +41,6 @@ function Card() {
           <meshStandardMaterial color="#D4AF37" metalness={0.8} roughness={0.2} />
         </RoundedBox>
 
-        {/* Branding */}
-        <Text
-          position={[0, -0.4, 0.03]}
-          fontSize={0.2}
-          color="#162A2B"
-          anchorX="center"
-          anchorY="middle"
-          letterSpacing={0.1}
-          font={interFontUrl}
-        >
-          FRAUDSHIELD AI
-        </Text>
       </group>
     </Float>
   );
