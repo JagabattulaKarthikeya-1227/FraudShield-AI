@@ -2,7 +2,7 @@ import { useReducedMotion } from '@/utils/useReducedMotion';
 import { VisibleCanvas } from '@/components/3d/VisibleCanvas';
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Box, Float, Environment } from '@react-three/drei';
+import { Box, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
 const gridData = Array.from({ length: 16 }, (_, i) => ({
@@ -51,7 +51,6 @@ export function ComplianceGrid3D() {
       <VisibleCanvas camera={{ position: [0, 0, 5], fov: 45 }} dpr={[1, 2]}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} color="#F3EFE6" />
-        <Environment preset="city" />
         <Float speed={reducedMotion ? 0 : 1.5} floatIntensity={0.5}>
           <GridCore />
         </Float>
