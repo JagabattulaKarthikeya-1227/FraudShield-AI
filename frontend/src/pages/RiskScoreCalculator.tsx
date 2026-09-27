@@ -24,51 +24,43 @@ const calcSchema = z.object({
 type CalcFields = z.infer<typeof calcSchema>;
 
 // ─── Risk colours ─────────────────────────────────────────────────────────────
-function riskStyles(prob: number) {
-  if (prob < 0.15) return { color: '#10b981', label: 'Low Risk',      bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700' };
-  if (prob < 0.75) return { color: '#f59e0b', label: 'Review Required', bg: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-700' };
-  return                { color: '#e11d48', label: 'High Risk',     bg: 'bg-rose-50',    border: 'border-rose-200',    text: 'text-rose-700' };
+function riskStyles(level?: string) {
+  if (level === 'LOW') return { color: '#10b981', bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700' };
+  if (level === 'CRITICAL') return { color: '#e11d48', bg: 'bg-rose-50', border: 'border-rose-200', text: 'text-rose-700' };
+  return { color: '#f59e0b', bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700' };
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export const RiskScoreCalculator = () => {
-  const [selectedTxId, setSelectedTxId] = useState<string | null>(null);
-
   const { mutate: predict, isPending, isSuccess, isError, data: predictionData, error } = usePredictSingle();
-  const {
-    data: explanationData,
-    isLoading: explanationLoading,
-  } = useTransactionExplanation(selectedTxId);
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<CalcFields>({
     resolver: zodResolver(calcSchema),
   });
 
+  const handlePredictionSuccess = (result: any) => {
+    const rowIndex = result?.data?.dataset_index;
+    if (Number.isInteger(rowIndex)) setValue('transaction_index', rowIndex);
+  };
+
   const handleRandom = () => {
-    // Generate a random index between 0 and 50000 for demo purposes
-    const randIdx = Math.floor(Math.random() * 50000);
-    setValue('transaction_index', randIdx);
+    // The backend selects a real row from the source dataset.
+    predict({}, { onSuccess: handlePredictionSuccess });
   };
 
   const onSubmit = (data: CalcFields) => {
-    // We send only the transaction index to the backend.
-    // The backend securely loads the confidential V1-V28 features directly from the database/CSV
-    // and runs the actual ET+MLP+XGBoost Hybrid Ensemble. 
-    predict(
-      { transaction_index: data.transaction_index ?? 0 },
-      {
-        onSuccess: (result: any) => {
-          const txId = result?.data?.transaction_id;
-          if (txId) setSelectedTxId(String(txId));
-        },
-      }
-    );
+    const payload = data.transaction_index === undefined
+      ? {}
+      : { transaction_index: data.transaction_index };
+    predict(payload, { onSuccess: handlePredictionSuccess });
   };
 
   const prob        = predictionData?.data?.fraud_probability ?? 0;
   const gaugeValue  = predictionData?.data?.risk_score ?? 0;
-  const rs          = riskStyles(prob);
+  const rs          = riskStyles(predictionData?.data?.risk_level);
   const txAmount    = predictionData?.data?.transaction_amount;
+  const datasetIndex = predictionData?.data?.dataset_index;
+  const datasetLabel = predictionData?.data?.dataset_label;
 
   return (
     <div className="flex-1 flex flex-col lg:flex-row w-full gap-6 lg:items-stretch pt-2">
@@ -82,14 +74,14 @@ export const RiskScoreCalculator = () => {
                 <span className="text-xs font-bold uppercase tracking-widest text-white/80">Live AI Inference</span>
               </div>
               <h1 className="text-2xl font-bold leading-tight mb-1">Risk Score Calculator</h1>
-              <p className="text-sm text-white/70">Historical Transaction Lookup (Powered by Hybrid Ensemble Fraud Classifier)</p>
+              <p className="text-sm text-white/70">Dataset-backed transaction inference</p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-5">
               
               <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 mb-2">
                 <p className="text-xs text-slate-500 mb-3 leading-relaxed">
-                  To ensure 100% accurate predictions, the model runs securely on the backend using the true PCA-transformed features of historical transactions. Enter a Transaction ID to analyze it.
+                  Select a row from creditcard.csv. The backend reads its 30 model features and dataset label; the ensemble calculates the risk score.
                 </p>
                 <Button 
                   type="button" 
@@ -98,13 +90,13 @@ export const RiskScoreCalculator = () => {
                   onClick={handleRandom}
                 >
                   <Search className="w-4 h-4 mr-2 text-slate-400" />
-                  Pick Random Transaction
+                  Pick Dataset Row
                 </Button>
               </div>
 
               {/* Transaction Index */}
               <div className="space-y-1.5">
-                <label htmlFor="calc-tx" className="text-sm font-semibold text-slate-700">Transaction ID (Index)</label>
+                <label htmlFor="calc-tx" className="text-sm font-semibold text-slate-700">Dataset row index</label>
                 <input
                   id="calc-tx"
                   type="number"
@@ -151,7 +143,7 @@ export const RiskScoreCalculator = () => {
                 <div>
                   <h2 className="text-xl font-bold text-slate-800 mb-2">Ready when you are</h2>
                   <p className="text-slate-500 text-sm max-w-xs">
-                    Enter a transaction ID and click "Run Fraud Detection"
+                    Enter a dataset row index or ask the backend to sample a row
                   </p>
                 </div>
               </motion.div>
@@ -201,38 +193,43 @@ export const RiskScoreCalculator = () => {
                   </div>
                 </div>
 
-                {/* SHAP Explanation */}
                 <StaggerContainer className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
                   <StaggerItem>
-                    <div className="flex items-center justify-between mb-5">
-                      <h3 className="text-base font-bold text-slate-900">AI Reasoning</h3>
-                      <span className="text-xs text-slate-400 flex items-center gap-1">
-                        <Info className="w-3 h-3" /> Model Analysis
-                      </span>
+                    <div className="flex items-center gap-2 mb-4">
+                      <Info className="w-4 h-4 text-slate-400" />
+                      <h3 className="text-base font-bold text-slate-900">Dataset & Model Result</h3>
                     </div>
                   </StaggerItem>
-
                   <StaggerItem>
-                    <div className={`pt-2 rounded-xl`}>
-                      <ul className="space-y-2 text-sm text-slate-600">
-                        <li className="flex items-start gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                          The Hybrid Ensemble Fraud Classifier evaluated all 29 encrypted transaction characteristics securely on the backend.
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                          {predictionData?.data?.prediction === 'Fraud' 
-                            ? "Several learned transaction characteristics significantly increased the fraud probability."
-                            : "The overall transaction pattern appears consistent with legitimate behavior."}
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                          The overall fraud probability of {gaugeValue.toFixed(1)}% 
-                          {predictionData?.data?.prediction === 'Fraud' ? ' exceeded ' : ' did not exceed '}
-                          the configured model decision threshold.
-                        </li>
-                      </ul>
-                    </div>
+                    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <dt className="text-slate-500">Source</dt>
+                        <dd className="font-medium text-slate-800">{predictionData?.data?.dataset_source ?? '—'}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-slate-500">Dataset row</dt>
+                        <dd className="font-medium text-slate-800">{datasetIndex ?? '—'}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-slate-500">Dataset label (ground truth)</dt>
+                        <dd className="font-medium text-slate-800">{datasetLabel ?? '—'}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-slate-500">Model prediction</dt>
+                        <dd className="font-medium text-slate-800">{predictionData?.data?.prediction ?? '—'}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-slate-500">Backend risk score</dt>
+                        <dd className="font-medium text-slate-800">{gaugeValue.toFixed(1)}%</dd>
+                      </div>
+                      <div>
+                        <dt className="text-slate-500">Backend recommended action</dt>
+                        <dd className="font-medium text-slate-800">{predictionData?.data?.recommended_action ?? '—'}</dd>
+                      </div>
+                    </dl>
+                    <p className="mt-4 text-xs text-slate-500">
+                      Transaction inputs and ground-truth label are from the dataset. Risk score, prediction, and action are returned by the backend model; the frontend does not invent metric values.
+                    </p>
                   </StaggerItem>
                 </StaggerContainer>
 
