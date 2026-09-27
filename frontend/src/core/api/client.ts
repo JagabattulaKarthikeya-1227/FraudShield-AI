@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '@/store/authStore';
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api/v1',
   // No withCredentials — backend uses header-only JWT, no cookies
   headers: {
     'Content-Type': 'application/json',
