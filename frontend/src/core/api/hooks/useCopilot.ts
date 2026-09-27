@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../client';
+import { useAuthStore } from '@/store/authStore';
 import { useCopilotContext } from '../../context/CopilotContext';
 
 export function useCopilotChat() {
@@ -16,11 +17,13 @@ export function useCopilotChat() {
       const baseURL = apiClient.defaults.baseURL || 'http://localhost:5000/api/v1';
       const endpoint = baseURL.endsWith('/api/v1') ? baseURL + '/copilot/chat' : baseURL + '/api/v1/copilot/chat';
 
+      const accessToken = useAuthStore.getState().accessToken;
       const response = await fetch(endpoint, {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
         body: JSON.stringify({ 
           query,
