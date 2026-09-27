@@ -6,7 +6,6 @@ import {
   RoundedBox, 
   ContactShadows, 
   OrbitControls,
-  Text,
   Float,
   Points,
   PointMaterial
@@ -94,30 +93,6 @@ function PremiumCard() {
           <meshStandardMaterial color="#b8860b" metalness={1} roughness={0.4} />
         </mesh>
 
-        {/* Branding - Embossed Effect */}
-        <Text
-          position={[-1.4, -0.7, 0.026]}
-          fontSize={0.25}
-          color="#E2E8F0"
-          anchorX="left"
-          anchorY="middle"
-          letterSpacing={0.1}
-          fontWeight={800}
-          font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZhrib2Bg-4.ttf"
-        >
-          FRAUDSHIELD
-        </Text>
-        <Text
-          position={[-1.4, -0.9, 0.026]}
-          fontSize={0.12}
-          color="#14B8A6"
-          anchorX="left"
-          anchorY="middle"
-          letterSpacing={0.2}
-          fontWeight={600}
-        >
-          ENTERPRISE AI
-        </Text>
 
         {/* Minimal Holographic Sticker */}
         <mesh position={[1.3, 0.7, 0.026]}>
@@ -139,20 +114,6 @@ function PremiumCard() {
           <meshStandardMaterial color="#f1f5f9" metalness={0.1} roughness={0.9} />
         </mesh>
 
-        {/* Fine Print */}
-        <Text
-          position={[0, -0.7, -0.026]}
-          rotation={[0, Math.PI, 0]}
-          fontSize={0.06}
-          color="#94a3b8"
-          anchorX="center"
-          anchorY="middle"
-          maxWidth={3.0}
-          textAlign="center"
-        >
-          This card is the property of FraudShield AI. Misuse is a violation of international security protocols.
-          For enterprise support, visit fraudshield.ai/support.
-        </Text>
       </RoundedBox>
     </group>
   );
