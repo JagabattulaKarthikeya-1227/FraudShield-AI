@@ -1,7 +1,7 @@
 import { VisibleCanvas } from '@/components/3d/VisibleCanvas';
 import React from "react";
 export * from './CreditCardScene';
-import { OrbitControls, Environment, Sphere, Box } from "@react-three/drei";
+import { OrbitControls, Sphere, Box } from "@react-three/drei";
 
 import { useReducedMotion } from '@/utils/useReducedMotion';
 
@@ -13,7 +13,6 @@ export const SceneWrapper: React.FC<{ children: React.ReactNode; className?: str
       <VisibleCanvas camera={{ position: [0, 0, 5], fov: 45 }}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
-        <Environment preset="city" />
         {children}
         <OrbitControls enableZoom={false} autoRotate={!reducedMotion} autoRotateSpeed={0.5} />
       </VisibleCanvas>
