@@ -23,14 +23,15 @@ def get_transaction_explanation(tx_id):
         raise AppError("Prediction/explanation unavailable", 404)
 
     probability = float(tx.prediction.risk_score)
-    from app.api.v1.predict import get_inference_service
-    engine = get_inference_service()
-    risk_level, _ = engine._determine_risk(probability)
-    is_high_risk = risk_level == "High Risk"
-    is_medium_risk = risk_level == "Review Required"
 
     # Customer View: plain-English NLP explanation only
     if user.role.value == "Customer":
+        from app.api.v1.predict import get_inference_service
+        engine = get_inference_service()
+        risk_level, _ = engine._determine_risk(probability)
+        is_high_risk = risk_level == "High Risk"
+        is_medium_risk = risk_level == "Review Required"
+
         if is_high_risk:
             msg = "This transaction was flagged by the risk engine due to its evaluated characteristics and amount."
         elif is_medium_risk:
@@ -43,27 +44,28 @@ def get_transaction_explanation(tx_id):
         )
 
     # Analyst / Admin View: dynamic SHAP feature contributions
-    shap_features = []
-    base_value = 0.0
-
-    # Read from database if already computed
-    if tx.prediction and tx.prediction.shap_values and isinstance(tx.prediction.shap_values, dict):
-        base_value = tx.prediction.shap_values.get("base_value", 0.0)
-        features_dict = tx.prediction.shap_values.get("features", {})
-        shap_features = [
-            {"name": k, "value": round(float(v), 4), "contribution": round(float(v), 4)}
-            for k, v in features_dict.items()
-        ]
-    else:
+    shap_values = tx.prediction.shap_values
+    if not shap_values or not isinstance(shap_values, dict):
         from app.core.exceptions import ModelNotReadyError
         raise ModelNotReadyError("SHAP explainer is unavailable.")
 
+    from app.api.v1.predict import get_inference_service
+    engine = get_inference_service()
+    risk_level, _ = engine._determine_risk(probability)
+
+    shap_features = [
+        {"name": key, "value": round(float(value), 4), "contribution": round(float(value), 4)}
+        for key, value in shap_values.get("features", {}).items()
+    ]
     return success_response(
         data={
             "explanation_type": "technical",
             "probability": probability,
             "risk_level": risk_level,
-            "shap_summary": {"base_value": base_value, "features": shap_features},
+            "shap_summary": {
+                "base_value": shap_values.get("base_value", 0.0),
+                "features": shap_features,
+            },
         }
     )
 

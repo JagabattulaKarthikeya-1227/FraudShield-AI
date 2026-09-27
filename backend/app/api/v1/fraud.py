@@ -1,8 +1,14 @@
 from flask import Blueprint, request, current_app
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_current_user
 from app.core.responses import success_response
 from app.core.exceptions import AppError
 from app.api.v1.predict import get_inference_service
+from app.ml.schema import CANONICAL_FEATURES
+from app.database.core import db
+from app.models.transaction import Transaction, TransactionStatus
+from app.models.prediction import Prediction
+from app.models.audit import AuditLog
+from app.models.misc import Notification
 import random
 import pandas as pd
 import os
@@ -75,10 +81,13 @@ def predict():
         transaction_index = int(sampled.index[0])
         row = sampled.iloc[0]
 
-    # Build the full 30-feature dict (Time, V1-V28, Amount) for the ensemble
-    features_dict = row.to_dict()
+    # Build the full 30-feature dict without the target Class column
+    features_dict = {
+        name: row[name]
+        for name in CANONICAL_FEATURES
+    }
 
-    # Run through the stacked ensemble (Extra Trees + MLP + XGBoost)
+    # Run through the stacked ensemble
     engine = get_inference_service()
     result = engine.predict_single(features_dict)
 
@@ -94,9 +103,80 @@ def predict():
         result["risk_level"], ("MEDIUM", "Review")
     )
 
+    # Persist the demo prediction so the returned ID can be used by the
+    # explainability endpoint. The old TX-{dataset index} value was not a
+    # database transaction ID and therefore always produced a 404.
+    user = get_current_user()
+    status_mapping = {
+        "approve": TransactionStatus.APPROVED,
+        "flag": TransactionStatus.FLAGGED,
+        "decline": TransactionStatus.DECLINED,
+    }
+    tx_status = status_mapping.get(
+        result["suggested_action"], TransactionStatus.PENDING
+    )
+    from datetime import datetime, timezone
+
+    tx = Transaction(
+        user_id=user.id,
+        merchant=data.get("Merchant", "Historical Transaction"),
+        category=data.get("Category", "General"),
+        amount=float(row.get("Amount", 0.0)),
+        status=tx_status,
+        transaction_date=datetime.now(timezone.utc),
+    )
+    db.session.add(tx)
+    db.session.flush()
+
+    shap_values_dict = None
+    try:
+        base_value, shap_features = engine.get_shap_explanation(features_dict)
+        shap_values_dict = {
+            "base_value": base_value,
+            "features": {
+                CANONICAL_FEATURES[i]: float(shap_features[i])
+                for i in range(len(CANONICAL_FEATURES))
+            },
+        }
+    except Exception as exc:
+        current_app.logger.warning(
+            f"Failed to compute SHAP values for demo prediction: {exc}"
+        )
+
+    db.session.add(
+        Prediction(
+            transaction_id=tx.id,
+            model_version=engine.active_record["version_id"],
+            risk_score=prob,
+            shap_values=shap_values_dict,
+        )
+    )
+    db.session.add(
+        AuditLog(
+            user_id=user.id,
+            action="AI_PREDICTION_GENERATED",
+            entity_type="Transaction",
+            entity_id=tx.id,
+            details={
+                "risk_level": result["risk_level"],
+                "action": result["suggested_action"],
+            },
+        )
+    )
+    if result["suggested_action"] != "approve":
+        db.session.add(
+            Notification(
+                user_id=user.id,
+                title=f"Transaction {result['risk_level']}",
+                message=f"Your transaction at {tx.merchant} requires attention.",
+                type="alert",
+            )
+        )
+    db.session.commit()
+
     # Return clean response — V1-V28 values are never forwarded to the frontend
     clean_response = {
-        "transaction_id": f"TX-{transaction_index}",
+        "transaction_id": tx.id,
         "transaction_amount": float(row.get("Amount", 0.0)),
         "fraud_probability": round(prob, 4),
         "risk_score": round(prob * 100.0, 2),
@@ -110,3 +190,4 @@ def predict():
     return success_response(
         data=clean_response, message="Prediction completed successfully."
     )
+
