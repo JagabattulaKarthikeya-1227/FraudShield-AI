@@ -2,7 +2,7 @@ import { useReducedMotion } from '@/utils/useReducedMotion';
 import { VisibleCanvas } from '@/components/3d/VisibleCanvas';
 import React, { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Sphere, Float, Environment, Points, PointMaterial } from '@react-three/drei';
+import { Sphere, Float, Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
 function RiskParticles() {
@@ -58,7 +58,6 @@ export function RiskSphere() {
       <VisibleCanvas camera={{ position: [0, 0, 5], fov: 45 }} dpr={[1, 2]}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1.5} color="#F3EFE6" />
-        <Environment preset="city" />
         
         <Float speed={reducedMotion ? 0 : 1.5} rotationIntensity={0.5} floatIntensity={1}>
           <Sphere args={[2, 64, 64]}>

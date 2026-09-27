@@ -2,7 +2,7 @@ import { useReducedMotion } from '@/utils/useReducedMotion';
 import { VisibleCanvas } from '@/components/3d/VisibleCanvas';
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Float, Environment, Cylinder } from '@react-three/drei';
+import { Float, Cylinder } from '@react-three/drei';
 import * as THREE from 'three';
 
 function ShieldCore() {
@@ -50,7 +50,6 @@ export function SecurityShield3D() {
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={2} color="#ffffff" />
         <directionalLight position={[-10, -10, -5]} intensity={0.5} color="#D9A441" />
-        <Environment preset="city" />
         <Float speed={reducedMotion ? 0 : 1.5} rotationIntensity={0.2} floatIntensity={0.5}>
           <ShieldCore />
         </Float>
