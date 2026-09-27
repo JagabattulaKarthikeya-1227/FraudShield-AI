@@ -68,9 +68,12 @@ def predict():
 
     if transaction_index is not None:
         try:
-            row = df.iloc[int(transaction_index)]
-        except IndexError:
+            transaction_index = int(transaction_index)
+        except (TypeError, ValueError, OverflowError):
+            raise AppError("Transaction index must be an integer.", 400)
+        if transaction_index < 0 or transaction_index >= len(df):
             raise AppError("Transaction index out of bounds", 404)
+        row = df.iloc[transaction_index]
     else:
         # Force 50/50 split for meaningful demo coverage
         is_fraud = random.choice([True, False])
@@ -119,8 +122,8 @@ def predict():
 
     tx = Transaction(
         user_id=user.id,
-        merchant=data.get("Merchant", "Historical Transaction"),
-        category=data.get("Category", "General"),
+        merchant="Kaggle Credit Card Fraud dataset",
+        category="Not provided by source dataset",
         amount=float(row.get("Amount", 0.0)),
         status=tx_status,
         transaction_date=datetime.now(timezone.utc),
@@ -177,7 +180,10 @@ def predict():
     # Return clean response — V1-V28 values are never forwarded to the frontend
     clean_response = {
         "transaction_id": tx.id,
-        "transaction_amount": float(row.get("Amount", 0.0)),
+        "dataset_source": "creditcard.csv",
+        "dataset_index": int(transaction_index),
+        "dataset_label": "Fraud" if int(row["Class"]) == 1 else "Normal",
+        "transaction_amount": float(row["Amount"]),
         "fraud_probability": round(prob, 4),
         "risk_score": round(prob * 100.0, 2),
         "prediction": "Fraud" if prob >= 0.75 else "Normal",
