@@ -3,7 +3,6 @@ import { VisibleCanvas } from '@/components/3d/VisibleCanvas';
 import React, { useRef, useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { 
-  Environment, 
   RoundedBox, 
   ContactShadows, 
   OrbitControls,
@@ -234,7 +233,6 @@ export function Hero3DScene() {
         <React.Suspense fallback={null}>
           <FadeInOverlay />
           {/* HDRI Lighting Setup */}
-          <Environment preset="city" />
           
           <spotLight position={[5, 5, 5]} intensity={2.5} angle={0.4} penumbra={1} color="#ffffff" castShadow />
           <directionalLight position={[-5, 2, 5]} intensity={1.5} color="#fff1e6" />
