@@ -2,7 +2,7 @@ import { useReducedMotion } from '@/utils/useReducedMotion';
 import { VisibleCanvas } from '@/components/3d/VisibleCanvas';
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Sphere, Line, Float, Environment, Html } from '@react-three/drei';
+import { Sphere, Line, Float, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
 const nodes = [
@@ -84,7 +84,6 @@ export function NeuralNetwork3D() {
       <VisibleCanvas camera={{ position: [0, 0, 7], fov: 45 }} dpr={[1, 2]}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1} color="#F3EFE6" />
-        <Environment preset="city" />
         <Network />
       </VisibleCanvas>
     </div>
